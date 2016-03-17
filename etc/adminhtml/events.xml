@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="admin_system_config_changed_section_algoliasearch_instant">
+        <observer name="algoliasearch_instant_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_credentials">
+        <observer name="algoliasearch_credentials_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_autocomplete">
+        <observer name="algoliasearch_autocomplete_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_categories">
+        <observer name="algoliasearch_categories_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_images">
+        <observer name="algoliasearch_images_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_queue">
+        <observer name="algoliasearch_queue_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_advanced">
+        <observer name="algoliasearch_advanced_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_products">
+        <observer name="algoliasearch_products_saved" instance="Algolia\AlgoliaSearch\Model\Observer\SaveSettings" />
+    </event>
+</config>

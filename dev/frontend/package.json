@@ -1,0 +1,15 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "./scripts/build.sh"
+  },
+  "dependencies": {
+    "algoliasearch-extensions-bundle": "^4.3.2"
+  },
+  "author": "Algolia <support@algolia.com>",
+  "license": "ISC"
+}

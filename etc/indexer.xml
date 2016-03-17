@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Indexer/etc/indexer.xsd">
+    <indexer id="algolia_products" view_id="algolia_products" class="Algolia\AlgoliaSearch\Model\Indexer\Product">
+        <title translate="true">Algolia Search Products</title>
+        <description translate="true">
+            Rebuild products index.
+        </description>
+    </indexer>
+    <indexer id="algolia_categories" view_id="algolia_categories" class="Algolia\AlgoliaSearch\Model\Indexer\Category">
+        <title translate="true">Algolia Search Categories</title>
+        <description translate="true">
+            Rebuild categories index.
+        </description>
+    </indexer>
+    <indexer id="algolia_pages" view_id="algolia_pages" class="Algolia\AlgoliaSearch\Model\Indexer\Page">
+        <title translate="true">Algolia Search Page</title>
+        <description translate="true">
+            Rebuild pages index.
+        </description>
+    </indexer>
+    <indexer id="algolia_suggestions" view_id="algolia_suggestions" class="Algolia\AlgoliaSearch\Model\Indexer\Suggestion">
+        <title translate="true">Algolia Search Suggestions</title>
+        <description translate="true">
+            Rebuild suggestion index.
+        </description>
+    </indexer>
+    <indexer id="algolia_additional_sections" view_id="algolia_additional_sections" class="Algolia\AlgoliaSearch\Model\Indexer\AdditionalSection">
+        <title translate="true">Algolia Search Suggestions</title>
+        <description translate="true">
+            Rebuild additional sections index.
+        </description>
+    </indexer>
+</config>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Algolia_AlgoliaSearch::algoliaBundle.min.js"/>
+        <css src="Algolia_AlgoliaSearch::algoliasearch.css" />
+    </head>
+    <referenceBlock name="head.additional">
+        <block type="core/template" template="polyfill.phtml" class="Algolia\AlgoliaSearch\Block\Algolia"/>
+        <block type="core/template" template="beforetopsearch.phtml" class="Algolia\AlgoliaSearch\Block\Algolia"/>
+    </referenceBlock>
+    <referenceBlock name="main.content">
+        <block type="core/template" before="-" template="beforecontent.phtml" class="Algolia\AlgoliaSearch\Block\Algolia"/>
+    </referenceBlock>
+</page>

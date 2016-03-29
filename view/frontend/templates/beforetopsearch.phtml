@@ -82,6 +82,7 @@ if ($this->config->isInstantEnabled() && $isSearchPage) {
 <script>
     requirejs(['algoliaBundle'], function(algoliaBundle) {
         algoliaBundle.$(function ($) {
+            document.body.innerHTML = document.body.innerHTML.replace(/__empty__/g, '');
             window.algoliaConfig = {
                 instant: {
                     enabled: <?php echo $this->config->isInstantEnabled() ? "true" : "false"; ?>,

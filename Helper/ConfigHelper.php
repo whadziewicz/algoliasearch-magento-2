@@ -44,13 +44,13 @@ class ConfigHelper
     const CATEGORY_CUSTOM_RANKING              = 'algoliasearch_categories/categories/custom_ranking_category_attributes';
 
     const IS_ACTIVE                            = 'algoliasearch_queue/queue/active';
-    const NUMBER_OF_ELEMENT_BY_PAGE            = 'algoliasearch_queue/queue/number_of_element_by_page';
     const NUMBER_OF_JOB_TO_RUN                 = 'algoliasearch_queue/queue/number_of_job_to_run';
 
     const XML_PATH_IMAGE_WIDTH                 = 'algoliasearch_image/image/width';
     const XML_PATH_IMAGE_HEIGHT                = 'algoliasearch_image/image/height';
     const XML_PATH_IMAGE_TYPE                  = 'algoliasearch_image/image/type';
 
+    const NUMBER_OF_ELEMENT_BY_PAGE            = 'algoliasearch_advanced/advanced/number_of_element_by_page';
     const REMOVE_IF_NO_RESULT                  = 'algoliasearch_advanced/advanced/remove_words_if_no_result';
     const PARTIAL_UPDATES                      = 'algoliasearch_advanced/advanced/partial_update';
     const CUSTOMER_GROUPS_ENABLE               = 'algoliasearch_advanced/advanced/customer_groups_enable';

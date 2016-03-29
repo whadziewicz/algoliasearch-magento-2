@@ -17,18 +17,18 @@
         </algoliasearch_credentials>
         <algoliasearch_autocomplete>
             <autocomplete>
-                <nb_of_products_suggestions></nb_of_products_suggestions>
-                <nb_of_categories_suggestions></nb_of_categories_suggestions>
-                <nb_of_queries_suggestions></nb_of_queries_suggestions>
-                <min_popularity></min_popularity>
-                <min_number_of_results></min_number_of_results>
-                <sections></sections>
+                <nb_of_products_suggestions>6</nb_of_products_suggestions>
+                <nb_of_categories_suggestions>2</nb_of_categories_suggestions>
+                <nb_of_queries_suggestions>0</nb_of_queries_suggestions>
+                <min_popularity>1000</min_popularity>
+                <min_number_of_results>2</min_number_of_results>
+                <sections>a:1:{s:18:"_1459261980310_310";a:3:{s:4:"name";s:5:"pages";s:5:"label";s:5:"Pages";s:11:"hitsPerPage";s:1:"2";}}</sections>
                 <excluded_pages></excluded_pages>
             </autocomplete>
         </algoliasearch_autocomplete>
         <algoliasearch_instant>
             <instant>
-                <instant_selector>6</instant_selector>
+                <instant_selector>.columns</instant_selector>
                 <facets>a:3:{s:18:"_1432907948596_596";a:3:{s:9:"attribute";s:5:"price";s:4:"type";s:6:"slider";s:5:"label";s:5:"Price";}s:18:"_1432907963376_376";a:3:{s:9:"attribute";s:10:"categories";s:4:"type";s:11:"conjunctive";s:5:"label";s:10:"Categories";}s:17:"_1447846054032_32";a:3:{s:9:"attribute";s:5:"color";s:4:"type";s:11:"disjunctive";s:5:"label";s:6:"Colors";}}</facets>
                 <max_values_per_facet>10</max_values_per_facet>
                 <sorts>a:3:{s:18:"_1432908018844_844";a:3:{s:9:"attribute";s:5:"price";s:4:"sort";s:3:"asc";s:5:"label";s:12:"Lowest price";}s:18:"_1432908022539_539";a:3:{s:9:"attribute";s:5:"price";s:4:"sort";s:4:"desc";s:5:"label";s:13:"Highest price";}s:18:"_1433768597454_454";a:3:{s:9:"attribute";s:10:"created_at";s:4:"sort";s:4:"desc";s:5:"label";s:12:"Newest first";}}</sorts>
@@ -57,20 +57,14 @@
                 <type>image</type>
             </image>
         </algoliasearch_images>
-        <algoliasearch_queue>
-            <queue>
-                <active>0</active>
-                <number_of_element_by_page>100</number_of_element_by_page>
-                <number_of_job_to_run>10</number_of_job_to_run>
-            </queue>
-        </algoliasearch_queue>
         <algoliasearch_advanced>
             <advanced>
+                <number_of_element_by_page>100</number_of_element_by_page>
                 <remove_words_if_no_result>allOptional</remove_words_if_no_result>
                 <partial_update>0</partial_update>
                 <customer_groups_enable>0</customer_groups_enable>
                 <make_seo_request>0</make_seo_request>
-                <remove_branding></remove_branding>
+                <remove_branding>0</remove_branding>
                 <autocomplete_selector>.algolia-search-input</autocomplete_selector>
             </advanced>
         </algoliasearch_advanced>

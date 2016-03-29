@@ -104,6 +104,7 @@ class Algolia implements AdapterInterface
     public function query(RequestInterface $request)
     {
         $query = $this->catalogSearchHelper->getEscapedQueryText();
+
         $storeId = $this->storeManager->getStore()->getId();
         $temporaryStorage = $this->temporaryStorageFactory->create();
 
@@ -117,7 +118,7 @@ class Algolia implements AdapterInterface
         }
         else {
             $algolia_query = $query !== '__empty__' ? $query : '';
-            $documents = $this->algoliaHelper->getSearchResult($algolia_query, $storeId);
+            $documents = $this->config->makeSeoRequest($storeId) ? $this->algoliaHelper->getSearchResult($algolia_query, $storeId) : [];
 
             $documents_to_store = array_map(function ($document) {
                 return new \Magento\Framework\Search\Document($document['entity_id'], ['score' => new \Magento\Framework\Search\DocumentField('score', $document['score'])]);

@@ -44,8 +44,11 @@ class Category implements \Magento\Framework\Indexer\ActionInterface, \Magento\F
                 $indexName = $this->categoryHelper->getIndexName($storeId);
                 $this->algoliaHelper->deleteObjects($ids, $indexName);
             }
+            else {
+                $this->fullAction->saveConfigurationToAlgolia($storeId);
+            }
 
-            $this->fullAction->rebuildStorePageIndex($storeId, $ids);
+            $this->fullAction->rebuildStoreCategoryIndex($storeId, $ids);
         }
     }
 

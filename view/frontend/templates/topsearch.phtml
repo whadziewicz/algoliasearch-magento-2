@@ -14,38 +14,6 @@ $price_key = $this->config->isCustomerGroupsEnabled($this->storeManager->getStor
 
 $image_base_url = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
 
-$title = '';
-$description = '';
-$content = '';
-$imgHtml = '';
-
-if($this->config->isInstantEnabled() && $this->config->replaceCategories() && $this->request->getControllerName() == 'category')
-{
-    $category = $this->registry->registry('current_category');
-    $title = $category->getName();
-
-    if ($category && $category->getDisplayMode() !== 'PAGE')
-    {
-        $category->getUrlInstance()->setStore($this->storeManager->getStore()->getStoreId());
-
-        if ($category->getDisplayMode() == 'PRODUCTS_AND_PAGE')
-        {
-            $page           = $category->getLandingPage();
-            $block          = $this->objectManager->create('\Magento\Cms\Model\Block');
-            $cms_block      = $block->load($page);
-
-            $description    = $category->getDescription();
-            $content        = $this->getLayout()->createBlock('cms/block')->setBlockId($page)->toHtml();
-
-            if ($category->getImageUrl())
-            {
-                $imgHtml = '<p class="category-image"><img src="'.$category->getImageUrl().'" alt="'.$this->escapeHtml($category->getName()).'" title="'.$this->escapeHtml($category->getName()).'" /></p>';
-                $imgHtml = $this->helper('catalog/output')->categoryAttribute($category, $imgHtml, 'image');
-            }
-        }
-    }
-}
-
 $placeholder = __('Search for products, categories, ...');
 
 ?>
@@ -221,26 +189,6 @@ $placeholder = __('Search for products, categories, ...');
     <div id="algolia-autocomplete-container"></div>
     {{/findAutocomplete}}
     <div id="algolia_instant_selector" class="<?php echo count($this->config->getFacets()) > 0 ? ' with-facets' : '' ?>">
-
-        <?php if ($title || $imgHtml || $description || $content): ?>
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="algolia-static-content">
-                        <div class="page-title category-title">
-                            <h1><?php echo $title; ?></h1>
-                        </div>
-                        <div>
-                            <?php echo $imgHtml; ?>
-                        </div>
-                        <div class="category-description std">
-                            <?php echo $description; ?>
-                        </div>
-                        <?php echo $content; ?>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
-
         <div class="row">
             <div class="col-md-3" id="algolia-left-container">
                 <div id="refine-toggle" class="visible-xs visible-sm">+ <?php echo __('Refine'); ?></div>
@@ -587,7 +535,10 @@ $placeholder = __('Search for products, categories, ...');
                             }
 
                             content += '</div>';
-                            content += '<?php echo __('or'); ?> <a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=__empty__"><?php echo __('See all products'); ?></a>'
+                            if (algoliaConfig.showSuggestionsOnNoResultsPage && this.suggestions.length > 0) {
+                                content += '<?php echo __('or'); ?>';
+                            }
+                            content += ' <a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=__empty__"><?php echo __('See all products'); ?></a>'
 
                             content += '</div>';
 

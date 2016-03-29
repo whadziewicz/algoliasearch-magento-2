@@ -17,10 +17,7 @@ bin/magento setup:store-config:set --base-url=$BASE_URL
 bin/magento setup:upgrade
 
 # reindex whole index
-#n98-magerun --root-dir=/var/www/htdocs indexer:reindex algolia_search_indexer
-#n98-magerun --root-dir=/var/www/htdocs indexer:reindex algolia_search_indexer_cat
-#n98-magerun --root-dir=/var/www/htdocs indexer:reindex algolia_search_indexer_pages
-#n98-magerun --root-dir=/var/www/htdocs indexer:reindex search_indexer_suggest
+bin/magento indexer:reindex algolia_products algolia_categories algolia_pages algolia_suggestions algolia_additional_sections
 
 # do it after indexing so that var/log doesn't get created as root
 n98-magerun2 --root-dir=/var/www/htdocs config:set dev/log/active 1

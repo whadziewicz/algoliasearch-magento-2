@@ -68,9 +68,10 @@ COPY bin/php.ini /usr/local/etc/php/php.ini
 RUN cd /tmp && curl -O https://phpmyadmin-downloads-532693.c.cdn77.org/phpMyAdmin/4.4.9/phpMyAdmin-4.4.9-english.tar.gz && tar xvf phpMyAdmin-4.4.9-english.tar.gz && mv phpMyAdmin-4.4.9-english /var/www/htdocs/phpmyadmin
 COPY bin/config.inc.php /var/www/htdocs/phpmyadmin/
 
+
 RUN service mysql start && mysql -uroot -e "create database magento;" && service mysql stop
-RUN service mysql start && cd /var/www/htdocs && bin/magento setup:install --backend-frontname="admin" --db-host="localhost" --db-name="magento" --db-user="root" --base-url="http://192.168.99.100" --language="en_US" --currency="EUR" --timezone="Europe/Paris" --admin-use-security-key="0" --admin-user="admin" --admin-password="P4ssw0rd" --admin-firstname="admin" --admin-lastname="admin" --admin-email="admin@admin.com" && service mysql stop
-RUN service mysql start && cd /var/www/htdocs && bin/magento setup:upgrade && service mysql stop
+RUN service mysql start && cd /var/www/htdocs && bin/magento setup:install --backend-frontname="admin" --db-host="localhost" --db-name="magento" --db-user="root" --base-url="http://192.168.99.100" --language="en_US" --currency="EUR" --timezone="Europe/Paris" --admin-use-security-key="0" --admin-user="admin" --admin-password="magentorocks1" --admin-firstname="admin" --admin-lastname="admin" --admin-email="admin@admin.com" && service mysql stop
+RUN service mysql start && cd /var/www/htdocs && bin/magento cache:flush && bin/magento cache:disable && service mysql stop
 
 RUN sed -i "s|www/html|www/htdocs|g" /etc/apache2/apache2.conf
 
@@ -85,7 +86,16 @@ RUN chmod +x /usr/local/bin/start.sh
 
 RUN usermod -a -G root www-data
 RUN usermod -a -G www-data root
-RUN service mysql start && cd /var/www/htdocs && bin/magento setup:static-content:deploy && service mysql stop
+
+COPY ./bin/auth.json /root/.composer/auth.json
+RUN service mysql start && composer require algolia/algoliasearch-magento-2:dev-master && bin/magento setup:upgrade && bin/magento setup:static-content:deploy && service mysql stop
+
+#RUN echo "<Directory /var/www/>\n\tAllowOverride All\n\tRequire all granted\n</Directory>" > /etc/apache2/apache2.conf
+RUN sed -i 's/name="login\[username\]"/name="login[username]" value="admin"/g' /var/www/htdocs/vendor/magento/module-backend/view/adminhtml/templates/admin/login.phtml && \
+	sed -i 's/name="login\[password\]"/name="login[password]" class="required-entry input-text" value="magentorocks1"/g' /var/www/htdocs/vendor/magento/module-backend/view/adminhtml/templates/admin/login.phtml && \
+	sed -i 's/<\/form>/<\/form><script>document.addEventListener\("DOMContentLoaded", function\(\) {algoliaAdminBundle.\$\(function \(\$\) \{ \$\("#login-form"\).submit\(\); \}\);\}\);<\/script>/g' /var/www/htdocs/vendor/magento/module-backend/view/adminhtml/templates/admin/login.phtml
+
+RUN sed -i 's/MaterializationStrategy\\Copy/MaterializationStrategy\\Symlink/g' /var/www/htdocs/app/etc/di.xml
 
 EXPOSE 80
 CMD start.sh

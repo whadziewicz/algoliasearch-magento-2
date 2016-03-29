@@ -19,7 +19,7 @@
         </description>
     </indexer>
     <indexer id="algolia_pages" view_id="algolia_pages" class="Algolia\AlgoliaSearch\Model\Indexer\Page">
-        <title translate="true">Algolia Search Page</title>
+        <title translate="true">Algolia Search Pages</title>
         <description translate="true">
             Rebuild pages index.
         </description>

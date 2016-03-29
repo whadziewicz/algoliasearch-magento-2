@@ -43,6 +43,9 @@ class Product implements \Magento\Framework\Indexer\ActionInterface, \Magento\Fr
                 $indexName = $this->productHelper->getIndexName($storeId);
                 $this->algoliaHelper->deleteObjects($ids, $indexName);
             }
+            else {
+                $this->fullAction->saveConfigurationToAlgolia($storeId);
+            }
 
             $this->fullAction->rebuildStoreProductIndex($storeId, $ids);
         }

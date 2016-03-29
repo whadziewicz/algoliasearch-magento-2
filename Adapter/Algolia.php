@@ -17,6 +17,7 @@ use Magento\Framework\Search\AdapterInterface;
 use Magento\Framework\Search\RequestInterface;
 use Magento\CatalogSearch\Helper\Data;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Request\Http;
 use \Algolia\AlgoliaSearch\Helper\Data as AlgoliaHelper;
 
 /**
@@ -69,6 +70,8 @@ class Algolia implements AdapterInterface
      */
     protected $algoliaHelper;
 
+    protected $request;
+
     /**
      * @param Mapper $mapper
      * @param ResponseFactory $responseFactory
@@ -85,7 +88,8 @@ class Algolia implements AdapterInterface
         ConfigHelper $config,
         Data $catalogSearchHelper,
         StoreManagerInterface $storeManager,
-        AlgoliaHelper $algoliaHelper
+        AlgoliaHelper $algoliaHelper,
+        Http $request
     ) {
         $this->mapper = $mapper;
         $this->responseFactory = $responseFactory;
@@ -96,6 +100,7 @@ class Algolia implements AdapterInterface
         $this->catalogSearchHelper = $catalogSearchHelper;
         $this->storeManager = $storeManager;
         $this->algoliaHelper = $algoliaHelper;
+        $this->request = $request;
     }
 
     /**
@@ -111,7 +116,9 @@ class Algolia implements AdapterInterface
         $documents = [];
         $table = null;
 
-        if (! $this->config->getApplicationID($storeId) || ! $this->config->getAPIKey($storeId) || $this->config->isEnabledFrontEnd($storeId) === false) {
+        if (! $this->config->getApplicationID($storeId) || ! $this->config->getAPIKey($storeId) || $this->config->isEnabledFrontEnd($storeId) === false ||
+            ($this->request->getControllerName() === 'category' && $this->config->replaceCategories($storeId) == false)
+        ) {
             $query = $this->mapper->buildQuery($request);
             $table = $temporaryStorage->storeDocumentsFromSelect($query);
             $documents = $this->getDocuments($table);

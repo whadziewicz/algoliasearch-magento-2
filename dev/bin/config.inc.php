@@ -18,4 +18,4 @@ $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';
 
 $cfg['Servers'][$i]['user'] = 'root';
-$cfg['Servers'][$i]['password'] = 'P4ssw0rd';
+$cfg['Servers'][$i]['password'] = '';

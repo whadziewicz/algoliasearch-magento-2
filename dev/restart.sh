@@ -8,7 +8,7 @@ INDEX_PREFIX=magento_
 BASE_URL=http://mymagentostore.com/
 
 cd `dirname "$0"`
-docker build -t algolia/algoliasearch-magento . || exit 1
+docker build -t algolia/algoliasearch-magento-2 . || exit 1
 echo "=============================================================="
 echo "||        DOCKER IMAGE SUCCESSFULLY REBUILT                 ||"
 echo "=============================================================="
@@ -84,8 +84,8 @@ ensure "-k" "$API_KEY"
 ensure "-s" "$SEARCH_ONLY_API_KEY"
 ensure "-b" "$BASE_URL"
 
-docker stop algoliasearch-magento > /dev/null 2>&1 || true
-docker rm algoliasearch-magento > /dev/null 2>&1 || true
+docker stop algoliasearch-magento-2 > /dev/null 2>&1 || true
+docker rm algoliasearch-magento-2 > /dev/null 2>&1 || true
 
 echo "     APPLICATION_ID: $APPLICATION_ID"
 echo "            API_KEY: $API_KEY"
@@ -94,13 +94,14 @@ echo "       INDEX_PREFIX: $INDEX_PREFIX"
 echo "           BASE_URL: $BASE_URL"
 echo ""
 
+#-v "`pwd`/..":/var/www/htdocs/.modman/algoliasearch-magento \
+
 docker run -p 80:80 \
-  -v "`pwd`/..":/var/www/htdocs/.modman/algoliasearch-magento \
   -e APPLICATION_ID=$APPLICATION_ID \
   -e SEARCH_ONLY_API_KEY=$SEARCH_ONLY_API_KEY \
   -e API_KEY=$API_KEY \
   -e INDEX_PREFIX=$INDEX_PREFIX \
   -e BASE_URL=$BASE_URL \
   -d \
-  --name algoliasearch-magento \
-  -t algolia/algoliasearch-magento
+  --name algoliasearch-magento-2 \
+  -t algolia/algoliasearch-magento-2

@@ -4,7 +4,7 @@ namespace Algolia\AlgoliaSearch\Model\Source;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\CategoryHelper;
-use Algolia\AlgoliaSearch\Helper\Entity\Producthelper;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
 use Magento\Framework\DataObject;
@@ -22,7 +22,7 @@ abstract class AbstractTable extends AbstractFieldArray
     abstract protected function getTableData();
 
     public function __construct(Context $context,
-                                Producthelper $producthelper,
+                                ProductHelper $producthelper,
                                 CategoryHelper $categoryHelper,
                                 ConfigHelper $configHelper,
                                 array $data = [])

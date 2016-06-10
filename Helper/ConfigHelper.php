@@ -280,7 +280,7 @@ class ConfigHelper
 
     public function getSortingIndices($storeId = null)
     {
-        $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\Producthelper');
+        $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\ProductHelper');
 
         $attrs = unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
 

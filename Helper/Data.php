@@ -5,7 +5,7 @@ namespace Algolia\AlgoliaSearch\Helper;
 use Algolia\AlgoliaSearch\Helper\Entity\AdditionalSectionHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\CategoryHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\PageHelper;
-use Algolia\AlgoliaSearch\Helper\Entity\Producthelper;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
@@ -30,7 +30,7 @@ class Data
 
     public function __construct(AlgoliaHelper $algoliaHelper,
                                 ConfigHelper $configHelper,
-                                Producthelper $producthelper,
+                                ProductHelper $producthelper,
                                 CategoryHelper $categoryHelper,
                                 PageHelper $pageHelper,
                                 SuggestionHelper $suggestionHelper,

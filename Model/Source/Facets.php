@@ -2,7 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Model\Source;
 
-use Algolia\AlgoliaSearch\Helper\Entity\Producthelper;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Algolia\AlgoliaSearch\Model\Source\Contracts\AttributesGetter;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;

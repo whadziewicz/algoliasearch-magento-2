@@ -41,6 +41,8 @@ abstract class BaseHelper
     protected $catalogHelper;
     protected $queryResource;
 
+    protected $storeUrls;
+
     abstract protected function getIndexNameSuffix();
 
     public function __construct(Config $eavConfig,
@@ -264,16 +266,15 @@ abstract class BaseHelper
         return $categoryName;
     }
 
-    public static function getStores($store_id)
+    public function getStores($store_id)
     {
-        $config = Mage::helper('algoliasearch/config');
         $store_ids = array();
 
         if ($store_id == null)
         {
-            foreach (Mage::app()->getStores() as $store)
+            foreach ($this->storeManager->getStores() as $store)
             {
-                if ($config->isEnabledBackEnd($store->getId()) === false)
+                if ($this->config->isEnabledBackEnd($store->getId()) === false)
                     continue;
 
                 if ($store->getIsActive())
@@ -285,6 +286,33 @@ abstract class BaseHelper
             $store_ids = array($store_id);
 
         return $store_ids;
+    }
+
+    /**
+     * @param $store_id
+     * @return Url
+     */
+    public function getStoreUrl($store_id)
+    {
+        if ($this->storeUrls == null) {
+
+            $this->storeUrls = [];
+            $storeIds = $this->getStores(null);
+
+            foreach ($storeIds as $storeId) {
+                // ObjectManager used instead of UrlFactory because UrlFactory will return UrlInterface which
+                // may cause a backend Url object to be returned
+                $url = $this->objectManager->create('Magento\Framework\Url');
+                $url->setStore($storeId);
+                $this->storeUrls[$storeId] = $url;
+            }
+        }
+
+        if (array_key_exists($store_id, $this->storeUrls)) {
+            return $this->storeUrls[$store_id];
+        }
+
+        return null;
     }
 
 }

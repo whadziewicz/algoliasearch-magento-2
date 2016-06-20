@@ -21,13 +21,13 @@ $placeholder = __('Search for products, categories, ...');
 <?php if ($this->config->isDefaultSelector()): ?>
 
     <div class="block block-search">
-        <div class="block block-title"><strong>Search</strong></div>
+        <div class="block block-title"><strong><?php echo __("Search") ?></strong></div>
         <div class="block block-content">
             <form class="form minisearch" id="search_mini_form" action="<?php echo $this->catalogSearchHelper->getResultUrl() ?>" method="get">
                 <div id="algolia-searchbox">
                     <div class="field search">
                         <label class="label" for="search" data-role="minisearch-label">
-                            <span>Search</span>
+                            <span><?php echo __("Search") ?></span>
                         </label>
                         <div class="control">
                             <input id="search" type="text" name="<?php echo $this->catalogSearchHelper->getQueryParamName() ?>" value="" class="input-text algolia-search-input" maxlength="128" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="<?php echo $placeholder; ?>">

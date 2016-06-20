@@ -156,7 +156,7 @@ class CategoryHelper extends BaseHelper
             'name'          => $category->getName(),
             'path'          => $path,
             'level'         => $category->getLevel(),
-            'url'           => $this->getStoreUrl($storeId)->getDirectUrl($category->getRequestPath()),
+            'url'           => $category->getUrl(),
             '_tags'         => array('category'),
             'popularity'    => 1,
             'product_count' => $category->getProductCount()

@@ -15,6 +15,7 @@ use Magento\Eav\Model\Config;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Url;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Helper\Data as CatalogHelper;
 use Magento\Tax\Helper\Data;

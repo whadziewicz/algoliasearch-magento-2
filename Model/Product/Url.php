@@ -3,7 +3,17 @@ namespace Algolia\AlgoliaSearch\Model\Product;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
+use Magento\Framework\UrlFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Filter\FilterManager;
+use Magento\Framework\Session\SidResolverInterface;
 
+/**
+ * The purpose of this class is to fix an issue during indexing where frontend URLs were using
+ * the default urls in a multistore environment even when emulating a store code, due to the URL di injection.
+ * E.g. if base url was www.foo.com and store url was www.bar.com, when indexing, the products for www.bar.com would be
+ * indexed using the base url of www.foo.com
+ */
 class Url extends \Magento\Catalog\Model\Product\Url
 {
 
@@ -13,10 +23,10 @@ class Url extends \Magento\Catalog\Model\Product\Url
     protected $objectManager;
 
     public function __construct(
-        \Magento\Framework\UrlFactory $urlFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Filter\FilterManager $filter,
-        \Magento\Framework\Session\SidResolverInterface $sidResolver,
+        UrlFactory $urlFactory,
+        StoreManagerInterface $storeManager,
+        FilterManager $filter,
+        SidResolverInterface $sidResolver,
         UrlFinderInterface $urlFinder,
         ObjectManagerInterface $objectManager,
         array $data = []
@@ -97,7 +107,11 @@ class Url extends \Magento\Catalog\Model\Product\Url
          */
         return $this->getStoreScopeUrlInstance($storeId)->getUrl($routePath, $routeParams);
     }
-    
+
+    /**
+     * If the store id passed in is admin (0), will return a Backend Url object (Default \Magento\Backend\Model\Url),
+     * otherwise returns the default Url object (default \Magento\Framework\Url)
+     */
     public function getStoreScopeUrlInstance($storeId)
     {
         if ($storeId == 0) {

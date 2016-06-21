@@ -2,10 +2,11 @@
 namespace Algolia\AlgoliaSearch\Block;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
-use Algolia\AlgoliaSearch\Helper\Data;
+use Magento\Search\Helper\Data as CatalogSearchHelper;
+use Magento\Framework\Data\CollectionDataSourceInterface;
 use Magento\Framework\View\Element\Template;
 
-class TopSearch extends Template
+class TopSearch extends Template implements CollectionDataSourceInterface
 {
     protected $config;
     protected $catalogSearchHelper;
@@ -13,7 +14,7 @@ class TopSearch extends Template
     public function __construct(
         Template\Context $context,
         ConfigHelper $config,
-        Data $catalogSearchHelper,
+        CatalogSearchHelper $catalogSearchHelper,
         array $data = []
     ) {
         $this->config = $config;

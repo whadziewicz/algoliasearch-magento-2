@@ -7,6 +7,7 @@ use Algolia\AlgoliaSearch\Helper\Entity\CategoryHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\PageHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper;
+use AlgoliaSearch\Version;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
@@ -39,7 +40,7 @@ class Data
                                 Logger $logger,
                                 ResourceConnection $resource)
     {
-        \AlgoliaSearch\Version::$custom_value = " Magento (1.5.3)";
+        Version::$custom_value = " Magento 2 (dev)";
 
         $this->algoliaHelper                = $algoliaHelper;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Algolia\AlgoliaSearch\Block\Hit;
+namespace Algolia\AlgoliaSearch\Block\Autocomplete;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Magento\Framework\View\Element\Template;

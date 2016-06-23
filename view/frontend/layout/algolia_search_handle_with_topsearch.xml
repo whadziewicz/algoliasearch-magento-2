@@ -11,11 +11,11 @@
         </referenceBlock>
         <referenceBlock name="footer">
             <!-- Multi-category Autocomplete templates -->
-            <block class="Algolia\AlgoliaSearch\Block\Hit\Product" name="algolia.hit.product" template="Algolia_AlgoliaSearch::hit/product.phtml"/>
-            <block class="Magento\Framework\View\Element\Template" name="algolia.hit.category" template="Algolia_AlgoliaSearch::hit/category.phtml"/>
-            <block class="Magento\Framework\View\Element\Template" name="algolia.hit.page" template="Algolia_AlgoliaSearch::hit/page.phtml"/>
-            <block class="Magento\Framework\View\Element\Template" name="algolia.hit.attribute" template="Algolia_AlgoliaSearch::hit/attribute.phtml"/>
-            <block class="Magento\Framework\View\Element\Template" name="algolia.hit.suggestion" template="Algolia_AlgoliaSearch::hit/suggestion.phtml"/>
+            <block class="Algolia\AlgoliaSearch\Block\Autocomplete\Product" name="algolia.autocomplete.product" template="Algolia_AlgoliaSearch::autocomplete/product.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="algolia.autocomplete.category" template="Algolia_AlgoliaSearch::autocomplete/category.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="algolia.autocomplete.page" template="Algolia_AlgoliaSearch::autocomplete/page.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="algolia.autocomplete.attribute" template="Algolia_AlgoliaSearch::autocomplete/attribute.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="algolia.autocomplete.suggestion" template="Algolia_AlgoliaSearch::autocomplete/suggestion.phtml"/>
 
             <!-- Instant search results page templates -->
             <block class="Algolia\AlgoliaSearch\Block\Instant\Wrapper" name="algolia.instant.wrapper" template="Algolia_AlgoliaSearch::instant/wrapper.phtml"/>

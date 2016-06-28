@@ -542,7 +542,7 @@ class ProductHelper extends BaseHelper
         $customData = array(
             'objectID'          => $product->getId(),
             'name'              => $product->getName(),
-            'url'               => $product->getProductUrl(),
+            'url'               => $product->getProductUrl(false),
             'visibility_search'  => (int) (in_array($visibility, $visibleInSearch)),
             'visibility_catalog' => (int) (in_array($visibility, $visibleInCatalog))
         );

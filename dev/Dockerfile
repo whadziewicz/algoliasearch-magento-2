@@ -76,6 +76,9 @@ RUN sed -i "s|www/html|www/htdocs|g" /etc/apache2/apache2.conf
 
 RUN mv pub/errors/local.xml.sample pub/errors/local.xml
 
+# enable mod_rewrite
+RUN cp /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load
+
 # magerun
 RUN cd /var/www/htdocs && wget https://files.magerun.net/n98-magerun2.phar && mv n98-magerun2.phar /usr/bin/n98-magerun2 && chmod -R 777 /usr/bin/n98-magerun2
 

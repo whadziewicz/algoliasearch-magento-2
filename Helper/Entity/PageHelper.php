@@ -46,9 +46,7 @@ class PageHelper extends BaseHelper
                 continue;
 
             $page_obj['objectID'] = $page->getId();
-
-            $pageHelper = $this->objectManager->create('\Magento\Cms\Helper\Page');
-            $page_obj['url'] = $pageHelper->getPageUrl($page->getId());
+            $page_obj['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier()]);
             $page_obj['content'] = $this->strip($page->getContent());
 
             $pages[] = $page_obj;

@@ -1,14 +1,16 @@
 <?php
-$base_url = $this->storeManager->getStore()->getBaseUrl();
+/** @var \Algolia\AlgoliaSearch\Block\Algolia $block */
+$base_url = $block->getBaseUrl();
+$config = $block->getConfigHelper();
+$productHelper = $block->getProductHelper();
+$catalogSearchHelper = $block->getCatalogSearchHelper();
 
 $isSearchPage = false;
 $isCategoryPage = false;
 
-$currency_code = $this->storeManager->getStore()->getCurrentCurrencyCode();
-$group_id = $this->customerSession->getCustomerGroupId();
-$price_key = $this->config->isCustomerGroupsEnabled($this->storeManager->getStore()->getStoreId()) ? '.'.$currency_code.'.group_'.$group_id : '.'.$currency_code.'.default';
+$price_key = $block->getPriceKey();
 
-$allDepartments = "All departments";
+$allDepartments = __("All departments");
 
 $query = '';
 $refinement_key = '';
@@ -18,23 +20,23 @@ $path = '';
 /**
  * Handle category replacement
  */
-if($this->config->isInstantEnabled() && $this->config->replaceCategories() && $this->request->getControllerName() == 'category')
+if($config->isInstantEnabled() && $config->replaceCategories() && $block->getRequest()->getControllerName() == 'category')
 {
-    $category = $this->registry->registry('current_category');
+    $category = $block->getCurrentCategory();
 
     if ($category && $category->getDisplayMode() !== 'PAGE')
     {
-        $category->getUrlInstance()->setStore($this->storeManager->getStore()->getStoreId());
+        $category->getUrlInstance()->setStore($block->getStoreId());
 
         foreach ($category->getPathIds() as $treeCategoryId) {
             if ($path != '') {
                 $path .= ' /// ';
             }
 
-            $path .= $this->productHelper->getCategoryName($treeCategoryId, $this->storeManager->getStore()->getStoreId());
+            $path .= $productHelper->getCategoryName($treeCategoryId, $block->getStoreId());
         }
 
-        $indexName = $this->productHelper->getIndexName($this->storeManager->getStore()->getStoreId());
+        $indexName = $productHelper->getIndexName($block->getStoreId());
         $category_url = $category->getUrl($category);
         $isSearchPage = true;
         $isCategoryPage = true;
@@ -44,18 +46,18 @@ if($this->config->isInstantEnabled() && $this->config->replaceCategories() && $t
 /**
  * Handle search
  */
-if ($this->config->isInstantEnabled())
+if ($config->isInstantEnabled())
 {
-    $pageIdentifier = $this->request->getFullActionName();
+    $pageIdentifier = $block->getRequest()->getFullActionName();
 
     if ($pageIdentifier === 'catalogsearch_result_index')
     {
-        $query = $this->catalogSearchHelper->getEscapedQueryText();
+        $query = $catalogSearchHelper->getEscapedQueryText();
 
         if ($query == '__empty__')
             $query = '';
 
-        $refinement_key = $this->request->getParam('refinement_key');
+        $refinement_key = $block->getRequest()->getParam('refinement_key');
 
         if ($refinement_key !== null)
         {
@@ -72,9 +74,9 @@ if ($this->config->isInstantEnabled())
 if ($base_url[strlen($base_url) - 1] == '/')
     $base_url = substr($base_url, 0, strlen($base_url) - 1);
 
-if ($this->config->isInstantEnabled() && $isSearchPage) {
+if ($config->isInstantEnabled() && $isSearchPage) {
     // hide the instant-search selector ASAP to remove flickering. Will be re-displayed later with JS
-    echo '<style>' . $this->config->getInstantSelector() . '{ display: none; }</style>';
+    echo '<style>' . $config->getInstantSelector() . '{ display: none; }</style>';
 }
 
 ?>
@@ -85,30 +87,30 @@ if ($this->config->isInstantEnabled() && $isSearchPage) {
             document.body.innerHTML = document.body.innerHTML.replace(/__empty__/g, '');
             window.algoliaConfig = {
                 instant: {
-                    enabled: <?php echo $this->config->isInstantEnabled() ? "true" : "false"; ?>,
-                    selector: '<?php echo $this->config->getInstantSelector(); ?>',
-                    isAddToCartEnabled: <?php echo $this->config->isAddToCartEnable() ? "true" : "false"; ?>
+                    enabled: <?php echo $config->isInstantEnabled() ? "true" : "false"; ?>,
+                    selector: '<?php echo $config->getInstantSelector(); ?>',
+                    isAddToCartEnabled: <?php echo $config->isAddToCartEnable() ? "true" : "false"; ?>
                 },
                 autocomplete: {
-                    enabled: <?php echo $this->config->isAutoCompleteEnabled() ? "true" : "false"; ?>,
-                    selector: '<?php echo $this->config->getAutocompleteSelector(); ?>',
-                    sections: <?php echo json_encode($this->config->getAutocompleteSections()); ?>,
-                    nbOfProductsSuggestions: '<?php echo $this->config->getNumberOfProductsSuggestions(); ?>',
-                    nbOfCategoriesSuggestions: '<?php echo $this->config->getNumberOfCategoriesSuggestions(); ?>',
-                    nbOfQueriesSuggestions: '<?php echo $this->config->getNumberOfQueriesSuggestions(); ?>'
+                    enabled: <?php echo $config->isAutoCompleteEnabled() ? "true" : "false"; ?>,
+                    selector: '<?php echo $config->getAutocompleteSelector(); ?>',
+                    sections: <?php echo json_encode($config->getAutocompleteSections()); ?>,
+                    nbOfProductsSuggestions: '<?php echo $config->getNumberOfProductsSuggestions(); ?>',
+                    nbOfCategoriesSuggestions: '<?php echo $config->getNumberOfCategoriesSuggestions(); ?>',
+                    nbOfQueriesSuggestions: '<?php echo $config->getNumberOfQueriesSuggestions(); ?>'
                 },
-                applicationId: '<?php echo $this->config->getApplicationID() ?>',
-                indexName: '<?php echo $this->productHelper->getBaseIndexName(); ?>',
-                apiKey: '<?php echo $this->config->getSearchOnlyAPIKey() ?>',
-                facets: <?php echo json_encode($this->config->getFacets()); ?>,
-                hitsPerPage: <?php echo (int) $this->config->getNumberOfProductResults() ?>,
-                sortingIndices: <?php echo json_encode(array_values($this->config->getSortingIndices())); ?>,
+                applicationId: '<?php echo $config->getApplicationID() ?>',
+                indexName: '<?php echo $productHelper->getBaseIndexName(); ?>',
+                apiKey: '<?php echo $config->getSearchOnlyAPIKey() ?>',
+                facets: <?php echo json_encode($config->getFacets()); ?>,
+                hitsPerPage: <?php echo (int) $config->getNumberOfProductResults() ?>,
+                sortingIndices: <?php echo json_encode(array_values($config->getSortingIndices())); ?>,
                 isSearchPage: <?php echo $isSearchPage ? "true" : "false" ?>,
                 isCategoryPage: <?php echo $isCategoryPage ? "true" : "false" ?>,
-                removeBranding: <?php echo $this->config->isRemoveBranding() ? "true" : "false"; ?>,
+                removeBranding: <?php echo $config->isRemoveBranding() ? "true" : "false"; ?>,
                 priceKey: '<?php echo $price_key; ?>',
-                currencySymbol: '<?php echo $this->currency->getCurrency($this->storeManager->getStore()->getCurrentCurrencyCode())->getSymbol(); ?>',
-                currency_code: '<?php echo $currency_code; ?>',
+                currencySymbol: '<?php echo $block->getCurrencySymbol(); ?>',
+                currency_code: '<?php echo $block->getCurrencyCode(); ?>',
                 autofocus: true,
                 request: {
                     query:<?php echo json_encode(array("value" => html_entity_decode($query))); ?>.value,
@@ -116,9 +118,9 @@ if ($this->config->isInstantEnabled() && $isSearchPage) {
                 refinement_value: '<?php echo $refinement_value; ?>',
                 path: '<?php echo $path; ?>'
             },
-                showSuggestionsOnNoResultsPage: <?php echo $this->config->showSuggestionsOnNoResultsPage() ? "true" : "false"; ?>,
+                showSuggestionsOnNoResultsPage: <?php echo $config->showSuggestionsOnNoResultsPage() ? "true" : "false"; ?>,
             baseUrl: '<?php echo $base_url ?>',
-                popularQueries: <?php echo json_encode($this->config->getPopularQueries()); ?>
+                popularQueries: <?php echo json_encode($config->getPopularQueries()); ?>
         };
 
             window.transformHit = function (hit, price_key) {

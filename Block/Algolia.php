@@ -80,7 +80,7 @@ class Algolia extends Template
 
     public function getStoreId()
     {
-        return $this->storeManager->getStore()->getStoreId();
+        return $this->_storeManager->getStore()->getStoreId();
     }
     
     public function getCurrentCategory()

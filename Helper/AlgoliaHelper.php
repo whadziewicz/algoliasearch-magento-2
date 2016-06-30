@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use AlgoliaSearch\AlgoliaException;
 use AlgoliaSearch\Client;
 use Magento\Framework\Message\ManagerInterface;
 
@@ -16,28 +17,32 @@ class AlgoliaHelper
     {
         $this->messageManager = $messageManager;
         $this->config = $configHelper;
+        
         $this->resetCredentialsFromConfig();
     }
 
     public function resetCredentialsFromConfig()
     {
-        if ($this->config->getApplicationID() && $this->config->getAPIKey()){
+        if ($this->config->getApplicationID() && $this->config->getAPIKey()) {
             $this->client = new Client($this->config->getApplicationID(), $this->config->getAPIKey());
         }
     }
 
     public function getIndex($name)
     {
+        $this->checkClient(__FUNCTION__);
         return $this->client->initIndex($name);
     }
 
     public function listIndexes()
     {
+        $this->checkClient(__FUNCTION__);
         return $this->client->listIndexes();
     }
 
     public function query($index_name, $q, $params)
     {
+        $this->checkClient(__FUNCTION__);
         return $this->client->initIndex($index_name)->search($q, $params);
     }
 
@@ -50,6 +55,7 @@ class AlgoliaHelper
 
     public function deleteIndex($index_name)
     {
+        $this->checkClient(__FUNCTION__);
         $this->client->deleteIndex($index_name);
     }
 
@@ -62,6 +68,7 @@ class AlgoliaHelper
 
     public function moveIndex($index_name_tmp, $index_name)
     {
+        $this->checkClient(__FUNCTION__);
         $this->client->moveIndex($index_name_tmp, $index_name);
     }
 
@@ -142,5 +149,21 @@ class AlgoliaHelper
             $index->partialUpdateObjects($objects);
         else
             $index->addObjects($objects);
+    }
+
+    private function checkClient($methodName)
+    {
+        if (isset($this->client))
+        {
+            return;
+        }
+
+        $this->resetCredentialsFromConfig();
+
+
+        if (!isset($this->client))
+        {
+            throw new AlgoliaException('Operation "'.$methodName.' could not be performed because Algolia credetials were not provided.');
+        }
     }
 }

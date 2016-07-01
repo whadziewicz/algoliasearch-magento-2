@@ -1,4 +1,5 @@
 <?php
+
 namespace Algolia\AlgoliaSearch\Block\Autocomplete;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
@@ -27,8 +28,9 @@ class Product extends Template
         if ($this->priceKey === null) {
             $groupId = $this->customerSession->getCustomer()->getGroupId();
             $currencyCode = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
+            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.'.$currencyCode.'.group_'.$groupId : '.'.$currencyCode.'.default';
         }
+
         return $this->priceKey;
     }
 }

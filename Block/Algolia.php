@@ -1,11 +1,10 @@
 <?php
+
 namespace Algolia\AlgoliaSearch\Block;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Locale\Currency;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
@@ -73,8 +72,9 @@ class Algolia extends Template
         if ($this->priceKey === null) {
             $groupId = $this->customerSession->getCustomer()->getGroupId();
             $currencyCode = $this->getCurrencyCode();
-            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
+            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.'.$currencyCode.'.group_'.$groupId : '.'.$currencyCode.'.default';
         }
+
         return $this->priceKey;
     }
 
@@ -82,7 +82,7 @@ class Algolia extends Template
     {
         return $this->_storeManager->getStore()->getStoreId();
     }
-    
+
     public function getCurrentCategory()
     {
         return $this->registry->registry('current_category');

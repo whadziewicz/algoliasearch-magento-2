@@ -650,9 +650,13 @@ class ProductHelper extends BaseHelper
 
                 $customData['media_gallery'] = array();
 
-                foreach ($product->getMediaGalleryImages() as $image)
+                $images = $product->getMediaGalleryImages();
+                if ($images)
                 {
-                    $customData['media_gallery'][] = str_replace(array('https://', 'http://'), '//', $image->getUrl());
+                    foreach ($images as $image)
+                    {
+                        $customData['media_gallery'][] = str_replace(array('https://', 'http://'), '//', $image->getUrl());
+                    }
                 }
             }
         }

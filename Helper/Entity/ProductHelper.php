@@ -52,7 +52,7 @@ class ProductHelper extends BaseHelper
                 'default_sort_by', 'display_mode', 'filter_price_range', 'global_position', 'image', 'include_in_menu', 'is_active',
                 'is_always_include_in_menu', 'is_anchor', 'landing_page', 'level', 'lower_cms_block',
                 'page_layout', 'path_in_store', 'position', 'small_image', 'thumbnail', 'url_key', 'url_path',
-                'visible_in_menu');
+                'visible_in_menu', 'quantity_and_stock_status');
 
             $productAttributes = array_diff($productAttributes, $excludedAttributes);
 

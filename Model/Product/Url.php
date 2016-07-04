@@ -1,4 +1,5 @@
 <?php
+
 namespace Algolia\AlgoliaSearch\Model\Product;
 
 use Magento\Framework\ObjectManagerInterface;
@@ -16,7 +17,6 @@ use Magento\Framework\Session\SidResolverInterface;
  */
 class Url extends \Magento\Catalog\Model\Product\Url
 {
-
     const FRONTEND_URL = 'Magento\Framework\Url';
     const BACKEND_URL = 'Magento\Backend\Model\Url';
 
@@ -58,9 +58,9 @@ class Url extends \Magento\Catalog\Model\Product\Url
             $requestPath = $product->getRequestPath();
             if (empty($requestPath) && $requestPath !== false) {
                 $filterData = [
-                    UrlRewrite::ENTITY_ID => $product->getId(),
+                    UrlRewrite::ENTITY_ID   => $product->getId(),
                     UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator::ENTITY_TYPE,
-                    UrlRewrite::STORE_ID => $storeId,
+                    UrlRewrite::STORE_ID    => $storeId,
                 ];
                 if ($categoryId) {
                     $filterData[UrlRewrite::METADATA]['category_id'] = $categoryId;
@@ -99,7 +99,7 @@ class Url extends \Magento\Catalog\Model\Product\Url
             $routeParams['_query'] = [];
         }
 
-        /**
+        /*
          * This is the only line changed from the default method.
          * For reference, the original line: $this->getUrlInstance()->setScope($storeId)->getUrl($routePath, $routeParams);
          * getUrlInstance() is a private method, so a new method has been written that will create a frontend Url object if
@@ -120,5 +120,4 @@ class Url extends \Magento\Catalog\Model\Product\Url
             return $this->objectManager->create(self::FRONTEND_URL);
         }
     }
-
 }

@@ -74,67 +74,61 @@ class AlgoliaHelper
 
     public function mergeSettings($index_name, $settings)
     {
-        $onlineSettings = array();
+        $onlineSettings = [];
 
-        try
-        {
+        try {
             $onlineSettings = $this->getIndex($index_name)->getSettings();
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
         }
 
-        $removes = array('slaves');
+        $removes = ['slaves'];
 
-        foreach ($removes as $remove)
-            if (isset($onlineSettings[$remove]))
+        foreach ($removes as $remove) {
+            if (isset($onlineSettings[$remove])) {
                 unset($onlineSettings[$remove]);
+            }
+        }
 
-        foreach ($settings as $key => $value)
+        foreach ($settings as $key => $value) {
             $onlineSettings[$key] = $value;
+        }
 
         return $onlineSettings;
     }
 
     public function handleTooBigRecords(&$objects, $index_name)
     {
-        $long_attributes = array('description', 'short_description', 'meta_description', 'content');
+        $long_attributes = ['description', 'short_description', 'meta_description', 'content'];
 
         $good_size = true;
 
-        $ids = array();
+        $ids = [];
 
-        foreach ($objects as $key => &$object)
-        {
+        foreach ($objects as $key => &$object) {
             $size = mb_strlen(json_encode($object));
 
-            if ($size > 20000)
-            {
-                foreach ($long_attributes as $attribute)
-                {
-                    if (isset($object[$attribute]))
-                    {
+            if ($size > 20000) {
+                foreach ($long_attributes as $attribute) {
+                    if (isset($object[$attribute])) {
                         unset($object[$attribute]);
                         $ids[$index_name.' objectID('.$object['objectID'].')'] = true;
                         $good_size = false;
                     }
-
                 }
 
                 $size = mb_strlen(json_encode($object));
 
-                if ($size > 20000)
-                {
+                if ($size > 20000) {
                     unset($objects[$key]);
                 }
             }
         }
 
-        if (count($objects) <= 0)
+        if (count($objects) <= 0) {
             return;
+        }
 
-        if ($good_size === false)
-        {
+        if ($good_size === false) {
             $this->messageManager->addError('Algolia reindexing : You have some records ('.implode(',', array_keys($ids)).') that are too big. They have either been truncated or skipped');
         }
     }
@@ -145,10 +139,11 @@ class AlgoliaHelper
 
         $index = $this->getIndex($index_name);
 
-        if ($this->config->isPartialUpdateEnabled())
+        if ($this->config->isPartialUpdateEnabled()) {
             $index->partialUpdateObjects($objects);
-        else
+        } else {
             $index->addObjects($objects);
+        }
     }
 
     private function checkClient($methodName)

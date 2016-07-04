@@ -45,7 +45,7 @@ abstract class AbstractTable extends AbstractFieldArray
                 $options = $options();
             }
 
-            $extraParams = $columnId === 'attribute' ? 'style="width:160px;"': 'style="width:100px;"';
+            $extraParams = $columnId === 'attribute' ? 'style="width:160px;"' : 'style="width:100px;"';
             $select->setExtraParams($extraParams);
             $select->setOptions($options);
 
@@ -59,12 +59,12 @@ abstract class AbstractTable extends AbstractFieldArray
     {
         $data = $this->getTableData();
 
-        foreach(array_keys($data) as $columnId) {
+        foreach (array_keys($data) as $columnId) {
             $columnData = $data[$columnId];
 
-            $column = array(
+            $column = [
                 'label' => __($columnData['label']),
-            );
+            ];
 
             if (isset($columnData['values'])) {
                 $column['renderer'] = $this->getRenderer($columnId, $columnData);
@@ -89,7 +89,7 @@ abstract class AbstractTable extends AbstractFieldArray
             $columnData = $data[$columnId];
 
             if (isset($columnData['values'])) {
-                $options['option_' . $this->getRenderer($columnId, $columnData)->calcOptionHash($row->getData($columnId))] = 'selected="selected"';
+                $options['option_'.$this->getRenderer($columnId, $columnData)->calcOptionHash($row->getData($columnId))] = 'selected="selected"';
             }
         }
 

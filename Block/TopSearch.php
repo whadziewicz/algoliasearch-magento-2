@@ -1,4 +1,5 @@
 <?php
+
 namespace Algolia\AlgoliaSearch\Block;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;

@@ -1,8 +1,8 @@
 <?php
 
 namespace Algolia\AlgoliaSearch\Model;
+
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
-use Magento\Framework\DataObject;
 use Magento\Framework\Event\ObserverInterface;
 
 /**
@@ -28,8 +28,7 @@ class Observer implements ObserverInterface
 
                     if ($this->config->isDefaultSelector()) {
                         $observer->getLayout()->getUpdate()->addHandle('algolia_search_handle_with_topsearch');
-                    }
-                    else {
+                    } else {
                         $observer->getLayout()->getUpdate()->addHandle('algolia_search_handle_no_topsearch');
                     }
                 }

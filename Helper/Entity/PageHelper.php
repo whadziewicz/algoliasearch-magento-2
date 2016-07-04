@@ -11,10 +11,10 @@ class PageHelper extends BaseHelper
 
     public function getIndexSettings($storeId)
     {
-        return array(
-            'attributesToIndex'         => array('slug', 'name', 'unordered(content)'),
-            'attributesToSnippet'       => array('content:7')
-        );
+        return [
+            'attributesToIndex'   => ['slug', 'name', 'unordered(content)'],
+            'attributesToSnippet' => ['content:7']
+        ];
     }
 
     public function getPages($storeId)
@@ -25,25 +25,27 @@ class PageHelper extends BaseHelper
 
         $excluded_pages = array_values($this->config->getExcludedPages());
 
-        foreach ($excluded_pages as &$excluded_page)
+        foreach ($excluded_pages as &$excluded_page) {
             $excluded_page = $excluded_page['pages'];
+        }
 
-        $pages = array();
+        $pages = [];
 
-        foreach ($magento_pages as $page)
-        {
-            if (in_array($page->getIdentifier(), $excluded_pages))
+        foreach ($magento_pages as $page) {
+            if (in_array($page->getIdentifier(), $excluded_pages)) {
                 continue;
+            }
 
-            $page_obj = array();
+            $page_obj = [];
 
             $page_obj['slug'] = $page->getIdentifier();
             $page_obj['name'] = $page->getTitle();
 
             $page->setStoreId($storeId);
 
-            if (! $page->getId())
+            if (!$page->getId()) {
                 continue;
+            }
 
             $page_obj['objectID'] = $page->getId();
             $page_obj['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier()]);

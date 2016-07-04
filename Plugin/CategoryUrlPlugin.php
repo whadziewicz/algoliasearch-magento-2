@@ -1,4 +1,5 @@
 <?php
+
 namespace Algolia\AlgoliaSearch\Plugin;
 
 use Magento\Catalog\Model\Category;
@@ -20,7 +21,7 @@ class CategoryUrlPlugin
     ) {
         $this->objectManager = $objectManager;
     }
-    
+
     public function aroundGetUrlInstance(Category $category, \Closure $proceed)
     {
         if ($category->getStoreId() == 0) {

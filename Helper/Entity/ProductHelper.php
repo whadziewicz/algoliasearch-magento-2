@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use Magento\Catalog\Model\Product;
 use Magento\Framework\DataObject;
 
 class ProductHelper extends BaseHelper
@@ -104,6 +105,7 @@ class ProductHelper extends BaseHelper
         $products = $products->addFinalPrice()
             ->addAttributeToSelect('special_from_date')
             ->addAttributeToSelect('special_to_date')
+            ->addAttributeToSelect('visibility')
             ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
 
         $additionalAttr = $this->getAdditionalAttributes($storeId);
@@ -131,7 +133,7 @@ class ProductHelper extends BaseHelper
         return $this->config->getProductAdditionalAttributes($storeId);
     }
 
-    public function setSettings($storeId)
+    public function setSettings($storeId, $saveToTmpIndicesToo = false)
     {
         $attributesToIndex = [];
         $unretrievableAttributes = [];
@@ -209,6 +211,9 @@ class ProductHelper extends BaseHelper
         $mergeSettings = $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
 
         $this->algoliaHelper->setSettings($this->getIndexName($storeId), $mergeSettings);
+        if ($saveToTmpIndicesToo === true) {
+            $this->algoliaHelper->setSettings($this->getIndexName($storeId, true), $mergeSettings);
+        }
 
         /*
          * Handle Slaves
@@ -272,6 +277,33 @@ class ProductHelper extends BaseHelper
                 }
             }
         }
+
+        if ($synonymsFile = $this->config->getSynonymsFile($storeId)) {
+            $synonymsToSet = json_decode(file_get_contents($synonymsFile));
+        } else {
+            $synonymsToSet = [];
+
+            $synonyms = $this->config->getSynonyms($storeId);
+            foreach ($synonyms as $objectID => $synonym) {
+                $synonymsToSet[] = [
+                    'objectID' => $objectID,
+                    'type' => 'synonym',
+                    'synonyms' => $this->explodeSynomyms($synonym['synonyms']),
+                ];
+            }
+
+            $onewaySynonyms = $this->config->getOnewaySynonyms($storeId);
+            foreach ($onewaySynonyms as $objectID => $onewaySynonym) {
+                $synonymsToSet[] = [
+                    'objectID' => $objectID,
+                    'type' => 'oneWaySynonym',
+                    'input' => $onewaySynonym['input'],
+                    'synonyms' => $this->explodeSynomyms($onewaySynonym['synonyms']),
+                ];
+            }
+        }
+
+        $this->algoliaHelper->setSynonyms($this->getIndexName($storeId, $saveToTmpIndicesToo), $synonymsToSet);
     }
 
     protected function getFields($store)
@@ -484,7 +516,7 @@ class ProductHelper extends BaseHelper
         return $selected_categories;
     }
 
-    public function getObject(\Magento\Catalog\Model\Product $product)
+    public function getObject(Product $product)
     {
         $type = $product->getTypeId();
         $this->logger->start('CREATE RECORD '.$product->getId().' '.$this->logger->getStoreName($product->getStoreId()));
@@ -682,11 +714,11 @@ class ProductHelper extends BaseHelper
 
                         $all_sub_products_out_of_stock = true;
 
-                        /** @var \Magento\Catalog\Model\Product $sub_product */
+                        /** @var Product $sub_product */
                         foreach ($sub_products as $sub_product) {
                             $isInStock = (int) $this->stockRegistry->getStockItem($sub_product->getId())->getIsInStock();
 
-                            if ($isInStock == false) {
+                            if ($isInStock == false && $this->config->indexOutOfStockOptions($product->getStoreId()) == false) {
                                 continue;
                             }
 
@@ -757,5 +789,10 @@ class ProductHelper extends BaseHelper
         $this->logger->stop('CREATE RECORD '.$product->getId().' '.$this->logger->getStoreName($product->getStoreId()));
 
         return $customData;
+    }
+
+    private function explodeSynomyms($synonyms)
+    {
+        return array_map('trim', explode(',', $synonyms));
     }
 }

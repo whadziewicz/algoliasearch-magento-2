@@ -2,7 +2,11 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use Magento;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Locale\Currency;
+use Magento\Directory\Model\Currency as DirCurrency;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -32,16 +36,19 @@ class ConfigHelper
     const EXCLUDED_PAGES = 'algoliasearch_autocomplete/autocomplete/excluded_pages';
     const MIN_POPULARITY = 'algoliasearch_autocomplete/autocomplete/min_popularity';
     const MIN_NUMBER_OF_RESULTS = 'algoliasearch_autocomplete/autocomplete/min_number_of_results';
+    const RENDER_TEMPLATE_DIRECTIVES = 'algoliasearch_autocomplete/autocomplete/render_template_directives';
 
     const NUMBER_OF_PRODUCT_RESULTS = 'algoliasearch_products/products/number_product_results';
     const PRODUCT_ATTRIBUTES = 'algoliasearch_products/products/product_additional_attributes';
     const PRODUCT_CUSTOM_RANKING = 'algoliasearch_products/products/custom_ranking_product_attributes';
     const RESULTS_LIMIT = 'algoliasearch_products/products/results_limit';
     const SHOW_SUGGESTIONS_NO_RESULTS = 'algoliasearch_products/products/show_suggestions_on_no_result_page';
+    const INDEX_OUT_OF_STOCK_OPTIONS = 'algoliasearch_products/products/index_out_of_stock_options';
 
     const CATEGORY_ATTRIBUTES = 'algoliasearch_categories/categories/category_additional_attributes';
     const INDEX_PRODUCT_COUNT = 'algoliasearch_categories/categories/index_product_count';
     const CATEGORY_CUSTOM_RANKING = 'algoliasearch_categories/categories/custom_ranking_category_attributes';
+    const SHOW_CATS_NOT_INCLUDED_IN_NAVIGATION = 'algoliasearch_categories/categories/show_cats_not_included_in_navigation';
 
     const IS_ACTIVE = 'algoliasearch_queue/queue/active';
     const NUMBER_OF_JOB_TO_RUN = 'algoliasearch_queue/queue/number_of_job_to_run';
@@ -50,6 +57,10 @@ class ConfigHelper
     const XML_PATH_IMAGE_HEIGHT = 'algoliasearch_image/image/height';
     const XML_PATH_IMAGE_TYPE = 'algoliasearch_image/image/type';
 
+    const SYNONYMS = 'algoliasearch_synonyms/synonyms_group/synonyms';
+    const ONEWAY_SYNONYMS = 'algoliasearch_synonyms/synonyms_group/oneway_synonyms';
+    const SYNONYMS_FILE = 'algoliasearch_synonyms/synonyms_group/synonyms_file';
+
     const NUMBER_OF_ELEMENT_BY_PAGE = 'algoliasearch_advanced/advanced/number_of_element_by_page';
     const REMOVE_IF_NO_RESULT = 'algoliasearch_advanced/advanced/remove_words_if_no_result';
     const PARTIAL_UPDATES = 'algoliasearch_advanced/advanced/partial_update';
@@ -57,25 +68,47 @@ class ConfigHelper
     const MAKE_SEO_REQUEST = 'algoliasearch_advanced/advanced/make_seo_request';
     const REMOVE_BRANDING = 'algoliasearch_advanced/advanced/remove_branding';
     const AUTOCOMPLETE_SELECTOR = 'algoliasearch_advanced/advanced/autocomplete_selector';
+    const INDEX_PRODUCT_ON_CATEGORY_PRODUCTS_UPDATE = 'algoliasearch_advanced/advanced/index_product_on_category_products_update';
 
     const SHOW_OUT_OF_STOCK = 'cataloginventory/options/show_out_of_stock';
 
     protected $_productTypeMap = [];
 
-    protected $configInterface;
-    protected $objectManager;
-    protected $currency;
-    protected $storeManager;
+    private $configInterface;
+    private $objectManager;
+    private $currency;
+    private $storeManager;
+    private $dirCurrency;
+    private $directoryList;
 
-    public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
-                                \Magento\Framework\ObjectManagerInterface $objectManager,
+    public function __construct(Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
+                                Magento\Framework\ObjectManagerInterface $objectManager,
                                 StoreManagerInterface $storeManager,
-                                Currency $currency
-    ) {
+                                Currency $currency,
+                                DirCurrency $dirCurrency,
+                                DirectoryList $directoryList)
+    {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
         $this->currency = $currency;
         $this->storeManager = $storeManager;
+        $this->dirCurrency = $dirCurrency;
+        $this->directoryList = $directoryList;
+    }
+
+    public function indexOutOfStockOptions($storeId = null)
+    {
+        return $this->configInterface->getValue(self::INDEX_OUT_OF_STOCK_OPTIONS, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function showCatsNotIncludedInNavigation($storeId = null)
+    {
+        return $this->configInterface->getValue(self::SHOW_CATS_NOT_INCLUDED_IN_NAVIGATION, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function getExtensionVersion()
+    {
+        return "1.0";
     }
 
     public function isDefaultSelector($storeId = null)
@@ -86,6 +119,11 @@ class ConfigHelper
     public function getAutocompleteSelector($storeId = null)
     {
         return $this->configInterface->getValue(self::AUTOCOMPLETE_SELECTOR, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function indexProductOnCategoryProductsUpdate($storeId = null)
+    {
+        return $this->configInterface->getValue(self::INDEX_PRODUCT_ON_CATEGORY_PRODUCTS_UPDATE, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getNumberOfQueriesSuggestions($storeId = null)
@@ -281,6 +319,11 @@ class ConfigHelper
         return [];
     }
 
+    public function getRenderTemplateDirectives($storeId = null)
+    {
+        return $this->configInterface->getValue(self::RENDER_TEMPLATE_DIRECTIVES, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
     public function getSortingIndices($storeId = null)
     {
         $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\ProductHelper');
@@ -416,5 +459,81 @@ class ConfigHelper
         $popularQueries = $suggestion_helper->getPopularQueries($storeId);
 
         return $popularQueries;
+    }
+
+    public function getAttributesToRetrieve($group_id)
+    {
+        if (false === $this->isCustomerGroupsEnabled()) {
+            return [];
+        }
+
+        $attributes = [];
+        foreach ($this->getProductAdditionalAttributes() as $attribute) {
+            if ($attribute['attribute'] !== 'price') {
+                $attributes[] = $attribute['attribute'];
+            }
+        }
+
+        $attributes = array_merge($attributes, [
+            'objectID',
+            'name',
+            'url',
+            'visibility_search',
+            'visibility_catalog',
+            'categories',
+            'categories_without_path',
+            'thumbnail_url',
+            'image_url',
+            'in_stock',
+            'type_id',
+        ]);
+
+        $currencies = $this->dirCurrency->getConfigAllowCurrencies();
+
+        foreach ($currencies as $currency) {
+            $attributes[] = 'price.'.$currency.'.default';
+            $attributes[] = 'price.'.$currency.'.default_formated';
+            $attributes[] = 'price.'.$currency.'.group_'.$group_id;
+            $attributes[] = 'price.'.$currency.'.group_'.$group_id.'_formated';
+            $attributes[] = 'price.'.$currency.'.special_from_date';
+            $attributes[] = 'price.'.$currency.'.special_to_date';
+        }
+
+        return ['attributesToRetrieve' => $attributes];
+    }
+
+    public function getSynonyms($storeId = null)
+    {
+        $synonyms = unserialize($this->configInterface->getValue(self::SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
+
+        if (is_array($synonyms)) {
+            return $synonyms;
+        }
+
+        return [];
+    }
+
+    public function getOnewaySynonyms($storeId = null)
+    {
+        $onewaySynonyms = unserialize($this->configInterface->getValue(self::ONEWAY_SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
+
+        if (is_array($onewaySynonyms)) {
+            return $onewaySynonyms;
+        }
+
+        return [];
+    }
+
+    public function getSynonymsFile($storeId = null)
+    {
+        $filename = $this->configInterface->getValue(self::SYNONYMS_FILE, ScopeInterface::SCOPE_STORE, $storeId);
+
+        if (!$filename) {
+            return null;
+        }
+
+        $baseDirectory = $this->directoryList->getPath(DirectoryList::MEDIA);
+
+        return $baseDirectory.'/algoliasearch_admin_config_uploads/'.$filename;
     }
 }

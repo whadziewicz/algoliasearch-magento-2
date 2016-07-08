@@ -3,7 +3,9 @@
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use Magento\Catalog\Model\Product;
+use Magento\Directory\Model\Currency;
 use Magento\Framework\DataObject;
+use Magento\Tax\Model\Config as TaxConfig;
 
 class ProductHelper extends BaseHelper
 {
@@ -308,11 +310,11 @@ class ProductHelper extends BaseHelper
 
     protected function getFields($store)
     {
-        if ($this->taxHelper->getPriceDisplayType($store) == \Magento\Tax\Model\Config::DISPLAY_TYPE_EXCLUDING_TAX) {
+        if ($this->taxHelper->getPriceDisplayType($store) == TaxConfig::DISPLAY_TYPE_EXCLUDING_TAX) {
             return ['price' => false];
         }
 
-        if ($this->taxHelper->getPriceDisplayType($store) == \Magento\Tax\Model\Config::DISPLAY_TYPE_INCLUDING_TAX) {
+        if ($this->taxHelper->getPriceDisplayType($store) == TaxConfig::DISPLAY_TYPE_INCLUDING_TAX) {
             return ['price' => true];
         }
 
@@ -322,9 +324,10 @@ class ProductHelper extends BaseHelper
     protected function formatPrice($price, $includeContainer, $currency_code)
     {
         if (!isset(static::$_currencies[$currency_code])) {
-            static::$_currencies[$currency_code] = $this->currencyManager->load($currency_code);
+            static::$_currencies[$currency_code] = $this->currencyFactory->create()->load($currency_code);
         }
 
+        /** @var Currency $currency */
         $currency = static::$_currencies[$currency_code];
 
         if ($currency) {
@@ -334,12 +337,15 @@ class ProductHelper extends BaseHelper
         return $price;
     }
 
-    protected function handlePrice(&$product, $sub_products, &$customData)
+    protected function handlePrice(Product &$product, $sub_products, &$customData)
     {
-        $fields = $this->getFields($product->getStore());
-        $customer_groups_enabled = $this->config->isCustomerGroupsEnabled($product->getStoreId());
         $store = $product->getStore();
         $type = $product->getTypeId();
+
+        $fields = $this->getFields($store);
+
+        $customer_groups_enabled = $this->config->isCustomerGroupsEnabled($product->getStoreId());
+
         $currencies = $this->currencyHelper->getConfigAllowCurrencies();
         $baseCurrencyCode = $store->getBaseCurrencyCode();
 
@@ -464,6 +470,9 @@ class ProductHelper extends BaseHelper
                         $customData[$field][$currency_code]['default'] = $min;
 
                         if ($min === $max) {
+                            $min = $this->currencyDirectory->currencyConvert($min, $baseCurrencyCode, $currency_code);
+
+                            $customData[$field][$currency_code]['default'] = $min;
                             $customData[$field][$currency_code]['default_formated'] = $this->formatPrice($min, false, $currency_code);
                         }
                     }

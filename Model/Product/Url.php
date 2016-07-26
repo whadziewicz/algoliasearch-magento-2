@@ -8,6 +8,7 @@ use Magento\Framework\UrlFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Filter\FilterManager;
 use Magento\Framework\Session\SidResolverInterface;
+use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 
 /**
  * The purpose of this class is to fix an issue during indexing where frontend URLs were using

@@ -13,6 +13,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\ProductMetadata;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Search\Model\Query;
 use Magento\Store\Model\App\Emulation;
@@ -42,9 +43,10 @@ class Data
                                 AdditionalSectionHelper $additionalSectionHelper,
                                 Emulation $emulation,
                                 Logger $logger,
-                                ResourceConnection $resource)
+                                ResourceConnection $resource,
+                                ProductMetadata $productMetadata)
     {
-        Version::$custom_value = ' Magento 2 (dev)';
+        Version::$custom_value = '; Magento2 integration 0.8.0; PHP '.phpversion().'; Magento '.$productMetadata->getVersion();
 
         $this->algoliaHelper = $algoliaHelper;
 

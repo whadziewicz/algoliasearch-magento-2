@@ -5,7 +5,6 @@ namespace Algolia\AlgoliaSearch\Helper;
 use AlgoliaSearch\AlgoliaException;
 use AlgoliaSearch\Client;
 use AlgoliaSearch\Version;
-use Magento\Framework\App\ProductMetadata;
 use Magento\Framework\Message\ManagerInterface;
 
 class AlgoliaHelper
@@ -15,7 +14,7 @@ class AlgoliaHelper
     protected $config;
     protected $messageManager;
 
-    public function __construct(ConfigHelper $configHelper, ManagerInterface $messageManager, ProductMetadata $productMetadata)
+    public function __construct(ConfigHelper $configHelper, ManagerInterface $messageManager)
     {
         $this->messageManager = $messageManager;
         $this->config = $configHelper;
@@ -24,7 +23,7 @@ class AlgoliaHelper
 
         Version::addPrefixUserAgentSegment('Magento2 integration', $this->config->getExtensionVersion());
         Version::addSuffixUserAgentSegment('PHP', phpversion());
-        Version::addSuffixUserAgentSegment('Magento', $productMetadata->getVersion());
+        Version::addSuffixUserAgentSegment('Magento', $this->config->getMagentoVersion());
     }
 
     public function resetCredentialsFromConfig()

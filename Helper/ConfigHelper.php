@@ -80,6 +80,7 @@ class ConfigHelper
     private $dirCurrency;
     private $directoryList;
     private $moduleResource;
+    private $productMetadata;
 
     public function __construct(Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
                                 Magento\Framework\ObjectManagerInterface $objectManager,
@@ -87,7 +88,8 @@ class ConfigHelper
                                 Currency $currency,
                                 DirCurrency $dirCurrency,
                                 DirectoryList $directoryList,
-                                Magento\Framework\Module\ResourceInterface $moduleResource)
+                                Magento\Framework\Module\ResourceInterface $moduleResource,
+                                Magento\Framework\App\ProductMetadata $productMetadata)
     {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
@@ -96,6 +98,7 @@ class ConfigHelper
         $this->dirCurrency = $dirCurrency;
         $this->directoryList = $directoryList;
         $this->moduleResource = $moduleResource;
+        $this->productMetadata = $productMetadata;
     }
 
     public function indexOutOfStockOptions($storeId = null)
@@ -106,6 +109,11 @@ class ConfigHelper
     public function showCatsNotIncludedInNavigation($storeId = null)
     {
         return $this->configInterface->getValue(self::SHOW_CATS_NOT_INCLUDED_IN_NAVIGATION, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function getMagentoVersion()
+    {
+        return $this->productMetadata->getVersion();
     }
 
     public function getExtensionVersion()

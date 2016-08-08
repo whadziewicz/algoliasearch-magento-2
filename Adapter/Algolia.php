@@ -7,7 +7,6 @@
 namespace Algolia\AlgoliaSearch\Adapter;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
-use Magento\Framework\App\ProductMetadata;
 use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
@@ -76,8 +75,6 @@ class Algolia implements AdapterInterface
 
     protected $documentFactory;
 
-    protected $productMetadata;
-
     /**
      * @param Mapper                  $mapper
      * @param ResponseFactory         $responseFactory
@@ -96,8 +93,7 @@ class Algolia implements AdapterInterface
         StoreManagerInterface $storeManager,
         AlgoliaHelper $algoliaHelper,
         Http $request,
-        DocumentFactory $documentFactory,
-        ProductMetadata $productMetadata
+        DocumentFactory $documentFactory
     ) {
         $this->mapper = $mapper;
         $this->responseFactory = $responseFactory;
@@ -110,7 +106,6 @@ class Algolia implements AdapterInterface
         $this->algoliaHelper = $algoliaHelper;
         $this->request = $request;
         $this->documentFactory = $documentFactory;
-        $this->productMetadata = $productMetadata;
     }
 
     /**
@@ -141,7 +136,7 @@ class Algolia implements AdapterInterface
             }
 
             $getDocumentMethod = 'getDocument21';
-            if (version_compare($this->productMetadata->getVersion(), '2.1.0', '<') === true) {
+            if (version_compare($this->config->getMagentoVersion(), '2.1.0', '<') === true) {
                 $getDocumentMethod = 'getDocument20';
             }
 

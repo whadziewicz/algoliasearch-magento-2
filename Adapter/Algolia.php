@@ -7,9 +7,10 @@
 namespace Algolia\AlgoliaSearch\Adapter;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Magento\Framework\App\ProductMetadata;
+use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
-use Magento\Framework\DB\Select;
 use Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder as AggregationBuilder;
 use Magento\Framework\Search\Adapter\Mysql\Mapper;
 use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
@@ -73,6 +74,10 @@ class Algolia implements AdapterInterface
 
     protected $request;
 
+    protected $documentFactory;
+
+    protected $productMetadata;
+
     /**
      * @param Mapper                  $mapper
      * @param ResponseFactory         $responseFactory
@@ -90,7 +95,9 @@ class Algolia implements AdapterInterface
         Data $catalogSearchHelper,
         StoreManagerInterface $storeManager,
         AlgoliaHelper $algoliaHelper,
-        Http $request
+        Http $request,
+        DocumentFactory $documentFactory,
+        ProductMetadata $productMetadata
     ) {
         $this->mapper = $mapper;
         $this->responseFactory = $responseFactory;
@@ -102,6 +109,8 @@ class Algolia implements AdapterInterface
         $this->storeManager = $storeManager;
         $this->algoliaHelper = $algoliaHelper;
         $this->request = $request;
+        $this->documentFactory = $documentFactory;
+        $this->productMetadata = $productMetadata;
     }
 
     /**
@@ -125,16 +134,22 @@ class Algolia implements AdapterInterface
             $documents = $this->getDocuments($table);
         } else {
             $algolia_query = $query !== '__empty__' ? $query : '';
+
             //If instant search is on, do not make a search query unless SEO request is set to 'Yes'
             if (!$this->config->isInstantEnabled($storeId) || $this->config->makeSeoRequest($storeId)) {
                 $documents = $this->algoliaHelper->getSearchResult($algolia_query, $storeId);
             }
 
-            $documents_to_store = array_map(function ($document) {
-                return new \Magento\Framework\Search\Document($document['entity_id'], ['score' => new \Magento\Framework\Search\DocumentField('score', $document['score'])]);
+            $getDocumentMethod = 'getDocument21';
+            if (version_compare($this->productMetadata->getVersion(), '2.1.0', '<') === true) {
+                $getDocumentMethod = 'getDocument20';
+            }
+
+            $apiDocuments = array_map(function ($document) use ($getDocumentMethod) {
+                return $this->{$getDocumentMethod}($document);
             }, $documents);
 
-            $table = $temporaryStorage->storeDocuments($documents_to_store);
+            $table = $temporaryStorage->storeApiDocuments($apiDocuments);
         }
 
         $aggregations = $this->aggregationBuilder->build($request, $table);
@@ -171,5 +186,15 @@ class Algolia implements AdapterInterface
     private function getConnection()
     {
         return $this->resource->getConnection();
+    }
+
+    private function getDocument20($document)
+    {
+        return new \Magento\Framework\Search\Document($document['entity_id'], ['score' => new \Magento\Framework\Search\DocumentField('score', $document['score'])]);
+    }
+
+    private function getDocument21($document)
+    {
+        return $this->documentFactory->create($document);
     }
 }

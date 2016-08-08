@@ -4,7 +4,6 @@ namespace Algolia\AlgoliaSearch\Helper;
 
 use Magento;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Locale\Currency;
 use Magento\Directory\Model\Currency as DirCurrency;
 use Magento\Store\Model\ScopeInterface;
@@ -80,13 +79,15 @@ class ConfigHelper
     private $storeManager;
     private $dirCurrency;
     private $directoryList;
+    private $moduleResource;
 
     public function __construct(Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
                                 Magento\Framework\ObjectManagerInterface $objectManager,
                                 StoreManagerInterface $storeManager,
                                 Currency $currency,
                                 DirCurrency $dirCurrency,
-                                DirectoryList $directoryList)
+                                DirectoryList $directoryList,
+                                Magento\Framework\Module\ResourceInterface $moduleResource)
     {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
@@ -94,6 +95,7 @@ class ConfigHelper
         $this->storeManager = $storeManager;
         $this->dirCurrency = $dirCurrency;
         $this->directoryList = $directoryList;
+        $this->moduleResource = $moduleResource;
     }
 
     public function indexOutOfStockOptions($storeId = null)
@@ -108,7 +110,7 @@ class ConfigHelper
 
     public function getExtensionVersion()
     {
-        return "1.0";
+        return $this->moduleResource->getDbVersion('Algolia_AlgoliaSearch');
     }
 
     public function isDefaultSelector($storeId = null)

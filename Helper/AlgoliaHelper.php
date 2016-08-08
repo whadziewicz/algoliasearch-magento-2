@@ -22,7 +22,7 @@ class AlgoliaHelper
 
         $this->resetCredentialsFromConfig();
 
-        Version::addPrefixUserAgentSegment('Magento2 integration', '0.8.0');
+        Version::addPrefixUserAgentSegment('Magento2 integration', $this->config->getExtensionVersion());
         Version::addSuffixUserAgentSegment('PHP', phpversion());
         Version::addSuffixUserAgentSegment('Magento', $productMetadata->getVersion());
     }

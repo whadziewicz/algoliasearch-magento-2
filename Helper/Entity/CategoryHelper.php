@@ -159,6 +159,7 @@ class CategoryHelper extends BaseHelper
             'path'          => $path,
             'level'         => $category->getLevel(),
             'url'           => $category->getUrl(),
+            'include_in_menu' => $category->getIncludeInMenu(),
             '_tags'         => ['category'],
             'popularity'    => 1,
             'product_count' => $category->getProductCount()

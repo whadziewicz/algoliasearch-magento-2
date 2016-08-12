@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.8.4
+
+- Always index categories' attribute `include_in_menu`
+- Follow Magento 2 coding styles
+
 ## 0.8.3
 
 - Add license information to `composer.json`

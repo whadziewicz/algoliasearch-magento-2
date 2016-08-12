@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.8.3
+
+- Add license information to `composer.json`
+
 ## 0.8.2
 
 - Fix fatal error thrown on Algolia search Adapter on version ~2.0.0

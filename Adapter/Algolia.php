@@ -7,19 +7,19 @@
 namespace Algolia\AlgoliaSearch\Adapter;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
-use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
+use Algolia\AlgoliaSearch\Helper\Data as AlgoliaHelper;
+use Magento\CatalogSearch\Helper\Data;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder as AggregationBuilder;
+use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
 use Magento\Framework\Search\Adapter\Mysql\Mapper;
 use Magento\Framework\Search\Adapter\Mysql\ResponseFactory;
 use Magento\Framework\Search\Adapter\Mysql\TemporaryStorageFactory;
 use Magento\Framework\Search\AdapterInterface;
 use Magento\Framework\Search\RequestInterface;
-use Magento\CatalogSearch\Helper\Data;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\App\Request\Http;
-use Algolia\AlgoliaSearch\Helper\Data as AlgoliaHelper;
 
 /**
  * MySQL Search Adapter

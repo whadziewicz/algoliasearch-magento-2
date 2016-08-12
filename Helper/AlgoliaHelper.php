@@ -121,7 +121,7 @@ class AlgoliaHelper
                 foreach ($long_attributes as $attribute) {
                     if (isset($object[$attribute])) {
                         unset($object[$attribute]);
-                        $ids[$index_name.' objectID('.$object['objectID'].')'] = true;
+                        $ids[$index_name . ' objectID(' . $object['objectID'] . ')'] = true;
                         $good_size = false;
                     }
                 }
@@ -139,7 +139,7 @@ class AlgoliaHelper
         }
 
         if ($good_size === false) {
-            $this->messageManager->addError('Algolia reindexing : You have some records ('.implode(',', array_keys($ids)).') that are too big. They have either been truncated or skipped');
+            $this->messageManager->addError('Algolia reindexing : You have some records (' . implode(',', array_keys($ids)) . ') that are too big. They have either been truncated or skipped');
         }
     }
 
@@ -187,17 +187,14 @@ class AlgoliaHelper
 
     private function checkClient($methodName)
     {
-        if (isset($this->client))
-        {
+        if (isset($this->client)) {
             return;
         }
 
         $this->resetCredentialsFromConfig();
 
-
-        if (!isset($this->client))
-        {
-            throw new AlgoliaException('Operation "'.$methodName.' could not be performed because Algolia credetials were not provided.');
+        if (!isset($this->client)) {
+            throw new AlgoliaException('Operation "' . $methodName . ' could not be performed because Algolia credetials were not provided.');
         }
     }
 }

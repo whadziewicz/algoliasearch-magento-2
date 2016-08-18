@@ -597,14 +597,13 @@ a.ais-current-refined-values--link:hover
 }
 
 #autocomplete-products-footer {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  background-color: #F9F9F9;
-  padding: 15px 0;
-  text-align: center;
-  display: none;
+	background-color: #F9F9F9;
+	text-align: center;
+	display: none;
+	position: absolute;
+	width: 100%;
+	padding: 10px 0;
+	bottom: 0;
 }
 
 #algolia-autocomplete-container.reverse #autocomplete-products-footer {

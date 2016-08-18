@@ -89,20 +89,20 @@ if ($config->isInstantEnabled() && $isSearchPage) {
     </script>';
 }
 
-$algoliaJsConfig = array(
-    'instant' => array(
+$algoliaJsConfig = [
+    'instant' => [
         'enabled' => $config->isInstantEnabled(),
         'selector' => $config->getInstantSelector(),
         'isAddToCartEnabled' => $config->isAddToCartEnable(),
-    ),
-    'autocomplete' => array(
+    ],
+    'autocomplete' => [
         'enabled' => $config->isAutoCompleteEnabled(),
         'selector' => $config->getAutocompleteSelector(),
         'sections' => $config->getAutocompleteSections(),
         'nbOfProductsSuggestions' => $config->getNumberOfProductsSuggestions(),
         'nbOfCategoriesSuggestions' => $config->getNumberOfCategoriesSuggestions(),
         'nbOfQueriesSuggestions' => $config->getNumberOfQueriesSuggestions(),
-    ),
+    ],
     'extensionVersion' => $config->getExtensionVersion(),
     'applicationId' => $config->getApplicationID(),
     'indexName' => $productHelper->getBaseIndexName(),
@@ -118,20 +118,20 @@ $algoliaJsConfig = array(
     'currencySymbol' => $currencySymbol,
     'maxValuesPerFacet' => (int) $config->getMaxValuesPerFacet(),
     'autofocus' => true,
-    'request' => array(
+    'request' => [
         'query' => html_entity_decode($query),
         'refinementKey' => $refinementKey,
         'refinementValue' => $refinementValue,
         'path' => $path,
-    ),
+    ],
     'showCatsNotIncludedInNavigation' => $config->showCatsNotIncludedInNavigation(),
     'showSuggestionsOnNoResultsPage' => $config->showSuggestionsOnNoResultsPage(),
     'baseUrl' => $baseUrl,
     'popularQueries' => $config->getPopularQueries(),
-    'urls' => array(
+    'urls' => [
         'logo' => $block->getViewFileUrl('Algolia_AlgoliaSearch::images/algolia-logo.png'),
-    ),
-    'translations' => array(
+    ],
+    'translations' => [
         'to' => __('to'),
         'or' => __('or'),
         'go' => __('Go'),
@@ -152,8 +152,8 @@ $algoliaJsConfig = array(
         'categories' => __('Categories'),
         'products' => __('Products'),
         'searchBy' => __('Search by'),
-    ),
-);
+    ],
+];
 
 ?>
 

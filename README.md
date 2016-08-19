@@ -14,10 +14,10 @@ See features and benefits of [Algolia Search Extension for Magento](https://comm
 The extension officially supports only 2.0.X versions of Magento. 
 It's possible to use it for versions >= 2.1.0, but some unexpected issues might appear. When you experience that, please [open an issue](https://github.com/algolia/algoliasearch-magento-2/issues/new).
 
-Documentation
+Documentation & demo
 --------------
 
-Check out our documentation on [community.algolia.com/magento](https://community.algolia.com/magento/m2-documentation/).
+Check out our documentation on [community.algolia.com/magento](https://community.algolia.com/magento/m2-documentation/) and live demo on [https://magento2.algolia.com](https://magento2.algolia.com). 
 
 Installation
 ------------
@@ -30,11 +30,6 @@ Run the following commands:
 - ```$ bin/magento module:enable Algolia_AlgoliaSearch```
 - ```$ bin/magento setup:upgrade && bin/magento setup:static-content:deploy```
 
-Demo
---------------
-
-You can check out our [live demo](https://magento.algolia.com) of Magento 1 integration. 
-Magento 2 demo is coming!
 
 ### Auto-completion menu
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.0
+
+- Release
+
 ## 0.9.1
 
 - Remove `debug: true` from autocomplete menu

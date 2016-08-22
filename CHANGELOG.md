@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.1
+
+- Remove `debug: true` from autocomplete menu
+
 ## 0.9.0
 
 - Optimized front-end (#54) - **BC break!** 

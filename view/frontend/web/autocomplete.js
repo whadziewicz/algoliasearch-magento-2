@@ -67,7 +67,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					dropdownMenu: '#menu-template'
 				},
 				dropdownMenuContainer: "#algolia-autocomplete-container",
-				debug: true
+				debug: false
 			};
 			
 			if (algoliaConfig.removeBranding === false) {

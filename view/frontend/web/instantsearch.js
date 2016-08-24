@@ -292,7 +292,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 		};
 		
-		/** Add all facet widgets to instatnsearch object **/
+		/** Add all facet widgets to instantsearch object **/
 		
 		window.getFacetWidget = function (facet, templates) {
 			

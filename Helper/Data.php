@@ -164,9 +164,9 @@ class Data
             return;
         }
 
-        $additionnal_sections = $this->configHelper->getAutocompleteSections();
+        $additional_sections = $this->configHelper->getAutocompleteSections();
 
-        foreach ($additionnal_sections as $section) {
+        foreach ($additional_sections as $section) {
             if ($section['name'] === 'products' || $section['name'] === 'categories' || $section['name'] === 'pages' || $section['name'] === 'suggestions') {
                 continue;
             }

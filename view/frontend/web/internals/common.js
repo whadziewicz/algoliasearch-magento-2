@@ -190,7 +190,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					templates: {
 						suggestion: function (hit) {
 							hit.url = algoliaConfig.baseUrl + '/catalogsearch/result/?q=' + hit.value + '&refinement_key=' + section.name;
-							return algoliaConfig.autocomplete.templates.additionnalSection.render(hit);
+							return algoliaConfig.autocomplete.templates.additionalSection.render(hit);
 						}
 					}
 				};

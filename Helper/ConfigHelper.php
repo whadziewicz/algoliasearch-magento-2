@@ -158,7 +158,7 @@ class ConfigHelper
 
     public function isEnabledFrontEnd($storeId = null)
     {
-        // Frontend = Backend + Frontent
+        // Frontend = Backend + Frontend
         return (bool) $this->configInterface->getValue(self::ENABLE_BACKEND, ScopeInterface::SCOPE_STORE, $storeId) && (bool) $this->configInterface->getValue(self::ENABLE_FRONTEND, ScopeInterface::SCOPE_STORE, $storeId);
     }
 

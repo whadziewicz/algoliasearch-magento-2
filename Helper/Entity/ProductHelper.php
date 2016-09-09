@@ -291,7 +291,7 @@ class ProductHelper extends BaseHelper
                 $synonymsToSet[] = [
                     'objectID' => $objectID,
                     'type' => 'synonym',
-                    'synonyms' => $this->explodeSynomyms($synonym['synonyms']),
+                    'synonyms' => $this->explodeSynonyms($synonym['synonyms']),
                 ];
             }
 
@@ -301,7 +301,7 @@ class ProductHelper extends BaseHelper
                     'objectID' => $objectID,
                     'type' => 'oneWaySynonym',
                     'input' => $onewaySynonym['input'],
-                    'synonyms' => $this->explodeSynomyms($onewaySynonym['synonyms']),
+                    'synonyms' => $this->explodeSynonyms($onewaySynonym['synonyms']),
                 ];
             }
         }
@@ -800,7 +800,7 @@ class ProductHelper extends BaseHelper
         return $customData;
     }
 
-    private function explodeSynomyms($synonyms)
+    private function explodeSynonyms($synonyms)
     {
         return array_map('trim', explode(',', $synonyms));
     }

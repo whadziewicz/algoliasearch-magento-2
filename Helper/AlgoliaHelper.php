@@ -194,7 +194,7 @@ class AlgoliaHelper
         $this->resetCredentialsFromConfig();
 
         if (!isset($this->client)) {
-            throw new AlgoliaException('Operation "' . $methodName . ' could not be performed because Algolia credetials were not provided.');
+            throw new AlgoliaException('Operation "' . $methodName . ' could not be performed because Algolia credentials were not provided.');
         }
     }
 }

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.0.1
+
+- Fixed issue with merging JS files - added new line at the end of [algoliaBundle.min.js](https://github.com/algolia/algoliasearch-magento-2/blob/master/view/frontend/web/internals/algoliaBundle.min.js)
+- Fixed page indexing when some excluded pages were set
+- Fixed data types of `enabled` variables in `algoliaConfig`
+- Fixed few typos
+
 ## 1.0.0
 
 - Release

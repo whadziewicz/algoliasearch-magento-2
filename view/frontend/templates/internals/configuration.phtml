@@ -91,12 +91,12 @@ if ($config->isInstantEnabled() && $isSearchPage) {
 
 $algoliaJsConfig = [
     'instant' => [
-        'enabled' => $config->isInstantEnabled(),
+        'enabled' => (bool) $config->isInstantEnabled(),
         'selector' => $config->getInstantSelector(),
         'isAddToCartEnabled' => $config->isAddToCartEnable(),
     ],
     'autocomplete' => [
-        'enabled' => $config->isAutoCompleteEnabled(),
+        'enabled' => (bool) $config->isAutoCompleteEnabled(),
         'selector' => $config->getAutocompleteSelector(),
         'sections' => $config->getAutocompleteSections(),
         'nbOfProductsSuggestions' => $config->getNumberOfProductsSuggestions(),

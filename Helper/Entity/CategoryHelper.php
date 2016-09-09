@@ -172,10 +172,10 @@ class CategoryHelper extends BaseHelper
         foreach ($this->config->getCategoryAdditionalAttributes($storeId) as $attribute) {
             $value = $category->getData($attribute['attribute']);
 
-            $attribute_ressource = $category->getResource()->getAttribute($attribute['attribute']);
+            $attribute_resource = $category->getResource()->getAttribute($attribute['attribute']);
 
-            if ($attribute_ressource) {
-                $value = $attribute_ressource->getFrontend()->getValue($category);
+            if ($attribute_resource) {
+                $value = $attribute_resource->getFrontend()->getValue($category);
             }
 
             if (isset($data[$attribute['attribute']])) {

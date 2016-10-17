@@ -116,6 +116,11 @@ class ConfigHelper
         return $this->productMetadata->getVersion();
     }
 
+    public function getMagentoEdition()
+    {
+        return $this->productMetadata->getEdition();
+    }
+
     public function getExtensionVersion()
     {
         return $this->moduleResource->getDbVersion('Algolia_AlgoliaSearch');

@@ -17,7 +17,7 @@ It's possible to use it for versions >= 2.1.0, but some unexpected issues might 
 Documentation & demo
 --------------
 
-Check out our documentation on [community.algolia.com/magento](https://community.algolia.com/magento/m2-documentation/) and live demo on [https://magento2.algolia.com](https://magento2.algolia.com). 
+Check out our documentation on [community.algolia.com/magento](https://community.algolia.com/magento/doc/m2/getting-started/) and live demo on [https://magento2.algolia.com](https://magento2.algolia.com). 
 
 Installation
 ------------

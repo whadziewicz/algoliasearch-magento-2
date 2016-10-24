@@ -7,7 +7,7 @@ This extension replaces the default search of Magento with a typo-tolerant, fast
 
 See features and benefits of [Algolia Search Extension for Magento](https://community.algolia.com/magento).
 
-![Latest version](https://img.shields.io/badge/latest-1.0.1-green.svg)
+![Latest version](https://img.shields.io/badge/latest-1.0.3-green.svg)
 ![Magento 2.0.X](https://img.shields.io/badge/Magento-2.0.X-blue.svg)
 ![PHP >= 5.5.22](https://img.shields.io/badge/PHP-%3E=5.5.22-green.svg)
 

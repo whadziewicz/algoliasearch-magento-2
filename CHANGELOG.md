@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.0.3
+
+- Fixed issue with indexing content on Magento 2.1 EE and higher (#87)
+- Fixed page indexing to index pages only from active stores (#82)
+
+## 1.0.2
+
+- Fixed issue with merging JS files in administration - added new line at the end of [algoliaAdminBundle.min.js](https://github.com/algolia/algoliasearch-magento-2/blob/master/view/adminhtml/web/algoliaAdminBundle.min.js)
+
 ## 1.0.1
 
 - Fixed issue with merging JS files - added new line at the end of [algoliaBundle.min.js](https://github.com/algolia/algoliasearch-magento-2/blob/master/view/frontend/web/internals/algoliaBundle.min.js)

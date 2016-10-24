@@ -48,6 +48,8 @@ abstract class BaseHelper
 
     protected $storeUrls;
 
+    private $idColumn;
+
     abstract protected function getIndexNameSuffix();
 
     public function __construct(Config $eavConfig,
@@ -210,11 +212,11 @@ abstract class BaseHelper
             if ($attribute = $resource->getAttribute('is_active')) {
                 $connection = $this->queryResource->getConnection();
                 $select = $connection->select()
-                    ->from(['backend' => $attribute->getBackendTable()], ['key' => new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.entity_id)"), 'category.path', 'backend.value'])
-                    ->join(['category' => $resource->getTable('catalog_category_entity')], 'backend.entity_id = category.entity_id', [])
+                    ->from(['backend' => $attribute->getBackendTable()], ['key' => new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$this->getCorrectIdColumn().")"), 'category.path', 'backend.value'])
+                    ->join(['category' => $resource->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.entity_id', [])
                     ->where('backend.attribute_id = ?', $attribute->getAttributeId())
                     ->order('backend.store_id')
-                    ->order('backend.entity_id');
+                    ->order('backend.'.$this->getCorrectIdColumn());
 
                 self::$_activeCategories = $connection->fetchAssoc($select);
             }
@@ -246,8 +248,8 @@ abstract class BaseHelper
                 $connection = $this->queryResource->getConnection();
 
                 $select = $connection->select()
-                    ->from(['backend' => $attribute->getBackendTable()], [new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.entity_id)"), 'backend.value'])
-                    ->join(['category' => $categoryModel->getTable('catalog_category_entity')], 'backend.entity_id = category.entity_id', [])
+                    ->from(['backend' => $attribute->getBackendTable()], [new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$this->getCorrectIdColumn().")"), 'backend.value'])
+                    ->join(['category' => $categoryModel->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.entity_id', [])
                     ->where('backend.attribute_id = ?', $attribute->getAttributeId())
                     ->where('category.level > ?', 1);
 
@@ -321,6 +323,21 @@ abstract class BaseHelper
             return $this->storeUrls[$store_id];
         }
 
-        return;
+        return null;
+    }
+
+    protected function getCorrectIdColumn()
+    {
+        if(isset($this->idColumn)) {
+            return $this->idColumn;
+        }
+
+        $this->idColumn = 'entity_id';
+
+        if ($this->config->getMagentoEdition() !== 'Community' && version_compare($this->config->getMagentoVersion(), '2.1.0', '>=')) {
+            $this->idColumn = 'row_id';
+        }
+
+        return $this->idColumn;
     }
 }

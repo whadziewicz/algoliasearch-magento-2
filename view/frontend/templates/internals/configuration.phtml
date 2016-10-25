@@ -59,7 +59,7 @@ if ($config->isInstantEnabled()) {
     $pageIdentifier = $block->getRequest()->getFullActionName();
 
     if ($pageIdentifier === 'catalogsearch_result_index') {
-        $query = $catalogSearchHelper->getEscapedQueryText();
+        $query = $block->getRequest()->getParam($catalogSearchHelper->getQueryParamName());
 
         if ($query == '__empty__') {
             $query = '';

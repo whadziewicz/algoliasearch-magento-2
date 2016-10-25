@@ -48,6 +48,7 @@ class CategoryHelper extends BaseHelper
             'customRanking'           => $customRankingsArr,
             'unretrievableAttributes' => $unretrievableAttributes,
         ];
+
         // Additional index settings from event observer
         $transport = new DataObject($indexSettings);
         $this->eventManager->dispatch('algolia_index_settings_prepare', [
@@ -57,7 +58,7 @@ class CategoryHelper extends BaseHelper
         );
         $indexSettings = $transport->getData();
 
-        $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
+        $indexSettings = $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
 
         return $indexSettings;
     }

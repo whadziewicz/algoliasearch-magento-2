@@ -58,7 +58,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 		});
 		
-		search.client.addAlgoliaAgent('Magento integration (' + algoliaConfig.extensionVersion + ')');
+		search.client.addAlgoliaAgent('Magento2 integration (' + algoliaConfig.extensionVersion + ')');
 		
 		/**
 		 * Custom widget - this widget is used to refine results for search page or catalog page

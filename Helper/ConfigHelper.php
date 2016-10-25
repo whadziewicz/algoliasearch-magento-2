@@ -501,6 +501,7 @@ class ConfigHelper
             'image_url',
             'in_stock',
             'type_id',
+            'value',
         ]);
 
         $currencies = $this->dirCurrency->getConfigAllowCurrencies();

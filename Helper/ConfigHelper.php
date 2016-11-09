@@ -89,7 +89,7 @@ class ConfigHelper
                                 DirCurrency $dirCurrency,
                                 DirectoryList $directoryList,
                                 Magento\Framework\Module\ResourceInterface $moduleResource,
-                                Magento\Framework\App\ProductMetadata $productMetadata)
+                                Magento\Framework\App\ProductMetadataInterface $productMetadata)
     {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
@@ -501,6 +501,7 @@ class ConfigHelper
             'image_url',
             'in_stock',
             'type_id',
+            'value',
         ]);
 
         $currencies = $this->dirCurrency->getConfigAllowCurrencies();

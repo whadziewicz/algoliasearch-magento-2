@@ -331,6 +331,13 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 		};
 		
+		window.createISWidgetContainer = function (attributeName) {
+			var div = document.createElement('div');
+			div.className = 'is-widget-container-' + attributeName.split('.').join('_');
+			
+			return div;
+		};
+		
 		var instant_selector = !algoliaConfig.autocomplete.enabled ? ".algolia-search-input" : "#instant-search-bar";
 		
 		$(document).on('input', algoliaConfig.autocomplete.selector, function () {

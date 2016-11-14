@@ -52,9 +52,9 @@ class ConfigHelper
     const IS_ACTIVE = 'algoliasearch_queue/queue/active';
     const NUMBER_OF_JOB_TO_RUN = 'algoliasearch_queue/queue/number_of_job_to_run';
 
-    const XML_PATH_IMAGE_WIDTH = 'algoliasearch_image/image/width';
-    const XML_PATH_IMAGE_HEIGHT = 'algoliasearch_image/image/height';
-    const XML_PATH_IMAGE_TYPE = 'algoliasearch_image/image/type';
+    const XML_PATH_IMAGE_WIDTH = 'algoliasearch_images/image/width';
+    const XML_PATH_IMAGE_HEIGHT = 'algoliasearch_images/image/height';
+    const XML_PATH_IMAGE_TYPE = 'algoliasearch_images/image/type';
 
     const SYNONYMS = 'algoliasearch_synonyms/synonyms_group/synonyms';
     const ONEWAY_SYNONYMS = 'algoliasearch_synonyms/synonyms_group/oneway_synonyms';

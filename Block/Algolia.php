@@ -6,11 +6,8 @@ use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\ActionInterface;
-use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Locale\Currency;
 use Magento\Framework\Registry;
-use Magento\Framework\Url\Helper\Data;
 use Magento\Framework\View\Element\Template;
 use Magento\Search\Helper\Data as CatalogSearchHelper;
 
@@ -25,8 +22,6 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
     protected $productHelper;
     protected $currency;
     protected $algoliaHelper;
-    protected $urlHelper;
-    protected $formKey;
 
     protected $priceKey;
 
@@ -39,8 +34,6 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
         Currency $currency,
         Registry $registry,
         AlgoliaHelper $algoliaHelper,
-        Data $urlHelper,
-        FormKey $formKey,
         array $data = []
     ) {
         $this->config = $config;
@@ -50,8 +43,6 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
         $this->currency = $currency;
         $this->registry = $registry;
         $this->algoliaHelper = $algoliaHelper;
-        $this->urlHelper = $urlHelper;
-        $this->formKey = $formKey;
 
         parent::__construct($context, $data);
     }
@@ -109,32 +100,5 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
     public function getCurrentCategory()
     {
         return $this->registry->registry('current_category');
-    }
-
-    public function getAddToCartParams()
-    {
-        $url = $this->getAddToCartUrl();
-
-        return [
-            'action' => $url,
-            'formKey' => $this->formKey->getFormKey(),
-        ];
-    }
-
-    private function getAddToCartUrl($additional = [])
-    {
-        $continueUrl = $this->urlHelper->getEncodedUrl($this->_urlBuilder->getCurrentUrl());
-        $urlParamName = ActionInterface::PARAM_NAME_URL_ENCODED;
-
-        $routeParams = [
-            $urlParamName => $continueUrl,
-            '_secure' => $this->algoliaHelper->getRequest()->isSecure()
-        ];
-
-        if (!empty($additional)) {
-            $routeParams = array_merge($routeParams, $additional);
-        }
-
-        return $this->_urlBuilder->getUrl('checkout/cart/add', $routeParams);
     }
 }

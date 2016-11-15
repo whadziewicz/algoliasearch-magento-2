@@ -1,8 +1,5 @@
 <?php
-/**
- * @var \Magento\Framework\View\TemplateEngine\Php $this
- * @var \Algolia\AlgoliaSearch\Block\Algolia $block
- */
+/** @var \Algolia\AlgoliaSearch\Block\Algolia $block */
 
 $config = $block->getConfigHelper();
 
@@ -30,8 +27,6 @@ $query = '';
 $refinementKey = '';
 $refinementValue = '';
 $path = '';
-
-$addToCartParams = $block->getAddToCartParams();
 
 /**
  * Handle category replacement
@@ -99,7 +94,6 @@ $algoliaJsConfig = [
         'enabled' => (bool) $config->isInstantEnabled(),
         'selector' => $config->getInstantSelector(),
         'isAddToCartEnabled' => $config->isAddToCartEnable(),
-        'addToCartParams' => $addToCartParams,
     ],
     'autocomplete' => [
         'enabled' => (bool) $config->isAutoCompleteEnabled(),

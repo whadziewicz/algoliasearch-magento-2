@@ -47,7 +47,19 @@ class ProductHelper extends BaseHelper
 
             $allAttributes = $this->eavConfig->getEntityAttributeCodes('catalog_product');
 
-            $productAttributes = array_merge(['name', 'path', 'categories', 'categories_without_path', 'description', 'ordered_qty', 'total_ordered', 'stock_qty', 'rating_summary', 'media_gallery'], $allAttributes);
+            $productAttributes = array_merge([
+                'name',
+                'path',
+                'categories',
+                'categories_without_path',
+                'description',
+                'ordered_qty',
+                'total_ordered',
+                'stock_qty',
+                'rating_summary',
+                'media_gallery',
+                'in_stock',
+            ], $allAttributes);
 
             $excludedAttributes = [
                 'all_children', 'available_sort_by', 'children', 'children_count', 'custom_apply_to_products',

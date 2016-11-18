@@ -264,7 +264,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					hierarchical_levels.push('categories.level' + l.toString());
 				
 				var hierarchicalMenuParams = {
-					container: facet.wrapper.appendChild(document.createElement('div')),
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributes: hierarchical_levels,
 					separator: ' /// ',
 					alwaysGetRootLevel: true,
@@ -300,7 +300,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				delete templates.item;
 				
 				return algoliaBundle.instantsearch.widgets.priceRanges({
-					container: facet.wrapper.appendChild(document.createElement('div')),
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					labels: {
 						currency: algoliaConfig.currencySymbol,
@@ -316,7 +316,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			
 			if (facet.type === 'conjunctive') {
 				return algoliaBundle.instantsearch.widgets.refinementList({
-					container: facet.wrapper.appendChild(document.createElement('div')),
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					limit: algoliaConfig.maxValuesPerFacet,
 					operator: 'and',
@@ -329,7 +329,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			
 			if (facet.type === 'disjunctive') {
 				return algoliaBundle.instantsearch.widgets.refinementList({
-					container: facet.wrapper.appendChild(document.createElement('div')),
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					limit: algoliaConfig.maxValuesPerFacet,
 					operator: 'or',
@@ -344,7 +344,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				delete templates.item;
 				
 				return algoliaBundle.instantsearch.widgets.rangeSlider({
-					container: facet.wrapper.appendChild(document.createElement('div')),
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					templates: templates,
 					cssClasses: {

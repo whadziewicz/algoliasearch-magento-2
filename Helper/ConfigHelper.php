@@ -5,6 +5,7 @@ namespace Algolia\AlgoliaSearch\Helper;
 use Magento;
 use Magento\Directory\Model\Currency as DirCurrency;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\DataObject;
 use Magento\Framework\Locale\Currency;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -81,6 +82,7 @@ class ConfigHelper
     private $directoryList;
     private $moduleResource;
     private $productMetadata;
+    private $eventManager;
 
     public function __construct(Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
                                 Magento\Framework\ObjectManagerInterface $objectManager,
@@ -89,7 +91,8 @@ class ConfigHelper
                                 DirCurrency $dirCurrency,
                                 DirectoryList $directoryList,
                                 Magento\Framework\Module\ResourceInterface $moduleResource,
-                                Magento\Framework\App\ProductMetadataInterface $productMetadata)
+                                Magento\Framework\App\ProductMetadataInterface $productMetadata,
+                                Magento\Framework\Event\ManagerInterface $eventManager)
     {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
@@ -99,6 +102,7 @@ class ConfigHelper
         $this->directoryList = $directoryList;
         $this->moduleResource = $moduleResource;
         $this->productMetadata = $productMetadata;
+        $this->eventManager = $eventManager;
     }
 
     public function indexOutOfStockOptions($storeId = null)
@@ -514,6 +518,10 @@ class ConfigHelper
             $attributes[] = 'price.' . $currency . '.special_from_date';
             $attributes[] = 'price.' . $currency . '.special_to_date';
         }
+
+        $transport = new DataObject($attributes);
+        $this->eventManager->dispatch('algolia_get_retrievable_attributes', ['attributes' => $transport]);
+        $attributes = $transport->getData();
 
         return ['attributesToRetrieve' => $attributes];
     }

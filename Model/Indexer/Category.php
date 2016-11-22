@@ -60,7 +60,7 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
         foreach ($storeIds as $storeId) {
             if ($categoryIds !== null) {
                 $indexName = $this->categoryHelper->getIndexName($storeId);
-                $this->queue->addToQueue($this->fullAction, 'deleteObjects', ['category_ids' => $categoryIds, 'index_name' => $indexName], count($categoryIds));
+                $this->queue->addToQueue($this->fullAction, 'deleteObjects', ['store_id' => $storeId, 'category_ids' => $categoryIds, 'index_name' => $indexName], count($categoryIds));
             } else {
                 $this->queue->addToQueue($this->fullAction, 'saveConfigurationToAlgolia', ['store_id' => $storeId], 1);
             }

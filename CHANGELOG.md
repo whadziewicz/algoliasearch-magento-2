@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.0.4
+
+- Fixed User-Agent from Magento 1 to Magento 2 (#92)
+- Fixed additional sections' links in autocomplete menu (#93)
+- All searchable attributes are set as Unordered by default (#94)
+- Fixed configHelper to use ProductMetadataInterface to get the correct dependecy (#97)
+- Fixed indexing of categories when option "Show categories that are not included in the navigation menu" weren't taken into account (#100)
+- Fixed backend Algolia adapter to correctly respect "Make SEO request" configuration (#101)
+- Fixed images config paths (#104)
+- Added specific HTML classes to refinement widget containers (#105)
+- Fixed the issue when queue runner didn't process any job after specific settings changed. Now it process always at least one job (#106)
+- Fixed the functionality of "Add To Cart" button (#107)
+- Attribute `in_stock` is now exposed in Algolia configuration and can be used for custom ranking or sorting (#109)
+- Add `algolia_get_retrievable_attributes` custom event to `getRetrievableAttributes` method to allow developers set custom retrievable  attributes for generated API keys (#112)
+- Fixed queue issue when `store_id` parameter was not passed to `deleteObjects` categories' operation (#113)
+
 ## 1.0.3
 
 - Fixed issue with indexing content on Magento 2.1 EE and higher (#87)

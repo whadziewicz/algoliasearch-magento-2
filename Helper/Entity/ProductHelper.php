@@ -233,9 +233,10 @@ class ProductHelper extends BaseHelper
         /*
          * Handle Slaves
          */
+        $isInstantSearchEnabled = (bool) $this->config->isInstantEnabled($storeId);
         $sorting_indices = $this->config->getSortingIndices($storeId);
 
-        if (count($sorting_indices) > 0) {
+        if ($isInstantSearchEnabled === true && count($sorting_indices) > 0) {
             $slaves = [];
 
             foreach ($sorting_indices as $values) {

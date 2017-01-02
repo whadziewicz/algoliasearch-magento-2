@@ -231,14 +231,14 @@ class ProductHelper extends BaseHelper
         }
 
         /*
-         * Handle Slaves
+         * Handle replicas
          */
-        $sorting_indices = $this->config->getSortingIndices($storeId);
+        $sortingIndices = $this->config->getSortingIndices($storeId);
 
-        if (count($sorting_indices) > 0) {
-            $slaves = [];
+        if (count($sortingIndices) > 0) {
+            $replicas = [];
 
-            foreach ($sorting_indices as $values) {
+            foreach ($sortingIndices as $values) {
                 if ($this->config->isCustomerGroupsEnabled($storeId)) {
                     if ($values['attribute'] === 'price') {
                         $groupCollection = $this->objectManager->create('Magento\Customer\Model\ResourceModel\Group\Collection');
@@ -248,21 +248,21 @@ class ProductHelper extends BaseHelper
 
                             $suffix_index_name = 'group_' . $group_id;
 
-                            $slaves[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $suffix_index_name . '_' . $values['sort'];
+                            $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $suffix_index_name . '_' . $values['sort'];
                         }
                     }
                 } else {
                     if ($values['attribute'] === 'price') {
-                        $slaves[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_default_' . $values['sort'];
+                        $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_default_' . $values['sort'];
                     } else {
-                        $slaves[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $values['sort'];
+                        $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $values['sort'];
                     }
                 }
             }
 
-            $this->algoliaHelper->setSettings($this->getIndexName($storeId), ['slaves' => $slaves]);
+            $this->algoliaHelper->setSettings($this->getIndexName($storeId), ['replicas' => $replicas]);
 
-            foreach ($sorting_indices as $values) {
+            foreach ($sortingIndices as $values) {
                 if ($this->config->isCustomerGroupsEnabled($storeId)) {
                     if (strpos($values['attribute'], 'price') !== false) {
                         $groupCollection = $this->objectManager->create('Magento\Customer\Model\ResourceModel\Group\Collection');

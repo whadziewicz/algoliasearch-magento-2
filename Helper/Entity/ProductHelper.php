@@ -797,13 +797,13 @@ class ProductHelper extends BaseHelper
 
         $this->handlePrice($product, $sub_products, $customData);
 
+        $customData['type_id'] = $type;
+
         $transport = new DataObject($customData);
         $this->eventManager->dispatch('algolia_subproducts_index', ['custom_data' => $transport, 'sub_products' => $sub_products]);
         $customData = $transport->getData();
 
         $customData = array_merge($customData, $defaultData);
-
-        $customData['type_id'] = $type;
 
         $this->castProductObject($customData);
 

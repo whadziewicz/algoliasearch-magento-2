@@ -57,8 +57,7 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
         foreach ($storeIds as $storeId) {
             if (is_array($productIds) && count($productIds) > 0) {
                 $this->queue->addToQueue($this->fullAction, 'rebuildStoreProductIndex', ['store_id' => $storeId, 'product_ids' => $productIds], count($productIds));
-
-                return;
+                continue;
             }
 
             $useTmpIndex = $this->configHelper->isQueueActive($storeId);

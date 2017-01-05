@@ -233,9 +233,10 @@ class ProductHelper extends BaseHelper
         /*
          * Handle replicas
          */
+        $isInstantSearchEnabled = (bool) $this->config->isInstantEnabled($storeId);
         $sortingIndices = $this->config->getSortingIndices($storeId);
 
-        if (count($sortingIndices) > 0) {
+        if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
             $replicas = [];
 
             foreach ($sortingIndices as $values) {

@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 1.0.5
+
+- Official support of Magento >= 2.1 (#117)
+- Fixed method signature for delete objects in Algolia (#120)
+- Show all configuration options in website and store views (#133)
+- Option "Make SEO Request" is enabled by default now (#134)
+- CMS pages are now indexed correctly for specific stores (#135)
+- Product's custom data now contains it's `type` in `algolia_subproducs_index` event (#136)
+- Replica indices are now not created when Instant Search feature is not enabled (#137)
+- New Algolia logo is used in autocomplete menu (#138)
+- The extension now sends `replicas` index setting instead of `slaves` (#139)
+- Products are now indexed correctly into all assigned stores (#140)
+
 ## 1.0.4
 
 - Fixed User-Agent from Magento 1 to Magento 2 (#92)

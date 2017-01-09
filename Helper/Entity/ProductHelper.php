@@ -112,7 +112,7 @@ class ProductHelper extends BaseHelper
             $products = $products->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSearchIds()]);
         }
 
-        if (false === $this->config->getShowOutOfStock($storeId)) {
+        if ($this->config->getShowOutOfStock($storeId) === false) {
             $this->stock->addInStockFilterToCollection($products);
         }
 

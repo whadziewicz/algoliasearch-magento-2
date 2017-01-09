@@ -188,7 +188,7 @@ class ConfigHelper
 
     public function getShowOutOfStock($storeId = null)
     {
-        return $this->configInterface->getValue(self::SHOW_OUT_OF_STOCK, ScopeInterface::SCOPE_STORE, $storeId);
+        return (bool) $this->configInterface->getValue(self::SHOW_OUT_OF_STOCK, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function noProcess($storeId = null)

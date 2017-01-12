@@ -117,7 +117,7 @@ class ProductHelper extends BaseHelper
         }
 
         /* @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-        $products = $products->addFinalPrice()
+        $products = $products
             ->addAttributeToSelect('special_from_date')
             ->addAttributeToSelect('special_to_date')
             ->addAttributeToSelect('visibility')
@@ -363,6 +363,8 @@ class ProductHelper extends BaseHelper
         $currencies = $this->currencyHelper->getConfigAllowCurrencies();
         $baseCurrencyCode = $store->getBaseCurrencyCode();
 
+        $priceInfo = $product->getPriceInfo();
+
         $groups = [];
 
         if ($customer_groups_enabled) {
@@ -375,13 +377,15 @@ class ProductHelper extends BaseHelper
             foreach ($currencies as $currency_code) {
                 $customData[$field][$currency_code] = [];
 
-                $price = (double) $this->catalogHelper->getTaxPrice($product, $product->getPrice(), $with_tax, null, null, null, $product->getStore(), null);
+                $price = $priceInfo->getPrice('regular_price')->getValue();
+                $price = (double) $this->catalogHelper->getTaxPrice($product, $price, $with_tax, null, null, null, $product->getStore(), null);
                 $price = $this->currencyDirectory->currencyConvert($price, $baseCurrencyCode, $currency_code);
 
                 $customData[$field][$currency_code]['default'] = $price;
                 $customData[$field][$currency_code]['default_formated'] = $this->formatPrice($price, false, $currency_code);
 
-                $special_price = (double) $this->catalogHelper->getTaxPrice($product, $product->getFinalPrice(), $with_tax, null, null, null, $product->getStore(), null);
+                $special_price = $priceInfo->getPrice('final_price')->getValue();
+                $special_price = (double) $this->catalogHelper->getTaxPrice($product, $special_price, $with_tax, null, null, null, $product->getStore(), null);
                 $special_price = $this->currencyDirectory->currencyConvert($special_price, $baseCurrencyCode, $currency_code);
 
                 if ($customer_groups_enabled) {

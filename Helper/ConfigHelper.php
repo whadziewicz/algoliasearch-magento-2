@@ -259,7 +259,7 @@ class ConfigHelper
 
     public function isAddToCartEnable($storeId = null)
     {
-        return $this->configInterface->getValue(self::XML_ADD_TO_CART_ENABLE, ScopeInterface::SCOPE_STORE, $storeId);
+        return (bool) $this->configInterface->getValue(self::XML_ADD_TO_CART_ENABLE, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isRemoveBranding($storeId = null)

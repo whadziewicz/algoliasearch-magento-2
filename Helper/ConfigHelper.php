@@ -513,6 +513,7 @@ class ConfigHelper
         foreach ($currencies as $currency) {
             $attributes[] = 'price.' . $currency . '.default';
             $attributes[] = 'price.' . $currency . '.default_formated';
+            $attributes[] = 'price.' . $currency . '.default_original_formated';
             $attributes[] = 'price.' . $currency . '.group_' . $group_id;
             $attributes[] = 'price.' . $currency . '.group_' . $group_id . '_formated';
             $attributes[] = 'price.' . $currency . '.special_from_date';

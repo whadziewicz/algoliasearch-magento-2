@@ -10,6 +10,7 @@ use Algolia\AlgoliaSearch\Model\Queue;
 use Magento;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Framework\Mview\ActionInterface
 {
@@ -20,15 +21,18 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
     private $configHelper;
     private $queue;
     private $messageManager;
+    private $output;
 
-    public function __construct(StoreManagerInterface $storeManager,
-                                ProductHelper $productHelper,
-                                Data $helper,
-                                AlgoliaHelper $algoliaHelper,
-                                ConfigHelper $configHelper,
-                                Queue $queue,
-                                ManagerInterface $messageManager)
-    {
+    public function __construct(
+        StoreManagerInterface $storeManager,
+        ProductHelper $productHelper,
+        Data $helper,
+        AlgoliaHelper $algoliaHelper,
+        ConfigHelper $configHelper,
+        Queue $queue,
+        ManagerInterface $messageManager,
+        ConsoleOutput $output
+    ) {
         $this->fullAction = $helper;
         $this->storeManager = $storeManager;
         $this->productHelper = $productHelper;
@@ -36,6 +40,7 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
         $this->configHelper = $configHelper;
         $this->queue = $queue;
         $this->messageManager = $messageManager;
+        $this->output = $output;
     }
 
     public function execute($productIds)
@@ -44,10 +49,12 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
             $errorMessage = 'Algolia reindexing failed: You need to configure your Algolia credentials in Stores > Configuration > Algolia Search.';
 
             if (php_sapi_name() === 'cli') {
-                throw new \Exception($errorMessage);
+                $this->output->writeln($errorMessage);
+
+                return;
             }
 
-            $this->messageManager->addErrorMessage($errorMessage);
+            $this->messageManager->addWarning($errorMessage);
 
             return;
         }

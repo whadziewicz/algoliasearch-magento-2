@@ -117,7 +117,7 @@ class ProductHelper extends BaseHelper
         }
 
         /* @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-        $products = $products
+        $products = $products->addFinalPrice()
             ->addAttributeToSelect('special_from_date')
             ->addAttributeToSelect('special_to_date')
             ->addAttributeToSelect('visibility')

@@ -135,13 +135,36 @@ abstract class BaseHelper
         }
     }
 
-    protected function strip($s)
+    protected function strip($s, $completeRemoveTags = array())
     {
+        if (!empty($completeRemoveTags) && $s) {
+            $dom = new \DOMDocument();
+            if (@$dom->loadHTML($s)) {
+                $toRemove = array();
+                foreach ($completeRemoveTags as $tag) {
+                    $removeTags = $dom->getElementsByTagName($tag);
+
+                    foreach ($removeTags as $item) {
+                        $toRemove[] = $item;
+                    }
+                }
+
+                foreach ($toRemove as $item) {
+                    $item->parentNode->removeChild($item);
+                }
+
+                $s = $dom->saveHTML();
+            }
+        }
+
         $s = trim(preg_replace('/\s+/', ' ', $s));
         $s = preg_replace('/&nbsp;/', ' ', $s);
         $s = preg_replace('!\s+!', ' ', $s);
+        $s = preg_replace('/\{\{[^}]+\}\}/', ' ', $s);
+        $s = strip_tags($s);
+        $s = trim($s);
 
-        return trim(strip_tags($s));
+        return $s;
     }
 
     public function isCategoryActive($categoryId, $storeId = null)

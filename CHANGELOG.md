@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 1.0.6
+
+- Fixed indexing of out-of-stock products (#142)
+- Fixed CSS for showing products's ratings on instant search page (#143)
+- The category refinement is now displayed in Current filters section and it's easy to remove on replaced category page (#144)
+- Fixed indexing of prices with applied price rules (#145, #160)
+- Formatted default original price attribute is now retrieved from Algolia by default (#151)
+- Fixed showing of "Add to cart" button (#152)
+- Exception is not thrown anymore from Algolia indexers when Algolia credentials are not filled in (#155)
+    - Fixes the installation abortion when the extension was installed before Magento's installation
+- Fixed the layout handle to load templates correctly to Ultimo theme (#156)
+- Fixed admin JavaScript to load correctly and not conflict with other pages (#159, #162)
+- `script` and `style` tags are now completely (with it's content) removed from CMS pages' indexed content (#163)
+- New version of instantsearch.js and autocomplete.js libraries (#165)
+
 ## 1.0.5
 
 - Official support of Magento >= 2.1 (#117)

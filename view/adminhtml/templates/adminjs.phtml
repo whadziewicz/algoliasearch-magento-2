@@ -1,11 +1,5 @@
 <script>
 document.addEventListener("DOMContentLoaded", function(event) {
-    requirejs.config({
-        paths: {
-            'algoliaAdminBundle': 'Algolia_AlgoliaSearch/algoliaAdminBundle.min'
-        }
-    });
-
     requirejs(['algoliaAdminBundle'], function(algoliaAdminBundle) {
         algoliaAdminBundle.$(function ($) {
             $('form[action*="algoliasearch"] .accordion .config .label').css('width', 'auto');

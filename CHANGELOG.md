@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.8
+
+- Fixed the requireJS issue introduced in 1.0.6, which ended up in administration's JavaScript not working (#168, #169)
+
 ## 1.0.6
 
 - Fixed indexing of out-of-stock products (#142)

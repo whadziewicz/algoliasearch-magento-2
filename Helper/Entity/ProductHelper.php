@@ -559,10 +559,14 @@ class ProductHelper extends BaseHelper
         $visibleInCatalog = $this->visibility->getVisibleInCatalogIds();
         $visibleInSearch = $this->visibility->getVisibleInSearchIds();
 
+        $urlParams = [
+            '_secure' => $this->config->useSecureUrlsInFrontend($product->getStoreId()),
+        ];
+
         $customData = [
             'objectID'           => $product->getId(),
             'name'               => $product->getName(),
-            'url'                => $product->getProductUrl(false),
+            'url'                => $product->getUrlModel()->getUrl($product, $urlParams),
             'visibility_search'  => (int) (in_array($visibility, $visibleInSearch)),
             'visibility_catalog' => (int) (in_array($visibility, $visibleInCatalog)),
         ];

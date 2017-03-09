@@ -59,7 +59,7 @@ class PageHelper extends BaseHelper
             }
 
             $page_obj['objectID'] = $page->getId();
-            $page_obj['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier()]);
+            $page_obj['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier(), '_secure' => $this->config->useSecureUrlsInFrontend($storeId)]);
             $page_obj['content'] = $this->strip($content, array('script', 'style'));
 
             $pages[] = $page_obj;

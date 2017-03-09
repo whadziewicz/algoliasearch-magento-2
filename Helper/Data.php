@@ -32,6 +32,8 @@ class Data
     protected $emulation;
     protected $resource;
 
+    private $emulationRuns = false;
+
     public function __construct(AlgoliaHelper $algoliaHelper,
                                 ConfigHelper $configHelper,
                                 ProductHelper $producthelper,
@@ -571,9 +573,14 @@ class Data
 
     public function startEmulation($storeId)
     {
+        if ($this->emulationRuns === true) {
+            return;
+        }
+
         $this->logger->start('START EMULATION');
 
         $this->emulation->startEnvironmentEmulation($storeId);
+        $this->emulationRuns = true;
 
         $this->logger->stop('START EMULATION');
     }
@@ -583,6 +590,7 @@ class Data
         $this->logger->start('STOP EMULATION');
 
         $this->emulation->stopEnvironmentEmulation();
+        $this->emulationRuns = false;
 
         $this->logger->stop('STOP EMULATION');
     }

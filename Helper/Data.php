@@ -525,7 +525,7 @@ class Data
         }
 
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
-            $collection->joinField('rating_summary', $reviewTableName, 'rating_summary', 'entity_pk_value=entity_id', '{{table}}.store_id=' . $storeId, 'left');
+            $collection->getSelect()->columns('(SELECT MAX(rating_summary) FROM ' . $reviewTableName . ' AS o WHERE o.entity_pk_value = e.entity_id AND o.store_id = '.$storeId.') as rating_summary');
         }
 
         $this->logger->start('LOADING ' . $this->logger->getStoreName($storeId) . ' collection page ' . $page . ', pageSize ' . $pageSize);

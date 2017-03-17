@@ -54,10 +54,10 @@ class AlgoliaHelper extends AbstractHelper
         return $this->client->listIndexes();
     }
 
-    public function query($index_name, $q, $params)
+    public function query($indexName, $q, $params)
     {
         $this->checkClient(__FUNCTION__);
-        return $this->client->initIndex($index_name)->search($q, $params);
+        return $this->client->initIndex($indexName)->search($q, $params);
     }
 
     public function setSettings($indexName, $settings)
@@ -67,23 +67,23 @@ class AlgoliaHelper extends AbstractHelper
         $index->setSettings($settings);
     }
 
-    public function deleteIndex($index_name)
+    public function deleteIndex($indexName)
     {
         $this->checkClient(__FUNCTION__);
-        $this->client->deleteIndex($index_name);
+        $this->client->deleteIndex($indexName);
     }
 
-    public function deleteObjects($ids, $index_name)
+    public function deleteObjects($ids, $indexName)
     {
-        $index = $this->getIndex($index_name);
+        $index = $this->getIndex($indexName);
 
         $index->deleteObjects($ids);
     }
 
-    public function moveIndex($index_name_tmp, $index_name)
+    public function moveIndex($tmpIndexName, $indexName)
     {
         $this->checkClient(__FUNCTION__);
-        $this->client->moveIndex($index_name_tmp, $index_name);
+        $this->client->moveIndex($tmpIndexName, $indexName);
     }
 
     public function generateSearchSecuredApiKey($key, $params = [])
@@ -91,12 +91,12 @@ class AlgoliaHelper extends AbstractHelper
         return $this->client->generateSecuredApiKey($key, $params);
     }
 
-    public function mergeSettings($index_name, $settings)
+    public function mergeSettings($indexName, $settings)
     {
         $onlineSettings = [];
 
         try {
-            $onlineSettings = $this->getIndex($index_name)->getSettings();
+            $onlineSettings = $this->getIndex($indexName)->getSettings();
         } catch (\Exception $e) {
         }
 
@@ -115,48 +115,11 @@ class AlgoliaHelper extends AbstractHelper
         return $onlineSettings;
     }
 
-    public function handleTooBigRecords(&$objects, $index_name)
+    public function addObjects($objects, $indexName)
     {
-        $long_attributes = ['description', 'short_description', 'meta_description', 'content'];
+        $this->prepareRecords($objects, $indexName);
 
-        $good_size = true;
-
-        $ids = [];
-
-        foreach ($objects as $key => &$object) {
-            $size = mb_strlen(json_encode($object));
-
-            if ($size > 20000) {
-                foreach ($long_attributes as $attribute) {
-                    if (isset($object[$attribute])) {
-                        unset($object[$attribute]);
-                        $ids[$index_name . ' objectID(' . $object['objectID'] . ')'] = true;
-                        $good_size = false;
-                    }
-                }
-
-                $size = mb_strlen(json_encode($object));
-
-                if ($size > 20000) {
-                    unset($objects[$key]);
-                }
-            }
-        }
-
-        if (count($objects) <= 0) {
-            return;
-        }
-
-        if ($good_size === false) {
-            $this->messageManager->addError('Algolia reindexing : You have some records (' . implode(',', array_keys($ids)) . ') that are too big. They have either been truncated or skipped');
-        }
-    }
-
-    public function addObjects($objects, $index_name)
-    {
-        $this->handleTooBigRecords($objects, $index_name);
-
-        $index = $this->getIndex($index_name);
+        $index = $this->getIndex($indexName);
 
         if ($this->config->isPartialUpdateEnabled()) {
             $index->partialUpdateObjects($objects);
@@ -204,6 +167,57 @@ class AlgoliaHelper extends AbstractHelper
 
         if (!isset($this->client)) {
             throw new AlgoliaException('Operation "' . $methodName . ' could not be performed because Algolia credentials were not provided.');
+        }
+    }
+
+    private function prepareRecords(&$objects, $indexName)
+    {
+        $currentCET = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+        $currentCET = $currentCET->format('Y-m-d H:i:s');
+
+        $modifiedIds = array();
+        foreach ($objects as $key => &$object) {
+            $object['algoliaLastUpdateAtCET'] = $currentCET;
+
+            $previousObject = $object;
+
+            $this->handleTooBigRecord($object);
+
+            if ($previousObject !== $object) {
+                $modifiedIds[] = $indexName.' objectID('.$previousObject['objectID'].')';
+            }
+
+            if ($object === false) {
+                unset($objects[$key]);
+                continue;
+            }
+        }
+
+        if (!empty($modifiedIds)) {
+            $this->messageManager->addError('Algolia reindexing: You have some records (' . implode(',', array_keys($modifiedIds)) . ') that are too big. They have either been truncated or skipped');
+        }
+    }
+
+    public function handleTooBigRecord(&$object)
+    {
+        $sizeLimit = 20000;
+
+        $longAttributes = array('description', 'short_description', 'meta_description', 'content');
+
+        $size = mb_strlen(json_encode($object));
+
+        if ($size > $sizeLimit) {
+            foreach ($longAttributes as $attribute) {
+                if (isset($object[$attribute])) {
+                    unset($object[$attribute]);
+                }
+            }
+
+            $size = mb_strlen(json_encode($object));
+
+            if ($size > $sizeLimit) {
+                $object = false;
+            }
         }
     }
 }

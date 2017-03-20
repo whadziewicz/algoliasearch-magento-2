@@ -157,12 +157,13 @@ class CategoryHelper extends BaseHelper
             $image_url = $category->getImageUrl();
         } catch (\Exception $e) { /* no image, no default: not fatal */
         }
+
         $data = [
             'objectID'      => $category->getId(),
             'name'          => $category->getName(),
             'path'          => $path,
             'level'         => $category->getLevel(),
-            'url'           => $category->getUrl(),
+            'url'           => $this->getUrl($category),
             'include_in_menu' => $category->getIncludeInMenu(),
             '_tags'         => ['category'],
             'popularity'    => 1,
@@ -211,5 +212,23 @@ class CategoryHelper extends BaseHelper
         }
 
         return self::$_rootCategoryId;
+    }
+
+    private function getUrl(Category $category)
+    {
+        $categoryUrl = $category->getUrl();
+
+        if ($this->config->useSecureUrlsInFrontend($category->getStoreId()) === false) {
+            return $categoryUrl;
+        }
+
+        $unsecureBaseUrl = $category->getUrlInstance()->getBaseUrl(['_secure' => false]);
+        $secureBaseUrl = $category->getUrlInstance()->getBaseUrl(['_secure' => true]);
+
+        if (strpos($categoryUrl, $unsecureBaseUrl) === 0) {
+            return substr_replace($categoryUrl, $secureBaseUrl, 0, mb_strlen($unsecureBaseUrl));
+        }
+
+        return $categoryUrl;
     }
 }

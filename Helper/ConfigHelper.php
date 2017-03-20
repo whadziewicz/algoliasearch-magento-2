@@ -72,6 +72,8 @@ class ConfigHelper
 
     const SHOW_OUT_OF_STOCK = 'cataloginventory/options/show_out_of_stock';
 
+    const USE_SECURE_IN_FRONTEND = 'web/secure/use_in_frontend';
+
     protected $_productTypeMap = [];
 
     private $configInterface;
@@ -189,6 +191,11 @@ class ConfigHelper
     public function getShowOutOfStock($storeId = null)
     {
         return (bool) $this->configInterface->getValue(self::SHOW_OUT_OF_STOCK, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function useSecureUrlsInFrontend($storeId = null)
+    {
+        return (bool) $this->configInterface->getValue(self::USE_SECURE_IN_FRONTEND, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function noProcess($storeId = null)

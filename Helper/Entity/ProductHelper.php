@@ -150,16 +150,16 @@ class ProductHelper extends BaseHelper
 
     public function setSettings($storeId, $saveToTmpIndicesToo = false)
     {
-        $attributesToIndex = [];
+        $searchableAttributes = [];
         $unretrievableAttributes = [];
         $attributesForFaceting = [];
 
         foreach ($this->getAdditionalAttributes() as $attribute) {
             if ($attribute['searchable'] == '1') {
                 if ($attribute['order'] == 'ordered') {
-                    $attributesToIndex[] = $attribute['attribute'];
+                    $searchableAttributes[] = $attribute['attribute'];
                 } else {
-                    $attributesToIndex[] = 'unordered(' . $attribute['attribute'] . ')';
+                    $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
                 }
             }
 
@@ -168,7 +168,7 @@ class ProductHelper extends BaseHelper
             }
 
             if ($attribute['attribute'] == 'categories') {
-                $attributesToIndex[] = $attribute['order'] == 'ordered' ? 'categories_without_path' : 'unordered(categories_without_path)';
+                $searchableAttributes[] = $attribute['order'] == 'ordered' ? 'categories_without_path' : 'unordered(categories_without_path)';
             }
         }
 
@@ -211,7 +211,7 @@ class ProductHelper extends BaseHelper
         }
 
         $indexSettings = [
-            'attributesToIndex'       => array_values(array_unique($attributesToIndex)),
+            'searchableAttributes'    => array_values(array_unique($searchableAttributes)),
             'customRanking'           => $customRankingsArr,
             'unretrievableAttributes' => $unretrievableAttributes,
             'attributesForFaceting'   => $attributesForFaceting,

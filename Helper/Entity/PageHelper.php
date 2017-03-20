@@ -14,8 +14,8 @@ class PageHelper extends BaseHelper
     public function getIndexSettings($storeId)
     {
         return [
-            'attributesToIndex'   => ['unordered(slug)', 'unordered(name)', 'unordered(content)'],
-            'attributesToSnippet' => ['content:7'],
+            'searchableAttributes' => ['unordered(slug)', 'unordered(name)', 'unordered(content)'],
+            'attributesToSnippet'  => ['content:7'],
         ];
     }
 

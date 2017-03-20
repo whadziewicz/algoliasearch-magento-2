@@ -120,6 +120,16 @@ class AlgoliaHelper extends AbstractHelper
 
         $removes = ['slaves', 'replicas'];
 
+        if (isset($settings['attributesToIndex'])) {
+            $settings['searchableAttributes'] = $settings['attributesToIndex'];
+            unset($settings['attributesToIndex']);
+        }
+
+        if (isset($onlineSettings['attributesToIndex'])) {
+            $onlineSettings['searchableAttributes'] = $onlineSettings['attributesToIndex'];
+            unset($onlineSettings['attributesToIndex']);
+        }
+
         foreach ($removes as $remove) {
             if (isset($onlineSettings[$remove])) {
                 unset($onlineSettings[$remove]);

@@ -145,6 +145,6 @@ class QueueTest extends TestCase
 
         $settings = $this->algoliaHelper->getIndex($this->indexPrefix.'default_products')->getSettings();
         $this->assertFalse(empty($settings['attributesForFaceting']), 'AttributesForFacetting should be set, but they are not.');
-        $this->assertFalse(empty($settings['attributesToIndex']), 'SearchableAttributes should be set, but they are not.');
+        $this->assertFalse(empty($settings['searchableAttributes']), 'SearchableAttributes should be set, but they are not.');
     }
 }

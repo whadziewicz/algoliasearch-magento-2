@@ -17,15 +17,15 @@ class CategoryHelper extends BaseHelper
 
     public function getIndexSettings($storeId)
     {
-        $attributesToIndex = [];
+        $searchableAttributes = [];
         $unretrievableAttributes = [];
 
         foreach ($this->config->getCategoryAdditionalAttributes($storeId) as $attribute) {
             if ($attribute['searchable'] == '1') {
                 if ($attribute['order'] == 'ordered') {
-                    $attributesToIndex[] = $attribute['attribute'];
+                    $searchableAttributes[] = $attribute['attribute'];
                 } else {
-                    $attributesToIndex[] = 'unordered(' . $attribute['attribute'] . ')';
+                    $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
                 }
             }
 
@@ -44,7 +44,7 @@ class CategoryHelper extends BaseHelper
 
         // Default index settings
         $indexSettings = [
-            'attributesToIndex'       => array_values(array_unique($attributesToIndex)),
+            'searchableAttributes'    => array_values(array_unique($searchableAttributes)),
             'customRanking'           => $customRankingsArr,
             'unretrievableAttributes' => $unretrievableAttributes,
         ];

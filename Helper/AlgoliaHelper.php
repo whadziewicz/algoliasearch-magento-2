@@ -16,6 +16,12 @@ class AlgoliaHelper extends AbstractHelper
     protected $config;
     protected $messageManager;
 
+    /** @var string */
+    private static $lastUsedIndexName;
+
+    /** @var int */
+    private static $lastTaskId;
+
     public function __construct(Context $context, ConfigHelper $configHelper, ManagerInterface $messageManager)
     {
         parent::__construct($context);
@@ -64,26 +70,38 @@ class AlgoliaHelper extends AbstractHelper
     {
         $index = $this->getIndex($indexName);
 
-        $index->setSettings($settings);
+        $res = $index->setSettings($settings);
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     public function deleteIndex($indexName)
     {
         $this->checkClient(__FUNCTION__);
-        $this->client->deleteIndex($indexName);
+        $res = $this->client->deleteIndex($indexName);
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     public function deleteObjects($ids, $indexName)
     {
         $index = $this->getIndex($indexName);
 
-        $index->deleteObjects($ids);
+        $res = $index->deleteObjects($ids);
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     public function moveIndex($tmpIndexName, $indexName)
     {
         $this->checkClient(__FUNCTION__);
-        $this->client->moveIndex($tmpIndexName, $indexName);
+        $res = $this->client->moveIndex($tmpIndexName, $indexName);
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     public function generateSearchSecuredApiKey($key, $params = [])
@@ -122,10 +140,13 @@ class AlgoliaHelper extends AbstractHelper
         $index = $this->getIndex($indexName);
 
         if ($this->config->isPartialUpdateEnabled()) {
-            $index->partialUpdateObjects($objects);
+            $res = $index->partialUpdateObjects($objects);
         } else {
-            $index->addObjects($objects);
+            $res = $index->addObjects($objects);
         }
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     public function setSynonyms($indexName, $synonyms)
@@ -150,11 +171,14 @@ class AlgoliaHelper extends AbstractHelper
         } while (($page * $hitsPerPage) < $complexSynonyms['nbHits']);
 
         if (empty($synonyms)) {
-            $index->clearSynonyms(true);
-            return;
+            $res = $index->clearSynonyms(true);
+        }
+        else {
+            $res = $index->batchSynonyms($synonyms, true, true);
         }
 
-        $index->batchSynonyms($synonyms, true, true);
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
     }
 
     private function checkClient($methodName)
@@ -168,6 +192,24 @@ class AlgoliaHelper extends AbstractHelper
         if (!isset($this->client)) {
             throw new AlgoliaException('Operation "' . $methodName . ' could not be performed because Algolia credentials were not provided.');
         }
+    }
+
+    public function clearIndex($indexName)
+    {
+        $res = $this->getIndex($indexName)->clearIndex();
+
+        self::$lastUsedIndexName = $indexName;
+        self::$lastTaskId = $res['taskID'];
+    }
+
+    public function waitLastTask()
+    {
+        if (!isset(self::$lastUsedIndexName) || !isset(self::$lastTaskId)) {
+            return;
+        }
+
+        $this->checkClient(__FUNCTION__);
+        $this->client->initIndex(self::$lastUsedIndexName)->waitTask(self::$lastTaskId);
     }
 
     private function prepareRecords(&$objects, $indexName)

@@ -388,7 +388,13 @@ class ProductHelper extends BaseHelper
                 $customData[$field][$currency_code]['default'] = $price;
                 $customData[$field][$currency_code]['default_formated'] = $this->formatPrice($price, false, $currency_code);
 
-                $special_price = $priceInfo->getPrice('final_price')->getValue();
+                $special_price = $priceInfo->getPrice('final_price')->getValue(); // The price with applied catalog rules
+
+                $specialPriceFromProduct = (float) $product->getFinalPrice(); // The product's special price
+                if ($specialPriceFromProduct > 0 && $specialPriceFromProduct < $special_price) {
+                    $special_price = $specialPriceFromProduct;
+                }
+
                 $special_price = (double) $this->catalogHelper->getTaxPrice($product, $special_price, $with_tax, null, null, null, $product->getStore(), null);
                 $special_price = $this->currencyDirectory->currencyConvert($special_price, $baseCurrencyCode, $currency_code);
 

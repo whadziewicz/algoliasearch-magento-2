@@ -75,6 +75,53 @@ class ProductsIndexingTest extends IndexingTestCase
         $this->assertTrue(empty($hit), 'Extra products attributes ('.$extraAttributes.') are indexed and should not be.');
     }
 
+    public function testNoSpecialPrice()
+    {
+        /** @var Product $indexer */
+        $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
+        $indexer->execute([9]);
+
+        $this->algoliaHelper->waitLastTask();
+
+        $res = $this->algoliaHelper->getObjects($this->indexPrefix.'default_products', ['9']);
+        $algoliaProduct = reset($res['results']);
+
+        $this->assertEquals(32, $algoliaProduct['price']['USD']['default']);
+        $this->assertFalse($algoliaProduct['price']['USD']['special_from_date']);
+        $this->assertFalse($algoliaProduct['price']['USD']['special_to_date']);
+    }
+
+    public function testSpecialPrice()
+    {
+        /** @var \Magento\Catalog\Model\Product $product */
+        $product = $this->getObjectManager()->create('\Magento\Catalog\Model\Product');
+        $product->load(9);
+
+        $specialPrice = 29;
+        $from = 1452556800;
+        $to = 1573516800;
+        $product->setCustomAttributes([
+            'special_price' => $specialPrice,
+            'special_from_date' => date('m/d/Y', $from),
+            'special_to_date' => date('m/d/Y', $to),
+        ]);
+
+        $product->save();
+
+        /** @var Product $indexer */
+        $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
+        $indexer->execute([9]);
+
+        $this->algoliaHelper->waitLastTask();
+
+        $res = $this->algoliaHelper->getObjects($this->indexPrefix.'default_products', ['9']);
+        $algoliaProduct = reset($res['results']);
+
+        $this->assertEquals($specialPrice, $algoliaProduct['price']['USD']['default']);
+        $this->assertEquals($from, $algoliaProduct['price']['USD']['special_from_date']);
+        $this->assertEquals($to, $algoliaProduct['price']['USD']['special_to_date']);
+    }
+
     private function setOneProductOutOfStock()
     {
         /** @var StockRegistry $stockRegistry */

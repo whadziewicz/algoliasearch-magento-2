@@ -4,6 +4,7 @@ namespace Algolia\AlgoliaSearch\Test\Integration;
 
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use AlgoliaSearch\AlgoliaException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 
@@ -22,6 +23,23 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->bootstrap();
+    }
+
+    public function tearDown()
+    {
+        $indices = $this->algoliaHelper->listIndexes();
+
+        foreach ($indices['items'] as $index) {
+            $name = $index['name'];
+
+            if (strpos($name, $this->indexPrefix) === 0) {
+                try {
+                    $this->algoliaHelper->deleteIndex($name);
+                } catch(AlgoliaException $e) {
+                    // Might be a replica
+                }
+            }
+        }
     }
 
     protected function resetConfigs($configs = [])
@@ -70,7 +88,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         $this->setConfig('algoliasearch_credentials/credentials/search_only_api_key', getenv('SEARCH_ONLY_API_KEY'));
         $this->setConfig('algoliasearch_credentials/credentials/api_key', getenv('API_KEY'));
 
-        $this->indexPrefix =  getenv('INDEX_PREFIX') ?: 'magento20tests_';
+        $this->indexPrefix =  getmypid() . (getenv('INDEX_PREFIX') ?: 'magento20tests_');
         $this->setConfig('algoliasearch_credentials/credentials/index_prefix', $this->indexPrefix);
 
         $this->boostrapped = true;

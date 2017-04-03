@@ -410,7 +410,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			search.start();
 			
 			if (algoliaConfig.request.path.length > 0 && algoliaConfig.areCategoriesInFacets === true) {
-				var page = data.helper.state.page;
+				var page = search.helper.state.page;
 				
 				search.helper.toggleRefinement('categories.level0', algoliaConfig.request.path).setPage(page).search();
 			}

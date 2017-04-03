@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.10
+
+- Fix IS on replaced category page (#202)
+
 ## 1.0.9
 
 - `algoliaBundle` is now loaded only via requireJS (#171)

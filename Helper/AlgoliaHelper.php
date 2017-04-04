@@ -66,6 +66,12 @@ class AlgoliaHelper extends AbstractHelper
         return $this->client->initIndex($indexName)->search($q, $params);
     }
 
+    public function getObjects($indexName, $objectIds)
+    {
+        $this->checkClient(__FUNCTION__);
+        return $this->getIndex($indexName)->getObjects($objectIds);
+    }
+
     public function setSettings($indexName, $settings)
     {
         $index = $this->getIndex($indexName);

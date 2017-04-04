@@ -19,12 +19,12 @@ class CategoriesIndexingTest extends IndexingTestCase
 
         /** @var Category $categoriesIndexer */
         $categoriesIndexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Category');
-        $categoriesIndexer->executeFull();
+        $categoriesIndexer->executeRow(3);
 
         $this->algoliaHelper->waitLastTask();
 
-        $results = $this->algoliaHelper->query($this->indexPrefix.'default_categories', '', array('hitsPerPage' => 1));
-        $hit = reset($results['hits']);
+        $results = $this->algoliaHelper->getObjects($this->indexPrefix.'default_categories', array('3'));
+        $hit = reset($results['results']);
 
         $defaultAttributes = array(
             'objectID',
@@ -37,7 +37,6 @@ class CategoriesIndexingTest extends IndexingTestCase
             'popularity',
             'algoliaLastUpdateAtCET',
             'product_count',
-            '_highlightResult',
         );
 
         foreach ($defaultAttributes as $key => $attribute) {

@@ -42,12 +42,12 @@ class ProductsIndexingTest extends IndexingTestCase
 
         /** @var Product $indexer */
         $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
-        $indexer->executeFull();
+        $indexer->executeRow(994);
 
         $this->algoliaHelper->waitLastTask();
 
-        $results = $this->algoliaHelper->query($this->indexPrefix.'default_products', '', array('hitsPerPage' => 1));
-        $hit = reset($results['hits']);
+        $results = $this->algoliaHelper->getObjects($this->indexPrefix.'default_products', array('994'));
+        $hit = reset($results['results']);
 
         $defaultAttributes = array(
             'objectID',
@@ -63,7 +63,6 @@ class ProductsIndexingTest extends IndexingTestCase
             'price',
             'type_id',
             'algoliaLastUpdateAtCET',
-            '_highlightResult',
         );
 
         foreach ($defaultAttributes as $key => $attribute) {

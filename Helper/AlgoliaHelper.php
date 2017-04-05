@@ -74,6 +74,8 @@ class AlgoliaHelper extends AbstractHelper
 
     public function setSettings($indexName, $settings)
     {
+        $this->checkClient(__FUNCTION__);
+
         $index = $this->getIndex($indexName);
 
         $res = $index->setSettings($settings);
@@ -93,6 +95,8 @@ class AlgoliaHelper extends AbstractHelper
 
     public function deleteObjects($ids, $indexName)
     {
+        $this->checkClient(__FUNCTION__);
+
         $index = $this->getIndex($indexName);
 
         $res = $index->deleteObjects($ids);

@@ -676,7 +676,7 @@ class ProductHelper extends BaseHelper
                 $images = $product->getMediaGalleryImages();
                 if ($images) {
                     foreach ($images as $image) {
-                        $customData['media_gallery'][] = str_replace(['https://', 'http://'], '//', $image->getUrl());
+                        $customData['media_gallery'][] = $imageHelper->removeProtocol($image->getUrl());
                     }
                 }
             }

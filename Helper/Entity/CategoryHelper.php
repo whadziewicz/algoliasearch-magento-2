@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use Algolia\AlgoliaSearch\Helper\Image;
 use Magento\Catalog\Model\Category;
 use Magento\Framework\DataObject;
 
@@ -152,9 +153,9 @@ class CategoryHelper extends BaseHelper
             $path .= $this->getCategoryName($categoryId, $storeId);
         }
 
-        $image_url = null;
+        $imageUrl = null;
         try {
-            $image_url = $category->getImageUrl();
+            $imageUrl = $category->getImageUrl();
         } catch (\Exception $e) { /* no image, no default: not fatal */
         }
 
@@ -170,8 +171,10 @@ class CategoryHelper extends BaseHelper
             'product_count' => $category->getProductCount(),
         ];
 
-        if (!empty($image_url)) {
-            $data['image_url'] = $image_url;
+        if (!empty($imageUrl)) {
+            /** @var Image $imageHelper */
+            $imageHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Image');
+            $data['image_url'] = $imageHelper->removeProtocol($imageUrl);
         }
 
         foreach ($this->config->getCategoryAdditionalAttributes($storeId) as $attribute) {

@@ -21,13 +21,15 @@ class Image extends \Magento\Catalog\Helper\Image
         try {
             $this->applyScheduledActions();
 
-            return $this->_getModel()->getUrl();
+            $url = $this->_getModel()->getUrl();
         } catch (\Exception $e) {
             $this->logger->log($e->getMessage());
             $this->logger->log($e->getTraceAsString());
 
-            return $this->getDefaultPlaceholderUrl();
+            $url = $this->getDefaultPlaceholderUrl();
         }
+
+        return $this->removeProtocol($url);
     }
 
     protected function initBaseFile()
@@ -43,5 +45,10 @@ class Image extends \Magento\Catalog\Helper\Image
         }
 
         return $this;
+    }
+
+    public function removeProtocol($url)
+    {
+        return str_replace(['https://', 'http://'], '//', $url);
     }
 }

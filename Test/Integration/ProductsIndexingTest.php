@@ -123,6 +123,13 @@ class ProductsIndexingTest extends IndexingTestCase
 
     public function testSpecialPrice()
     {
+        /** @var \Magento\Framework\App\ProductMetadataInterface $productMetadata */
+        $productMetadata = $this->getObjectManager()->create('\Magento\Framework\App\ProductMetadataInterface');
+        $version = $productMetadata->getVersion();
+        if (version_compare($version, '2.1', '<') === true) {
+            $this->markTestSkipped();
+        }
+
         /** @var \Magento\Catalog\Model\Product $product */
         $product = $this->getObjectManager()->create('\Magento\Catalog\Model\Product');
         $product->load(9);

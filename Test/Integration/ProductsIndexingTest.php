@@ -66,12 +66,43 @@ class ProductsIndexingTest extends IndexingTestCase
         );
 
         foreach ($defaultAttributes as $key => $attribute) {
-            $this->assertTrue(key_exists($attribute, $hit), 'Products attribute "'.$attribute.'" should be indexed but it is not"');
+            $this->assertArrayHasKey($attribute, $hit, 'Products attribute "'.$attribute.'" should be indexed but it is not"');
             unset($hit[$attribute]);
         }
 
         $extraAttributes = implode(', ', array_keys($hit));
-        $this->assertTrue(empty($hit), 'Extra products attributes ('.$extraAttributes.') are indexed and should not be.');
+        $this->assertEmpty($hit, 'Extra products attributes ('.$extraAttributes.') are indexed and should not be.');
+    }
+
+    public function testNoProtocolImageUrls()
+    {
+        $additionAttributes = $this->configHelper->getProductAdditionalAttributes();
+        $additionAttributes[] = [
+            'attribute' => 'media_gallery',
+            'searchable' => '0',
+            'retrievable' => '1',
+            'order' => 'unordered',
+        ];
+
+        $this->setConfig('algoliasearch_products/products/product_additional_attributes', serialize($additionAttributes));
+
+        /** @var Product $indexer */
+        $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
+        $indexer->executeRow(994);
+
+        $this->algoliaHelper->waitLastTask();
+
+        $results = $this->algoliaHelper->getObjects($this->indexPrefix.'default_products', array('994'));
+        $hit = reset($results['results']);
+
+        $this->assertStringStartsWith('//', $hit['image_url']);
+        $this->assertStringStartsWith('//', $hit['thumbnail_url']);
+
+        $this->assertArrayHasKey('media_gallery', $hit);
+
+        foreach ($hit['media_gallery'] as $galleryImageUrl) {
+            $this->assertStringStartsWith('//', $galleryImageUrl);
+        }
     }
 
     private function setOneProductOutOfStock()

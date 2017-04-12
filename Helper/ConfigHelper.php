@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento;
 use Magento\Directory\Model\Currency as DirCurrency;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -85,6 +86,7 @@ class ConfigHelper
     private $moduleResource;
     private $productMetadata;
     private $eventManager;
+    private $currencyManager;
 
     public function __construct(Magento\Framework\App\Config\ScopeConfigInterface $configInterface,
                                 Magento\Framework\ObjectManagerInterface $objectManager,
@@ -94,7 +96,8 @@ class ConfigHelper
                                 DirectoryList $directoryList,
                                 Magento\Framework\Module\ResourceInterface $moduleResource,
                                 Magento\Framework\App\ProductMetadataInterface $productMetadata,
-                                Magento\Framework\Event\ManagerInterface $eventManager)
+                                Magento\Framework\Event\ManagerInterface $eventManager,
+                                Magento\Directory\Model\Currency $currencyManager)
     {
         $this->objectManager = $objectManager;
         $this->configInterface = $configInterface;
@@ -105,6 +108,7 @@ class ConfigHelper
         $this->moduleResource = $moduleResource;
         $this->productMetadata = $productMetadata;
         $this->eventManager = $eventManager;
+        $this->currencyManager = $currencyManager;
     }
 
     public function indexOutOfStockOptions($storeId = null)
@@ -352,31 +356,48 @@ class ConfigHelper
 
     public function getSortingIndices($storeId = null)
     {
+        /** @var ProductHelper $productHelper */
         $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\ProductHelper');
 
         $attrs = unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
 
-        if ($storeId === null) {
-            /** @var \Magento\Customer\Model\Session $customerSession */
-            $customerSession = $this->objectManager->create('Magento\Customer\Model\Session');
-            $group_id = $customerSession->getCustomerGroupId();
+        $currencies = $this->currencyManager->getConfigAllowCurrencies();
 
-            foreach ($attrs as &$attr) {
-                if ($this->isCustomerGroupsEnabled($storeId)) {
-                    if (strpos($attr['attribute'], 'price') !== false) {
-                        $suffix_index_name = 'group_' . $group_id;
+        foreach ($attrs as &$attr) {
+            $indexName = false;
+            $sortAttribute = false;
 
-                        $attr['name'] = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $suffix_index_name . '_' . $attr['sort'];
-                    } else {
-                        $attr['name'] = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $attr['sort'];
-                    }
-                } else {
-                    if (strpos($attr['attribute'], 'price') !== false) {
-                        $attr['name'] = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . 'default' . '_' . $attr['sort'];
-                    } else {
-                        $attr['name'] = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $attr['sort'];
-                    }
+            if ($this->isCustomerGroupsEnabled($storeId) && $attr['attribute'] === 'price') {
+                $groupCollection = $this->objectManager->get('Magento\Customer\Model\ResourceModel\Group\Collection');
+
+                foreach ($groupCollection as $group) {
+                    $customerGroupId = (int) $group->getData('customer_group_id');
+
+                    $indexNameSuffix = 'group_'.$customerGroupId;
+
+                    $indexName = $productHelper->getIndexName($storeId).'_'.$attr['attribute'].'_'.$indexNameSuffix.'_'.$attr['sort'];
+                    $sortAttribute = $attr['attribute'] . '.' . $currencies[0] . '.' . $indexNameSuffix;
                 }
+            } elseif ($attr['attribute'] === 'price') {
+                $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . 'default' . '_' . $attr['sort'];
+                $sortAttribute = $attr['attribute'] . '.' . $currencies[0] . '.' . 'default';
+            } else {
+                $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $attr['sort'];
+                $sortAttribute = $attr['attribute'];
+            }
+
+            if ($indexName && $sortAttribute) {
+                $attr['name'] = $indexName;
+                $attr['ranking'] = [
+                    $attr['sort'].'('.$sortAttribute.')',
+                    'typo',
+                    'geo',
+                    'words',
+                    'proximity',
+                    'attribute',
+                    'exact',
+                    'custom',
+                ];
             }
         }
 

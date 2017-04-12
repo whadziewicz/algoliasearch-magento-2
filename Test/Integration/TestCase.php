@@ -27,19 +27,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $indices = $this->algoliaHelper->listIndexes();
-
-        foreach ($indices['items'] as $index) {
-            $name = $index['name'];
-
-            if (strpos($name, $this->indexPrefix) === 0) {
-                try {
-                    $this->algoliaHelper->deleteIndex($name);
-                } catch(AlgoliaException $e) {
-                    // Might be a replica
-                }
-            }
-        }
+        $this->clearIndices();
     }
 
     protected function resetConfigs($configs = [])
@@ -66,6 +54,23 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             ScopeInterface::SCOPE_STORE,
             'default'
         );
+    }
+
+    protected function clearIndices()
+    {
+        $indices = $this->algoliaHelper->listIndexes();
+
+        foreach ($indices['items'] as $index) {
+            $name = $index['name'];
+
+            if (strpos($name, $this->indexPrefix) === 0) {
+                try {
+                    $this->algoliaHelper->deleteIndex($name);
+                } catch(AlgoliaException $e) {
+                    // Might be a replica
+                }
+            }
+        }
     }
 
     /** @return \Magento\Framework\ObjectManagerInterface */

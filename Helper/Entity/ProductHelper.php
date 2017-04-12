@@ -242,60 +242,15 @@ class ProductHelper extends BaseHelper
         $sortingIndices = $this->config->getSortingIndices($storeId);
 
         if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
-            $replicas = [];
-
-            foreach ($sortingIndices as $values) {
-                if ($this->config->isCustomerGroupsEnabled($storeId)) {
-                    if ($values['attribute'] === 'price') {
-                        $groupCollection = $this->objectManager->create('Magento\Customer\Model\ResourceModel\Group\Collection');
-
-                        foreach ($groupCollection as $group) {
-                            $group_id = (int) $group->getData('customer_group_id');
-
-                            $suffix_index_name = 'group_' . $group_id;
-
-                            $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $suffix_index_name . '_' . $values['sort'];
-                        }
-                    }
-                } else {
-                    if ($values['attribute'] === 'price') {
-                        $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_default_' . $values['sort'];
-                    } else {
-                        $replicas[] = $this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $values['sort'];
-                    }
-                }
-            }
+            $replicas = array_values(array_map(function($sortingIndex) {
+                return $sortingIndex['name'];
+            }, $sortingIndices));
 
             $this->algoliaHelper->setSettings($this->getIndexName($storeId), ['replicas' => $replicas]);
 
             foreach ($sortingIndices as $values) {
-                if ($this->config->isCustomerGroupsEnabled($storeId)) {
-                    if (strpos($values['attribute'], 'price') !== false) {
-                        $groupCollection = $this->objectManager->create('Magento\Customer\Model\ResourceModel\Group\Collection');
-
-                        foreach ($groupCollection as $group) {
-                            $group_id = (int) $group->getData('customer_group_id');
-
-                            $suffix_index_name = 'group_' . $group_id;
-
-                            $sort_attribute = strpos($values['attribute'], 'price') !== false ? $values['attribute'] . '.' . $currencies[0] . '.' . $suffix_index_name : $values['attribute'];
-
-                            $mergeSettings['ranking'] = [$values['sort'] . '(' . $sort_attribute . ')', 'typo', 'geo', 'words', 'proximity', 'attribute', 'exact', 'custom'];
-
-                            $this->algoliaHelper->setSettings($this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $suffix_index_name . '_' . $values['sort'], $mergeSettings);
-                        }
-                    }
-                } else {
-                    $sort_attribute = strpos($values['attribute'], 'price') !== false ? $values['attribute'] . '.' . $currencies[0] . '.' . 'default' : $values['attribute'];
-
-                    $mergeSettings['ranking'] = [$values['sort'] . '(' . $sort_attribute . ')', 'typo', 'geo', 'words', 'proximity', 'attribute', 'exact', 'custom'];
-
-                    if ($values['attribute'] === 'price') {
-                        $this->algoliaHelper->setSettings($this->getIndexName($storeId) . '_' . $values['attribute'] . '_default_' . $values['sort'], $mergeSettings);
-                    } else {
-                        $this->algoliaHelper->setSettings($this->getIndexName($storeId) . '_' . $values['attribute'] . '_' . $values['sort'], $mergeSettings);
-                    }
-                }
+                $mergeSettings['ranking'] = $values['ranking'];
+                $this->algoliaHelper->setSettings($values['name'], $mergeSettings);
             }
         }
 

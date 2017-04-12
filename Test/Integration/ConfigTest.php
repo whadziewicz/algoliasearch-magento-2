@@ -92,4 +92,72 @@ class ConfigTest extends TestCase
 
         $this->assertTrue($categoriesAttributeIsIncluded, 'Categories attribute should be included in facets, but it is not');
     }
+
+    public function testReplicaCreationWithoutCustomerGroups()
+    {
+        $this->replicaCreationTest(false);
+    }
+
+    public function testReplicaCreationWithCustomerGroups()
+    {
+        $this->replicaCreationTest(true);
+    }
+
+    private function replicaCreationTest($withCustomerGroups = false)
+    {
+        $enableCustomGroups = '0';
+        $priceAttribute = 'default';
+
+        if ($withCustomerGroups === true) {
+            $enableCustomGroups = '1';
+            $priceAttribute = 'group_3';
+        }
+
+        $sortingIndicesData =
+        [
+            [
+                'attribute' => 'price',
+                'sort' => 'asc',
+                'label' => 'Lowest price',
+            ],
+            [
+                'attribute' => 'price',
+                'sort' => 'desc',
+                'label' => 'Highest price',
+            ],
+            [
+                'attribute' => 'created_at',
+                'sort' => 'desc',
+                'label' => 'Newest first',
+            ],
+        ];
+
+        $this->setConfig('algoliasearch_credentials/credentials/is_instant_enabled', '1'); // Needed to set replicas to Algolia
+        $this->setConfig('algoliasearch_instant/instant/sorts', serialize($sortingIndicesData));
+        $this->setConfig('algoliasearch_advanced/advanced/customer_groups_enable', $enableCustomGroups);
+
+        $sortingIndicesWithRankingWhichShouldBeCreated = [
+            $this->indexPrefix.'default_products_price_'.$priceAttribute.'_asc' => 'asc(price.USD.'.$priceAttribute.')',
+            $this->indexPrefix.'default_products_price_'.$priceAttribute.'_desc' => 'desc(price.USD.'.$priceAttribute.')',
+            $this->indexPrefix.'default_products_created_at_desc' => 'desc(created_at)',
+        ];
+
+        /** @var Data $helper */
+        $helper = $this->getObjectManager()->create('Algolia\AlgoliaSearch\Helper\Data');
+        $helper->saveConfigurationToAlgolia(1);
+
+        $this->algoliaHelper->waitLastTask();
+
+        $indices = $this->algoliaHelper->listIndexes();
+        $indicesNames = array_map(function($indexData) {
+            return $indexData['name'];
+        }, $indices['items']);
+
+        foreach ($sortingIndicesWithRankingWhichShouldBeCreated as $indexName => $firstRanking) {
+            $this->assertContains($indexName, $indicesNames);
+
+            $settings = $this->algoliaHelper->getSettings($indexName);
+            $this->assertEquals($firstRanking, reset($settings['ranking']));
+        }
+    }
 }

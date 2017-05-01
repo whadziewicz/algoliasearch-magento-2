@@ -85,12 +85,12 @@ class PagesIndexingTest extends IndexingTestCase
         $testPage = $pageFactory->create();
 
         $testPage = $testPage->setTitle('Example CMS page')
-             ->setIdentifier('example-cms-page')
-             ->setIsActive(true)
-             ->setPageLayout('1column')
-             ->setStores(array(0))
-             ->setContent('Hello Im a test CMS page with script tags and style tags. <script>alert("Foo");</script> <style>.bar { font-weight: bold; }</style>')
-             ->save();
+                             ->setIdentifier('example-cms-page')
+                             ->setIsActive(true)
+                             ->setPageLayout('1column')
+                             ->setStores(array(0))
+                             ->setContent('Hello Im a test CMS page with script tags and style tags. <script>alert("Foo");</script> <style>.bar { font-weight: bold; }</style>')
+                             ->save();
 
         $testPageId = $testPage->getId();
 
@@ -104,6 +104,35 @@ class PagesIndexingTest extends IndexingTestCase
                 $this->assertNotContains('alert("Foo");', $content);
                 $this->assertNotContains('<style>', $content);
                 $this->assertNotContains('.bar { font-weight: bold; }', $content);
+            }
+        }
+
+        $testPage->delete();
+    }
+
+    public function testUtf8()
+    {
+        $utf8Content = 'příliš žluťoučký kůň';
+
+        $pageFactory = $this->getObjectManager()->create('\Magento\Cms\Model\PageFactory');
+        $testPage = $pageFactory->create();
+
+        $testPage = $testPage->setTitle('Example CMS page')
+                             ->setIdentifier('example-cms-page-utf8')
+                             ->setIsActive(true)
+                             ->setPageLayout('1column')
+                             ->setStores(array(0))
+                             ->setContent($utf8Content)
+                             ->save();
+
+        $testPageId = $testPage->getId();
+
+        /** @var PageHelper $pagesHelper */
+        $pagesHelper = $this->getObjectManager()->create('Algolia\AlgoliaSearch\Helper\Entity\PageHelper');
+        $pages = $pagesHelper->getPages(1);
+        foreach ($pages as $page) {
+            if ($page['objectID'] == $testPageId) {
+                $this->assertSame($utf8Content, $page['content']);
             }
         }
 

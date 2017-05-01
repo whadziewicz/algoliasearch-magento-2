@@ -481,13 +481,11 @@ a.ais-current-refined-values--link:hover
 
 .col9 {
   float: right;
-  min-width: 100%;
   box-sizing: border-box;
 }
 
 .col3 {
   float: right;
-  min-width: 100%;
   box-sizing: border-box;
 }
 
@@ -502,7 +500,7 @@ a.ais-current-refined-values--link:hover
 	display: flex;
 	height: 100%;
 	flex: 1;
-	
+
 }
 
 @media (min-width: 768px) {

@@ -119,12 +119,17 @@ class AlgoliaHelper extends AbstractHelper
         return $this->client->generateSecuredApiKey($key, $params);
     }
 
+    public function getSettings($indexName)
+    {
+        return $this->getIndex($indexName)->getSettings();
+    }
+
     public function mergeSettings($indexName, $settings)
     {
         $onlineSettings = [];
 
         try {
-            $onlineSettings = $this->getIndex($indexName)->getSettings();
+            $onlineSettings = $this->getSettings($indexName);
         } catch (\Exception $e) {
         }
 

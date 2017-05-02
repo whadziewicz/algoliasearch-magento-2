@@ -750,4 +750,27 @@ class QueueTest extends TestCase
         $this->assertEquals($pid, $firstJob['pid']);
         $this->assertEquals($pid, $lastJob['pid']);
     }
+
+    public function testMaxSingleJobsSizeOnProductReindex()
+    {
+        $this->setConfig('algoliasearch_queue/queue/active', '1');
+
+        $this->setConfig('algoliasearch_queue/queue/number_of_job_to_run', 10);
+        $this->setConfig('algoliasearch_advanced/advanced/number_of_element_by_page', 100);
+
+        $this->connection->query('TRUNCATE TABLE algoliasearch_queue');
+
+        /** @var Product $indexer */
+        $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
+        $indexer->execute(range(1, 512));
+
+        $dbJobs = $this->connection->query('SELECT * FROM algoliasearch_queue')->fetchAll();
+        $this->assertSame(6, count($dbJobs));
+
+        $firstJob = reset($dbJobs);
+        $lastJob = end($dbJobs);
+
+        $this->assertEquals(100, $firstJob['data_size']);
+        $this->assertEquals(12, $lastJob['data_size']);
+    }
 }

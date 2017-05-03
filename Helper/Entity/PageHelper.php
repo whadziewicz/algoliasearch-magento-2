@@ -42,10 +42,10 @@ class PageHelper extends BaseHelper
                 continue;
             }
 
-            $page_obj = [];
+            $pageObject = [];
 
-            $page_obj['slug'] = $page->getIdentifier();
-            $page_obj['name'] = $page->getTitle();
+            $pageObject['slug'] = $page->getIdentifier();
+            $pageObject['name'] = $page->getTitle();
 
             $page->setStoreId($storeId);
 
@@ -58,11 +58,12 @@ class PageHelper extends BaseHelper
                 $content = $this->filterProvider->getPageFilter()->filter($content);
             }
 
-            $page_obj['objectID'] = $page->getId();
-            $page_obj['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier(), '_secure' => $this->config->useSecureUrlsInFrontend($storeId)]);
-            $page_obj['content'] = $this->strip($content, array('script', 'style'));
+            $pageObject['objectID'] = $page->getId();
+            $pageObject['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier(), '_secure' => $this->config->useSecureUrlsInFrontend($storeId)]);
 
-            $pages[] = $page_obj;
+            $pageObject['content'] = $this->strip($content, array('script', 'style'));
+
+            $pages[] = $pageObject;
         }
 
         return $pages;

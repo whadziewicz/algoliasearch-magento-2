@@ -139,7 +139,7 @@ abstract class BaseHelper
     {
         if (!empty($completeRemoveTags) && $s) {
             $dom = new \DOMDocument();
-            if (@$dom->loadHTML($s)) {
+            if (@$dom->loadHTML(mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8'))) {
                 $toRemove = array();
                 foreach ($completeRemoveTags as $tag) {
                     $removeTags = $dom->getElementsByTagName($tag);
@@ -156,6 +156,8 @@ abstract class BaseHelper
                 $s = $dom->saveHTML();
             }
         }
+
+        $s = html_entity_decode($s, null, 'UTF-8');
 
         $s = trim(preg_replace('/\s+/', ' ', $s));
         $s = preg_replace('/&nbsp;/', ' ', $s);

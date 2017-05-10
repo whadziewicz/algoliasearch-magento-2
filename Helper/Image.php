@@ -29,7 +29,10 @@ class Image extends \Magento\Catalog\Helper\Image
             $url = $this->getDefaultPlaceholderUrl();
         }
 
-        return $this->removeProtocol($url);
+        $url = $this->removeProtocol($url);
+        $url = $this->removeDoubleSlashes($url);
+
+        return $url;
     }
 
     protected function initBaseFile()
@@ -50,5 +53,13 @@ class Image extends \Magento\Catalog\Helper\Image
     public function removeProtocol($url)
     {
         return str_replace(['https://', 'http://'], '//', $url);
+    }
+
+    public function removeDoubleSlashes($url)
+    {
+        $url = str_replace('//', '/', $url);
+        $url = '/'.$url;
+
+        return $url;
     }
 }

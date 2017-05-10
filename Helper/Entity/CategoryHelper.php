@@ -174,7 +174,11 @@ class CategoryHelper extends BaseHelper
         if (!empty($imageUrl)) {
             /** @var Image $imageHelper */
             $imageHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Image');
-            $data['image_url'] = $imageHelper->removeProtocol($imageUrl);
+
+            $imageUrl = $imageHelper->removeProtocol($imageUrl);
+            $imageUrl = $imageHelper->removeDoubleSlashes($imageUrl);
+
+            $data['image_url'] = $imageUrl;
         }
 
         foreach ($this->config->getCategoryAdditionalAttributes($storeId) as $attribute) {

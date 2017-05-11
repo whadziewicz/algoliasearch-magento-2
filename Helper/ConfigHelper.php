@@ -234,7 +234,7 @@ class ConfigHelper
 
     public function isCustomerGroupsEnabled($storeId = null)
     {
-        return $this->configInterface->getValue(self::CUSTOMER_GROUPS_ENABLE, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->configInterface->isSetFlag(self::CUSTOMER_GROUPS_ENABLE, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isPartialUpdateEnabled($storeId = null)
@@ -515,8 +515,15 @@ class ConfigHelper
         }
 
         $attributes = [];
+
         foreach ($this->getProductAdditionalAttributes() as $attribute) {
-            if ($attribute['attribute'] !== 'price') {
+            if ($attribute['attribute'] !== 'price' && $attribute['retrievable'] === '1') {
+                $attributes[] = $attribute['attribute'];
+            }
+        }
+
+        foreach ($this->getCategoryAdditionalAttributes() as $attribute) {
+            if ($attribute['retrievable'] === '1') {
                 $attributes[] = $attribute['attribute'];
             }
         }
@@ -551,6 +558,8 @@ class ConfigHelper
         $transport = new DataObject($attributes);
         $this->eventManager->dispatch('algolia_get_retrievable_attributes', ['attributes' => $transport]);
         $attributes = $transport->getData();
+
+        $attributes = array_unique($attributes);
 
         return ['attributesToRetrieve' => $attributes];
     }

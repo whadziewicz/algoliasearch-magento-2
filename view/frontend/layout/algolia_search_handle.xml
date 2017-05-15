@@ -10,8 +10,9 @@
     </head>
     <body>
         <referenceBlock name="head.additional">
-            <block class="Algolia\AlgoliaSearch\Block\Algolia" name="algolia.internals.configuration" template="Algolia_AlgoliaSearch::internals/configuration.phtml"/>
+            <block class="Algolia\AlgoliaSearch\Block\Configuration" name="algolia.internals.configuration" template="Algolia_AlgoliaSearch::internals/configuration.phtml"/>
         </referenceBlock>
+
         <referenceBlock name="main.content">
             <block class="Magento\Framework\View\Element\Template" before="-" name="algolia.beforecontent" template="Algolia_AlgoliaSearch::internals/beforecontent.phtml"/>
         </referenceBlock>

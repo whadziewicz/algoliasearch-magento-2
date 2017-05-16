@@ -93,6 +93,28 @@ class ConfigTest extends TestCase
         $this->assertTrue($categoriesAttributeIsIncluded, 'Categories attribute should be included in facets, but it is not');
     }
 
+    public function testRetrievableAttributes()
+    {
+        $this->resetConfigs(array('algoliasearch_products/products/product_additional_attributes', 'algoliasearch_categories/categories/category_additional_attributes'));
+
+        $this->setConfig('algoliasearch_advanced/advanced/customer_groups_enable', '0');
+
+        $retrievableAttributes = $this->configHelper->getAttributesToRetrieve(1);
+        $this->assertEmpty($retrievableAttributes);
+
+        $this->setConfig('algoliasearch_advanced/advanced/customer_groups_enable', '1');
+
+        $retrievableAttributes = $this->configHelper->getAttributesToRetrieve(1);
+        $this->assertNotEmpty($retrievableAttributes);
+
+        $retrievableAttributes = $retrievableAttributes['attributesToRetrieve'];
+        $this->assertNotEmpty($retrievableAttributes);
+
+        $this->assertContains('objectID', $retrievableAttributes);
+        $this->assertContains('name', $retrievableAttributes);
+        $this->assertContains('product_count', $retrievableAttributes); // Category attribute
+    }
+
     public function testReplicaCreationWithoutCustomerGroups()
     {
         $this->replicaCreationTest(false);

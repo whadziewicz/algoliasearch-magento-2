@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 1.1.0
+
+- Fixed products prices - now all prices (currencies, promos, ...) are correctly indexed (#233)
+- Optimized the number of delete queries (#209)
+- Image URLs are indexed without protocol (#211)
+- Queue processing is now optimized and process always the right number of jobs (#208)
+- Fixed the autocomplete menu on mobile (#215, #222)
+- Fixed the replica creation with customers' groups enabled (#217)
+- Fixed broken reference on Magento_Theme (#224)
+- Fix for overloaded queued jobs (#229, #228)
+- Fixed encoding of CMS pages (#227)
+- Fixed image URLs with double slashes (#234)
+- Fixed `attributesToRetrieve` to contain category attributes (#235)
+
+**BC Breaks**
+- Refactored `configuration.phtml` - all the logic moved to `Block` class (#238)
+- Optimized CSS and assets - removed couple of images and CSS classes (#236)
+- JS hooks - instantsearch.js file was completely refactored to create IS config object which can be manipulated via hook method (#240)
+
 ## 1.0.10
 
 - Fix IS on replaced category page (#202)

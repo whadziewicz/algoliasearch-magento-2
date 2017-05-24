@@ -553,10 +553,13 @@ class Data
                 $toRealRemove = $indexData['toRemove'];
             } else {
                 $indexData['toRemove'] = array_map('strval', $indexData['toRemove']);
-                $objects = $this->algoliaHelper->getObjects($indexName, $indexData['toRemove']);
-                foreach ($objects['results'] as $object) {
-                    if (isset($object['objectID'])) {
-                        $toRealRemove[] = $object['objectID'];
+
+                foreach (array_chunk($indexData['toRemove'], 1000) as $chunk) {
+                    $objects = $this->algoliaHelper->getObjects($indexName, $chunk);
+                    foreach ($objects['results'] as $object) {
+                        if (isset($object['objectID'])) {
+                            $toRealRemove[] = $object['objectID'];
+                        }
                     }
                 }
             }

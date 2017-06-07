@@ -76,6 +76,12 @@ class ConfigHelper
 
     const USE_SECURE_IN_FRONTEND = 'web/secure/use_in_frontend';
 
+    const EXTRA_SETTINGS_PRODUCTS = 'algoliasearch_extra_settings/extra_settings/products_extra_settings';
+    const EXTRA_SETTINGS_CATEGORIES = 'algoliasearch_extra_settings/extra_settings/categories_extra_settings';
+    const EXTRA_SETTINGS_PAGES = 'algoliasearch_extra_settings/extra_settings/pages_extra_settings';
+    const EXTRA_SETTINGS_SUGGESTIONS = 'algoliasearch_extra_settings/extra_settings/suggestions_extra_settings';
+    const EXTRA_SETTINGS_ADDITIONAL_SECTIONS = 'algoliasearch_extra_settings/extra_settings/additional_sections_extra_settings';
+
     protected $_productTypeMap = [];
 
     private $configInterface;
@@ -493,6 +499,15 @@ class ConfigHelper
         }
 
         return [];
+    }
+
+    public function getExtraSettings($section, $storeId = null)
+    {
+        $constant = 'EXTRA_SETTINGS_'.mb_strtoupper($section);
+
+        $value = $this->configInterface->getValue(constant('self::'.$constant), ScopeInterface::SCOPE_STORE, $storeId);
+
+        return trim($value);
     }
 
     public function getCurrency($storeId = null)

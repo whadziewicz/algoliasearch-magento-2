@@ -186,7 +186,7 @@ class ConfigHelper
 
     public function isEnabledBackend($storeId = null)
     {
-        return $this->configInterface->getValue(self::ENABLE_BACKEND, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->configInterface->isSetFlag(self::ENABLE_BACKEND, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function makeSeoRequest($storeId = null)

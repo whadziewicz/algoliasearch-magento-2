@@ -453,10 +453,22 @@ class ConfigHelper
 
     public function getProductAdditionalAttributes($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::PRODUCT_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
+        $attributes = unserialize($this->configInterface->getValue(self::PRODUCT_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
 
-        if (is_array($attrs)) {
-            return $attrs;
+        $facets = unserialize($this->configInterface->getValue(self::FACETS, ScopeInterface::SCOPE_STORE,$storeId));
+        $attributes = $this->addIndexableAttributes($attributes, $facets, '0');
+
+        $sorts = unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE,$storeId));
+        $attributes = $this->addIndexableAttributes($attributes, $sorts, '0');
+
+        $customRankings = unserialize($this->configInterface->getValue(self::PRODUCT_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE,$storeId));
+        $customRankings = array_filter($customRankings, function ($customRanking) {
+            return $customRanking['attribute'] != 'custom_attribute';
+        });
+        $attributes = $this->addIndexableAttributes($attributes, $customRankings, '0', '0');
+
+        if (is_array($attributes)) {
+            return $attributes;
         }
 
         return [];
@@ -618,5 +630,25 @@ class ConfigHelper
         $baseDirectory = $this->directoryList->getPath(DirectoryList::MEDIA);
 
         return $baseDirectory . '/algoliasearch_admin_config_uploads/' . $filename;
+    }
+
+    private function addIndexableAttributes($attributes, $addedAttributes, $searchable = '1', $retrievable = '1', $indexNoValue = '1')
+    {
+        foreach ((array) $addedAttributes as $addedAttribute) {
+            foreach ((array) $attributes as $attribute) {
+                if ($addedAttribute['attribute'] == $attribute['attribute']) {
+                    continue 2;
+                }
+            }
+
+            $attributes[] = array(
+                'attribute'         => $addedAttribute['attribute'],
+                'searchable'        => $searchable,
+                'retrievable'       => $retrievable,
+                'index_no_value'    => $indexNoValue,
+            );
+        }
+
+        return $attributes;
     }
 }

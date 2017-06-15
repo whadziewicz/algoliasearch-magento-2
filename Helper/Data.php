@@ -63,9 +63,7 @@ class Data
     public function deleteProductsStoreIndices($storeId = null)
     {
         if ($storeId !== null) {
-            if ($this->configHelper->isEnabledBackend($storeId) === false) {
-                $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+            if ($this->isIndexingEnabled($storeId) === false) {
                 return;
             }
         }
@@ -88,6 +86,10 @@ class Data
 
     public function deleteObjects($storeId, $ids, $indexName)
     {
+        if ($this->isIndexingEnabled($storeId) === false) {
+            return;
+        }
+
         $this->algoliaHelper->deleteObjects($ids, $indexName);
     }
 
@@ -97,9 +99,7 @@ class Data
             return;
         }
 
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -161,9 +161,7 @@ class Data
 
     public function rebuildStoreAdditionalSectionsIndex($storeId)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -190,9 +188,7 @@ class Data
 
     public function rebuildStorePageIndex($storeId)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -215,9 +211,7 @@ class Data
 
     public function rebuildStoreCategoryIndex($storeId, $categoryIds = null)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -251,9 +245,7 @@ class Data
 
     public function rebuildStoreSuggestionIndex($storeId)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -280,14 +272,16 @@ class Data
 
     public function moveIndex($tmpIndexName, $indexName)
     {
+        if ($this->isIndexingEnabled() === false) {
+            return;
+        }
+
         $this->algoliaHelper->moveIndex($tmpIndexName, $indexName);
     }
 
     public function moveStoreSuggestionIndex($storeId)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -296,9 +290,7 @@ class Data
 
     public function rebuildStoreProductIndex($storeId, $productIds)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -339,17 +331,17 @@ class Data
 
     public function rebuildProductIndex($storeId, $productIds, $page, $pageSize, $useTmpIndex)
     {
+        if ($this->isIndexingEnabled($storeId) === false) {
+            return;
+        }
+
         $collection = $this->productHelper->getProductCollectionQuery($storeId, null, $useTmpIndex);
         $this->rebuildStoreProductIndexPage($storeId, $collection, $page, $pageSize, null, $productIds, $useTmpIndex);
-
-        return $this;
     }
 
     public function rebuildStoreSuggestionIndexPage($storeId, $collectionDefault, $page, $pageSize)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -387,9 +379,7 @@ class Data
 
     public function rebuildStoreCategoryIndexPage($storeId, $collectionDefault, $page, $pageSize)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -483,9 +473,7 @@ class Data
 
     public function rebuildStoreProductIndexPage($storeId, $collectionDefault, $page, $pageSize, $emulationInfo = null, $productIds = null, $useTmpIndex = false)
     {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
+        if ($this->isIndexingEnabled($storeId) === false) {
             return;
         }
 
@@ -652,5 +640,16 @@ class Data
         if (!empty($error)) {
             throw new AlgoliaException('<br>'.implode('<br> ', $error));
         }
+    }
+
+    private function isIndexingEnabled($storeId = null)
+    {
+        if ($this->configHelper->isEnabledBackend($storeId) === false) {
+            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
+
+            return false;
+        }
+
+        return true;
     }
 }

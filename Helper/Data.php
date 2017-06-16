@@ -60,30 +60,6 @@ class Data
         $this->resource = $resource;
     }
 
-    public function deleteProductsStoreIndices($storeId = null)
-    {
-        if ($storeId !== null) {
-            if ($this->isIndexingEnabled($storeId) === false) {
-                return;
-            }
-        }
-
-        $this->algoliaHelper->deleteIndex($this->productHelper->getIndexName($storeId));
-    }
-
-    public function deleteCategoriesStoreIndices($storeId = null)
-    {
-        if ($storeId !== null) {
-            if ($this->configHelper->isEnabledBackend($storeId) === false) {
-                $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
-                return;
-            }
-        }
-
-        $this->algoliaHelper->deleteIndex($this->categoryHelper->getIndexName($storeId));
-    }
-
     public function deleteObjects($storeId, $ids, $indexName)
     {
         if ($this->isIndexingEnabled($storeId) === false) {

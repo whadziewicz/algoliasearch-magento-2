@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use Magento\Framework\DataObject;
 use Magento\Search\Model\Query;
 
 class SuggestionHelper extends BaseHelper
@@ -13,17 +14,23 @@ class SuggestionHelper extends BaseHelper
 
     public function getIndexSettings($storeId)
     {
-        return [
+        $indexSettings = [
             'searchableAttributes' => ['query'],
             'customRanking'        => ['desc(popularity)', 'desc(number_of_results)', 'asc(date)'],
             'typoTolerance'        => false,
             'attributesToRetrieve' => ['query'],
         ];
+
+        $transport = new DataObject($indexSettings);
+        $this->eventManager->dispatch('algolia_suggestions_index_before_set_settings', ['store_id' => $storeId, 'index_settings' => $transport]);
+        $indexSettings = $transport->getData();
+
+        return $indexSettings;
     }
 
     public function getObject(Query $suggestion)
     {
-        $suggestion_obj = [
+        $suggestionObject = [
             'objectID'          => $suggestion->getData('query_id'),
             'query'             => $suggestion->getData('query_text'),
             'number_of_results' => (int) $suggestion->getData('num_results'),
@@ -31,7 +38,11 @@ class SuggestionHelper extends BaseHelper
             'updated_at'        => (int) strtotime($suggestion->getData('updated_at')),
         ];
 
-        return $suggestion_obj;
+        $transport = new DataObject($suggestionObject);
+        $this->eventManager->dispatch('algolia_after_create_suggestion_object', ['suggestion' => $transport, 'suggestionObject' => $suggestion]);
+        $suggestionObject = $transport->getData();
+
+        return $suggestionObject;
     }
 
     public function getPopularQueries($storeId)
@@ -67,6 +78,8 @@ class SuggestionHelper extends BaseHelper
         $collection = $collection->addStoreFilter($storeId)->setStoreId($storeId);
 
         $collection->getSelect()->where('num_results >= ' . $this->config->getMinNumberOfResults($storeId) . ' AND popularity >= ' . $this->config->getMinPopularity($storeId) . ' AND query_text != "__empty__"');
+
+        $this->eventManager->dispatch('algolia_after_suggestions_collection_build', ['store' => $storeId, 'collection' => $collection]);
 
         return $collection;
     }

@@ -548,34 +548,18 @@ class ProductHelper extends BaseHelper
         }
     }
 
-    public function getAllCategories($category_ids)
+    public function getAllCategories($categoryIds)
     {
-        static $categories = null;
+        $categories = $this->getCoreCategories();
 
-        if ($categories === null) {
-            $categoriesData = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
-            $categoriesData
-                ->addAttributeToSelect('name')
-                ->addAttributeToFilter('include_in_menu', '1')
-                ->addFieldToFilter('level', ['gt' => 1])
-                ->addIsActiveFilter();
-
-            $categories = [];
-
-            foreach ($categoriesData as $category) {
-                $categories[$category->getId()] = $category;
-            }
-        }
-
-        $selected_categories = [];
-
-        foreach ($category_ids as $id) {
+        $selectedCategories = [];
+        foreach ($categoryIds as $id) {
             if (isset($categories[$id])) {
-                $selected_categories[] = $categories[$id];
+                $selectedCategories[] = $categories[$id];
             }
         }
 
-        return $selected_categories;
+        return $selectedCategories;
     }
 
     public function getObject(Product $product)

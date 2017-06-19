@@ -52,7 +52,12 @@ class CategoryHelper extends BaseHelper
 
         // Additional index settings from event observer
         $transport = new DataObject($indexSettings);
-        $this->eventManager->dispatch('algolia_index_settings_prepare', [
+        $this->eventManager->dispatch('algolia_index_settings_prepare', [ // Only for backward compatibility
+                'store_id'       => $storeId,
+                'index_settings' => $transport,
+            ]
+        );
+        $this->eventManager->dispatch('algolia_categories_index_before_set_settings', [
                 'store_id'       => $storeId,
                 'index_settings' => $transport,
             ]
@@ -100,6 +105,8 @@ class CategoryHelper extends BaseHelper
         if ($categoryIds) {
             $categories->addFieldToFilter('entity_id', ['in' => $categoryIds]);
         }
+
+        $this->eventManager->dispatch('algolia_after_categories_collection_build', ['store' => $storeId, 'collection' => $categories]);
 
         return $categories;
     }
@@ -204,6 +211,10 @@ class CategoryHelper extends BaseHelper
         foreach ($data as &$data0) {
             $data0 = $this->try_cast($data0);
         }
+
+        $transport = new DataObject($data);
+        $this->eventManager->dispatch('algolia_after_create_category_object', ['category' => $category, 'categoryObject' => $transport]);
+        $data = $transport->getData();
 
         return $data;
     }

@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use Magento\Cms\Model\Page;
+use Magento\Framework\DataObject;
 
 class PageHelper extends BaseHelper
 {
@@ -13,10 +14,16 @@ class PageHelper extends BaseHelper
 
     public function getIndexSettings($storeId)
     {
-        return [
+        $indexSettings = [
             'searchableAttributes' => ['unordered(slug)', 'unordered(name)', 'unordered(content)'],
             'attributesToSnippet'  => ['content:7'],
         ];
+
+        $transport = new DataObject($indexSettings);
+        $this->eventManager->dispatch('algolia_pages_index_before_set_settings', ['store_id' => $storeId, 'index_settings' => $transport]);
+        $indexSettings = $transport->getData();
+
+        return $indexSettings;
     }
 
     public function getPages($storeId)
@@ -60,8 +67,11 @@ class PageHelper extends BaseHelper
 
             $pageObject['objectID'] = $page->getId();
             $pageObject['url'] = $this->getStoreUrl($storeId)->getUrl(null, ['_direct' => $page->getIdentifier(), '_secure' => $this->config->useSecureUrlsInFrontend($storeId)]);
-
             $pageObject['content'] = $this->strip($content, array('script', 'style'));
+
+            $transport = new DataObject($pageObject);
+            $this->eventManager->dispatch('algolia_after_create_page_object', ['page' => $transport, 'pageObject' => $page]);
+            $pageObject = $transport->getData();
 
             $pages[] = $pageObject;
         }

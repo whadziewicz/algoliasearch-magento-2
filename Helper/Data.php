@@ -14,6 +14,7 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Search\Model\Query;
 use Magento\Store\Model\App\Emulation;
 
@@ -32,6 +33,7 @@ class Data
     protected $configHelper;
     protected $emulation;
     protected $resource;
+    protected $eventManager;
 
     private $emulationRuns = false;
 
@@ -44,7 +46,8 @@ class Data
                                 AdditionalSectionHelper $additionalSectionHelper,
                                 Emulation $emulation,
                                 Logger $logger,
-                                ResourceConnection $resource)
+                                ResourceConnection $resource,
+                                ManagerInterface $eventManager)
     {
         $this->algoliaHelper = $algoliaHelper;
 
@@ -58,6 +61,7 @@ class Data
         $this->logger = $logger;
         $this->emulation = $emulation;
         $this->resource = $resource;
+        $this->eventManager = $eventManager;
     }
 
     public function deleteObjects($storeId, $ids, $indexName)
@@ -492,6 +496,11 @@ class Data
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
             $collection->getSelect()->columns('(SELECT MAX(rating_summary) FROM ' . $reviewTableName . ' AS o WHERE o.entity_pk_value = e.entity_id AND o.store_id = '.$storeId.') as rating_summary');
         }
+
+        $this->eventManager->dispatch(
+            'algolia_before_products_collection_load',
+            ['collection' => $collection, 'store' => $storeId]
+        );
 
         $this->logger->start('LOADING ' . $this->logger->getStoreName($storeId) . ' collection page ' . $page . ', pageSize ' . $pageSize);
 

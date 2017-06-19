@@ -197,7 +197,8 @@ class ProductHelper extends BaseHelper
             $products = $products->addAttributeToFilter('entity_id', ['in' => $productIds]);
         }
 
-        $this->eventManager->dispatch('algolia_rebuild_store_product_index_collection_load_before', ['store' => $storeId, 'collection' => $products]);
+        $this->eventManager->dispatch('algolia_rebuild_store_product_index_collection_load_before', ['store' => $storeId, 'collection' => $products]); // Only for backward compatibility
+        $this->eventManager->dispatch('algolia_after_products_collection_build', ['store' => $storeId, 'collection' => $products]);
 
         return $products;
     }
@@ -280,7 +281,11 @@ class ProductHelper extends BaseHelper
 
         // Additional index settings from event observer
         $transport = new DataObject($indexSettings);
-        $this->eventManager->dispatch('algolia_index_settings_prepare', [
+        $this->eventManager->dispatch('algolia_index_settings_prepare', [ // Only for backward compatibility
+            'store_id'       => $storeId,
+            'index_settings' => $transport,
+        ]);
+        $this->eventManager->dispatch('algolia_products_index_before_set_settings', [
             'store_id'       => $storeId,
             'index_settings' => $transport,
         ]);
@@ -818,12 +823,16 @@ class ProductHelper extends BaseHelper
         $customData['type_id'] = $type;
 
         $transport = new DataObject($customData);
-        $this->eventManager->dispatch('algolia_subproducts_index', ['custom_data' => $transport, 'sub_products' => $sub_products]);
+        $this->eventManager->dispatch('algolia_subproducts_index', ['custom_data' => $transport, 'sub_products' => $sub_products, 'productObject' => $product]);
         $customData = $transport->getData();
 
         $customData = array_merge($customData, $defaultData);
 
         $this->castProductObject($customData);
+
+        $transport = new DataObject($customData);
+        $this->eventManager->dispatch('algolia_after_create_product_object', ['custom_data' => $transport, 'sub_products' => $sub_products, 'productObject' => $product]);
+        $customData = $transport->getData();
 
         $this->logger->stop('CREATE RECORD ' . $product->getId() . ' ' . $this->logger->getStoreName($product->getStoreId()));
 

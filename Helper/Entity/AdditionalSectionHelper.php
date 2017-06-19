@@ -13,9 +13,15 @@ class AdditionalSectionHelper extends BaseHelper
 
     public function getIndexSettings($storeId)
     {
-        return [
+        $indexSettings = [
             'searchableAttributes' => ['unordered(value)'],
         ];
+
+        $transport = new DataObject($indexSettings);
+        $this->eventManager->dispatch('algolia_additional_sections_index_before_set_settings', ['store_id' => $storeId, 'index_settings' => $transport]);
+        $indexSettings = $transport->getData();
+
+        return $indexSettings;
     }
 
     public function getAttributeValues($storeId, $section)
@@ -45,7 +51,7 @@ class AdditionalSectionHelper extends BaseHelper
             $values = [$values];
         }
 
-        $values = array_map(function ($value) use ($section) {
+        $values = array_map(function ($value) use ($section, $storeId) {
 
             $record = [
                 'objectID' => $value,
@@ -53,9 +59,8 @@ class AdditionalSectionHelper extends BaseHelper
             ];
 
             $transport = new DataObject($record);
-
-            $this->eventManager->dispatch('algolia_additional_section_item_index_before', ['section' => $section, 'record' => $transport]);
-
+            $this->eventManager->dispatch('algolia_additional_section_item_index_before', ['section' => $section, 'record' => $transport, 'store_id' => $storeId]);
+            $this->eventManager->dispatch('algolia_additional_section_items_before_index', ['section' => $section, 'record' => $transport, 'store_id' => $storeId]);
             $record = $transport->getData();
 
             return $record;

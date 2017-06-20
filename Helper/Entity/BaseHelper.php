@@ -50,6 +50,7 @@ abstract class BaseHelper
 
     protected $storeUrls;
 
+    private $coreCategories;
     private $idColumn;
 
     abstract protected function getIndexNameSuffix();
@@ -242,7 +243,7 @@ abstract class BaseHelper
                 $connection = $this->queryResource->getConnection();
                 $select = $connection->select()
                     ->from(['backend' => $attribute->getBackendTable()], ['key' => new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$this->getCorrectIdColumn().")"), 'category.path', 'backend.value'])
-                    ->join(['category' => $resource->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.entity_id', [])
+                    ->join(['category' => $resource->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.'.$this->getCorrectIdColumn(), [])
                     ->where('backend.attribute_id = ?', $attribute->getAttributeId())
                     ->order('backend.store_id')
                     ->order('backend.'.$this->getCorrectIdColumn());
@@ -278,7 +279,7 @@ abstract class BaseHelper
 
                 $select = $connection->select()
                     ->from(['backend' => $attribute->getBackendTable()], [new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$this->getCorrectIdColumn().")"), 'backend.value'])
-                    ->join(['category' => $categoryModel->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.entity_id', [])
+                    ->join(['category' => $categoryModel->getTable('catalog_category_entity')], 'backend.'.$this->getCorrectIdColumn().' = category.'.$this->getCorrectIdColumn(), [])
                     ->where('backend.attribute_id = ?', $attribute->getAttributeId())
                     ->where('category.level > ?', 1);
 
@@ -288,17 +289,27 @@ abstract class BaseHelper
 
         $categoryName = null;
 
-        $key = $storeId . '-' . $categoryId;
+        $categoryKeyId = $categoryId;
+
+        if ($this->getCorrectIdColumn() === 'row_id') {
+            $category = $this->getCategoryById($categoryId);
+            if ($category) {
+                $categoryKeyId = $category->getRowId();
+            }
+        }
+
+        if(is_null($categoryKeyId)) {
+            return $categoryName;
+        }
+
+        $key = $storeId . '-' . $categoryKeyId;
 
         if (isset(self::$_categoryNames[$key])) {
             // Check whether the category name is present for the specified store
-
             $categoryName = strval(self::$_categoryNames[$key]);
         } elseif ($storeId != 0) {
             // Check whether the category name is present for the default store
-
             $key = '0-' . $categoryId;
-
             if (isset(self::$_categoryNames[$key])) {
                 $categoryName = strval(self::$_categoryNames[$key]);
             }
@@ -355,9 +366,36 @@ abstract class BaseHelper
         return null;
     }
 
+    protected function getCoreCategories() {
+        if (isset($this->coreCategories)) {
+            return $this->coreCategories;
+        }
+
+        $categoriesData = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
+        $categoriesData
+            ->addAttributeToSelect('name')
+            ->addAttributeToFilter('include_in_menu', '1')
+            ->addFieldToFilter('level', ['gt' => 1])
+            ->addIsActiveFilter();
+
+        $this->coreCategories = [];
+        foreach ($categoriesData as $category) {
+            $this->coreCategories[$category->getId()] = $category;
+        }
+
+        return $this->coreCategories;
+    }
+
+    protected function getCategoryById($categoryId)
+    {
+        $catagories = $this->getCoreCategories();
+
+        return isset($catagories[$categoryId]) ? $catagories[$categoryId] : null;
+    }
+
     protected function getCorrectIdColumn()
     {
-        if(isset($this->idColumn)) {
+        if (isset($this->idColumn)) {
             return $this->idColumn;
         }
 

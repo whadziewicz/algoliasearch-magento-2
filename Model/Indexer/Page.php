@@ -71,7 +71,9 @@ class Page implements Magento\Framework\Indexer\ActionInterface, Magento\Framewo
         }
 
         foreach ($storeIds as $storeId) {
-            $this->queue->addToQueue($this->fullAction, 'rebuildStorePageIndex', ['store_id' => $storeId], 1);
+            if ($this->isPagesInAdditionalSections($storeId)) {
+                $this->queue->addToQueue($this->fullAction, 'rebuildStorePageIndex', ['store_id' => $storeId], 1);
+            }
         }
     }
 
@@ -81,5 +83,17 @@ class Page implements Magento\Framework\Indexer\ActionInterface, Magento\Framewo
 
     public function executeRow($id)
     {
+    }
+
+    private function isPagesInAdditionalSections($storeId)
+    {
+        $sections = $this->configHelper->getAutocompleteSections($storeId);
+        foreach ($sections as $section) {
+            if ($section['name'] === 'pages') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

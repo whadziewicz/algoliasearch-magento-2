@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## 1.2.0
+
+### FEATURES
+
+- Analytics - the extension now uses Magento's GA to measure searches (#253)
+    - [Documentation](https://community.algolia.com/magento/doc/m2/analytics/)
+- Option to send an extra Algolia settings to Algolia indices (#245)
+- The configuration page now displays information about the indexing queue and gives possibility to clear the queue (#262)
+- In attribute select boxes (sorts, facets, ranking, ...) is now possible to choose from all attributes and not just those set as "attribute to indexing" (#257)
+- Option to disable synonyms management in Magento (#260)
+    - By default it's turned off - if you're using synonyms management in Magento, please turn it on after the upgrade
+- Extension back-end events are now more granular (#266)
+    - [Documentation](https://community.algolia.com/magento/doc/m2/backend/)
+
+### UPDATES
+
+- All CSS selectors were prefixed with Algolia containers and unused styles were removed (#246)
+    - **BC break** - please check the look & feel of your results
+- Algolia settings are now pushed to Algolia after the save of extra settings configuration page (#258)
+- Added titles to configuration sections (#259)
+- **BC Break** - Unused "deleteIndices" method were removed (#263)
+
+
+### FIXES
+
+- Fix the issue with Algolia error when more than 1000 products are supposed to be deleted (#249)
+- Fixed the thumbnail URL when using `/pub/` directory as the root directory (#247)
+    - [Documentation](https://community.algolia.com/magento/faq/#in-magento2-the-indexed-image-urls-have-pub-at-the-beginning)
+- Fix the issue when backend was still enabled even though it was set as disabled in configuration (#256)
+- Fix the issue when indexing was disabled, but the extension still performed some indexing operations (#261)
+- Fix category fetching on Magento EE (#265)
+- Fix the back button on category pages to not return all products from the store (#267)
+- CMS pages are no longer index when the "Pages" section is removed from Addition sections (#271)
+
 ## 1.1.0
 
 - Fixed products prices - now all prices (currencies, promos, ...) are correctly indexed (#233)

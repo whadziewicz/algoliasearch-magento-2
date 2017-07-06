@@ -39,7 +39,7 @@ Check out the [Algolia Search for Magento 2 documentation](https://community.alg
 Installation
 ------------
 
-The easiest way to install the extension is to use [Composer](https://getcomposer.org/).
+The easiest way to install the extension is to use [Composer](https://getcomposer.org/) and follow the [getting started](https://community.algolia.com/magento/doc/m2/getting-started/)
 
 Run the following commands:
 

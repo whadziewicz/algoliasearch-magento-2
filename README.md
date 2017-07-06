@@ -16,12 +16,12 @@ Official website: [community.algolia.com/magento](https://community.algolia.com/
 Demo
 --------------
 
-Try our live demo on [https://magento2.algolia.com](https://magento2.algolia.com). 
+Try the auto-complete and the instant search results page on our [live demo](https://magento2.algolia.com). 
 
 Algolia Search
 --------------
 
-[Algolia Search](http://www.algolia.com) is a hosted full-text, numerical, and faceted search engine capable of delivering realtime results from the first keystroke.
+[Algolia](http://www.algolia.com) is a search engine API as a service capable of delivering realtime results from the first keystroke.
 
 This extension replaces the default search of Magento with a typo-tolerant, fast & relevant search experience backed by Algolia. It's based on [algoliasearch-client-php](https://github.com/algolia/algoliasearch-client-php), [autocomplete.js](https://github.com/algolia/autocomplete.js) and [instantsearch.js](https://github.com/algolia/instantsearch.js).
 
@@ -39,7 +39,7 @@ Check out the [Algolia Search for Magento 2 documentation](https://community.alg
 Installation
 ------------
 
-The easiest way to install the extension is to use [Composer](https://getcomposer.org/) and follow the [getting started](https://community.algolia.com/magento/doc/m2/getting-started/)
+The easiest way to install the extension is to use [Composer](https://getcomposer.org/) and follow our [getting started guide](https://community.algolia.com/magento/doc/m2/getting-started/).
 
 Run the following commands:
 

@@ -38,6 +38,7 @@ class ConfigHelper
     const MIN_POPULARITY = 'algoliasearch_autocomplete/autocomplete/min_popularity';
     const MIN_NUMBER_OF_RESULTS = 'algoliasearch_autocomplete/autocomplete/min_number_of_results';
     const RENDER_TEMPLATE_DIRECTIVES = 'algoliasearch_autocomplete/autocomplete/render_template_directives';
+    const AUTOCOMPLETE_MENU_DEBUG = 'algoliasearch_autocomplete/autocomplete/debug';
 
     const NUMBER_OF_PRODUCT_RESULTS = 'algoliasearch_products/products/number_product_results';
     const PRODUCT_ATTRIBUTES = 'algoliasearch_products/products/product_additional_attributes';
@@ -370,6 +371,11 @@ class ConfigHelper
     public function getRenderTemplateDirectives($storeId = null)
     {
         return $this->configInterface->getValue(self::RENDER_TEMPLATE_DIRECTIVES, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function isAutocompleteDebugEnabled($storeId = null)
+    {
+        return $this->configInterface->isSetFlag(self::AUTOCOMPLETE_MENU_DEBUG, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getSortingIndices($storeId = null)

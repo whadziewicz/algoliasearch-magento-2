@@ -226,6 +226,16 @@
                                 ]]>
                     </comment>
                 </field>
+                <field id="debug" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable autocomplete menu's debug mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When set to Yes, autocomplete menu won't disappear when clicked outside of the menu.
+                            It's useful when you debug / style the look of autocomplete menu.
+                        ]]>
+                    </comment>
+                </field>
             </group>
         </section>
         <section id="algoliasearch_instant" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">

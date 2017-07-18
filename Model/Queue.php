@@ -93,6 +93,10 @@ class Queue
 
         $jobs = $this->getJobs($maxJobs, $pid);
 
+        if (empty($jobs)) {
+            return;
+        }
+
         // Run all reserved jobs
         foreach ($jobs as $job) {
             try {

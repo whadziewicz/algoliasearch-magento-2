@@ -228,7 +228,7 @@ class ProductHelper extends BaseHelper
             }
 
             if ($attribute['attribute'] == 'categories') {
-                $searchableAttributes[] = $attribute['order'] == 'ordered' ? 'categories_without_path' : 'unordered(categories_without_path)';
+                $searchableAttributes[] = (isset($attribute['order']) && $attribute['order'] == 'ordered') ? 'categories_without_path' : 'unordered(categories_without_path)';
             }
         }
 

@@ -6,6 +6,7 @@ use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Logger;
 use Magento\Catalog\Helper\Data as CatalogHelper;
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Helper\Stock;
@@ -52,6 +53,8 @@ abstract class BaseHelper
 
     private $coreCategories;
     private $idColumn;
+
+    private $isCategoryVisibleInMenuCache;
 
     abstract protected function getIndexNameSuffix();
 
@@ -253,6 +256,24 @@ abstract class BaseHelper
         }
 
         return self::$_activeCategories;
+    }
+
+    public function isCategoryVisibleInMenu($categoryId, $storeId)
+    {
+        $key = $categoryId.' - '.$storeId;
+        if (isset($this->isCategoryVisibleInMenuCache[$key])) {
+            return $this->isCategoryVisibleInMenuCache[$key];
+        }
+
+        $categoryId = (int) $categoryId;
+
+        /** @var Category $category */
+        $category = $this->objectManager->create('\Magento\Catalog\Model\Category');
+        $category = $category->setStoreId($storeId)->load($categoryId);
+
+        $this->isCategoryVisibleInMenuCache[$key] = (bool) $category->getIncludeInMenu();
+
+        return $this->isCategoryVisibleInMenuCache[$key];
     }
 
     public function getCategoryName($categoryId, $storeId = null)

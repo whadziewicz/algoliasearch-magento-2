@@ -630,6 +630,12 @@ class ProductHelper extends BaseHelper
                 $path = [];
 
                 foreach ($category->getPathIds() as $treeCategoryId) {
+                    if (!$this->config->showCatsNotIncludedInNavigation($product->getStoreId()) && !$this->isCategoryVisibleInMenu($treeCategoryId, $product->getStoreId())) {
+                        // If the category should not be included in menu - skip it
+                        $path[] = null;
+                        continue;
+                    }
+
                     $name = $this->getCategoryName($treeCategoryId, $product->getStoreId());
                     if ($name) {
                         $path[] = $name;
@@ -656,6 +662,10 @@ class ProductHelper extends BaseHelper
             for ($i = 0; $i < count($category); $i++) {
                 if (isset($categories_hierarchical[$level_name . $i]) === false) {
                     $categories_hierarchical[$level_name . $i] = [];
+                }
+
+                if ($category[$i] === null) {
+                    continue;
                 }
 
                 $categories_hierarchical[$level_name . $i][] = implode(' /// ', array_slice($category, 0, $i + 1));

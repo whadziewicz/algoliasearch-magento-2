@@ -5,6 +5,7 @@ namespace Algolia\AlgoliaSearch\Helper\Entity;
 use Algolia\AlgoliaSearch\Helper\Image;
 use Magento\Catalog\Model\Product;
 use Magento\Directory\Model\Currency;
+use Magento\Framework\App\Cache\Type\Config as ConfigCache;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Tax\Model\Config as TaxConfig;
@@ -77,12 +78,13 @@ class ProductHelper extends BaseHelper
         CurrencyHelper $currencyManager,
         FilterProvider $filterProvider,
         PriceCurrencyInterface $priceCurrency,
-        Rule $rule
+        Rule $rule,
+        ConfigCache $cache
     ) {
         parent::__construct($eavConfig, $configHelper, $algoliaHelper, $logger, $storeManager,
             $eventManager, $visibility, $stock, $taxHelper, $stockRegistry, $currencyDirectory,
             $currencyHelper, $objectManager, $catalogHelper, $queryResource, $currencyManager,
-            $filterProvider, $priceCurrency, $rule);
+            $filterProvider, $priceCurrency, $rule, $cache);
 
         $this->imageHelper = $this->objectManager->create(
             'Algolia\AlgoliaSearch\Helper\Image',

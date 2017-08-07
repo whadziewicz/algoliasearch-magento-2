@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Helper;
 
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
+use Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper;
 use Magento;
 use Magento\Directory\Model\Currency as DirCurrency;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -543,12 +544,17 @@ class ConfigHelper
 
     public function getPopularQueries($storeId = null)
     {
+        if (!$this->isInstantEnabled($storeId) || !$this->showSuggestionsOnNoResultsPage($storeId)) {
+            return array();
+        }
+
         if ($storeId === null) {
             $storeId = $this->storeManager->getStore()->getId();
         }
 
-        $suggestion_helper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper');
-        $popularQueries = $suggestion_helper->getPopularQueries($storeId);
+        /** @var SuggestionHelper $suggestionHelper */
+        $suggestionHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper');
+        $popularQueries = $suggestionHelper->getPopularQueries($storeId);
 
         return $popularQueries;
     }

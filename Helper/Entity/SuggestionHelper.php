@@ -7,6 +7,8 @@ use Magento\Search\Model\Query;
 
 class SuggestionHelper extends BaseHelper
 {
+    private $popularQueriesCacheId = 'algoliasearch_popular_queries_cache_tag';
+
     protected function getIndexNameSuffix()
     {
         return '_suggestions';
@@ -47,6 +49,11 @@ class SuggestionHelper extends BaseHelper
 
     public function getPopularQueries($storeId)
     {
+        $queries = $this->cache->load($this->popularQueriesCacheId);
+        if ($queries !== false) {
+            return unserialize($queries);
+        }
+
         $collection = $this->objectManager->create('\Magento\Search\Model\ResourceModel\Query\Collection');
         $collection->getSelect()->where('num_results >= ' . $this->config->getMinNumberOfResults() . ' AND popularity >= ' . $this->config->getMinPopularity() . ' AND query_text != "__empty__"');
         $collection->getSelect()->limit(12);
@@ -68,7 +75,11 @@ class SuggestionHelper extends BaseHelper
             }
         }
 
-        return array_slice($suggestions, 0, 9);
+        $queries = array_slice($suggestions, 0, 9);
+
+        $this->cache->save(serialize($queries), $this->popularQueriesCacheId, [], 24*3600);
+
+        return $queries;
     }
 
     public function getSuggestionCollectionQuery($storeId)

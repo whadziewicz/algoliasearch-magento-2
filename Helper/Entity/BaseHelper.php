@@ -16,6 +16,7 @@ use Magento\Directory\Helper\Data as CurrencyDirectory;
 use Magento\Directory\Model\Currency;
 use Magento\Directory\Model\Currency as CurrencyHelper;
 use Magento\Eav\Model\Config;
+use Magento\Framework\App\Cache\Type\Config as ConfigCache;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
@@ -43,11 +44,13 @@ abstract class BaseHelper
     protected $stockRegistry;
     protected $currencyHelper;
     protected $currencyDirectory;
+    protected $objectManager;
     protected $catalogHelper;
     protected $queryResource;
     protected $filterProvider;
     protected $rule;
     protected $priceCurrency;
+    protected $cache;
 
     protected $storeUrls;
 
@@ -76,7 +79,8 @@ abstract class BaseHelper
                                 Currency $currencyManager,
                                 FilterProvider $filterProvider,
                                 PriceCurrencyInterface $priceCurrency,
-                                Rule $rule)
+                                Rule $rule,
+                                ConfigCache $cache)
     {
         $this->eavConfig = $eavConfig;
         $this->config = $configHelper;
@@ -98,6 +102,7 @@ abstract class BaseHelper
         $this->filterProvider = $filterProvider;
         $this->priceCurrency = $priceCurrency;
         $this->rule = $rule;
+        $this->cache = $cache;
     }
 
     public function getBaseIndexName($storeId = null)

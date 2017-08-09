@@ -4,6 +4,7 @@ namespace Algolia\AlgoliaSearch\Test\Integration;
 
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Algolia\AlgoliaSearch\Setup\UpgradeSchema;
 use AlgoliaSearch\AlgoliaException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\TestFramework\Helper\Bootstrap;
@@ -32,16 +33,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function resetConfigs($configs = [])
     {
-        $configXmlFile = __DIR__.'/../../etc/config.xml';
-
-        $xml = simplexml_load_file($configXmlFile);
+        /** @var UpgradeSchema $installClass */
+        $installClass = $this->getObjectManager()->get('Algolia\AlgoliaSearch\Setup\UpgradeSchema');
+        $defaultConfigData = $installClass->getDefaultConfigData();
 
         foreach ($configs as $config) {
-            list($section, $subsection, $setting) = explode('/', $config);
-
-            $element = $xml->xpath('//default/'.$section.'/'.$subsection.'/'.$setting);
-            $value = (string) reset($element);
-
+            $value = (string) $defaultConfigData[$config];
             $this->setConfig($config, $value);
         }
     }

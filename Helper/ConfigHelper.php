@@ -264,7 +264,7 @@ class ConfigHelper
 
     public function getAutocompleteSections($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::AUTOCOMPLETE_SECTIONS, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::AUTOCOMPLETE_SECTIONS, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($attrs)) {
             return array_values($attrs);
@@ -360,7 +360,7 @@ class ConfigHelper
 
     public function getExcludedPages($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::EXCLUDED_PAGES, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::EXCLUDED_PAGES, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($attrs)) {
             return $attrs;
@@ -384,7 +384,7 @@ class ConfigHelper
         /** @var ProductHelper $productHelper */
         $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\ProductHelper');
 
-        $attrs = unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
 
         $currencies = $this->currencyManager->getConfigAllowCurrencies();
 
@@ -455,7 +455,7 @@ class ConfigHelper
 
     public function getCategoryAdditionalAttributes($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::CATEGORY_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::CATEGORY_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($attrs)) {
             return $attrs;
@@ -466,15 +466,15 @@ class ConfigHelper
 
     public function getProductAdditionalAttributes($storeId = null)
     {
-        $attributes = unserialize($this->configInterface->getValue(self::PRODUCT_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
+        $attributes = $this->unserialize($this->configInterface->getValue(self::PRODUCT_ATTRIBUTES, ScopeInterface::SCOPE_STORE, $storeId));
 
-        $facets = unserialize($this->configInterface->getValue(self::FACETS, ScopeInterface::SCOPE_STORE,$storeId));
+        $facets = $this->unserialize($this->configInterface->getValue(self::FACETS, ScopeInterface::SCOPE_STORE,$storeId));
         $attributes = $this->addIndexableAttributes($attributes, $facets, '0');
 
-        $sorts = unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE,$storeId));
+        $sorts = $this->unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE,$storeId));
         $attributes = $this->addIndexableAttributes($attributes, $sorts, '0');
 
-        $customRankings = unserialize($this->configInterface->getValue(self::PRODUCT_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE,$storeId));
+        $customRankings = $this->unserialize($this->configInterface->getValue(self::PRODUCT_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE,$storeId));
         $customRankings = array_filter($customRankings, function ($customRanking) {
             return $customRanking['attribute'] != 'custom_attribute';
         });
@@ -489,7 +489,7 @@ class ConfigHelper
 
     public function getFacets($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::FACETS, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::FACETS, ScopeInterface::SCOPE_STORE, $storeId));
 
         foreach ($attrs as &$attr) {
             if ($attr['type'] == 'other') {
@@ -506,7 +506,7 @@ class ConfigHelper
 
     public function getCategoryCustomRanking($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::CATEGORY_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::CATEGORY_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($attrs)) {
             return $attrs;
@@ -517,7 +517,7 @@ class ConfigHelper
 
     public function getProductCustomRanking($storeId = null)
     {
-        $attrs = unserialize($this->configInterface->getValue(self::PRODUCT_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE, $storeId));
+        $attrs = $this->unserialize($this->configInterface->getValue(self::PRODUCT_CUSTOM_RANKING, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($attrs)) {
             return $attrs;
@@ -622,7 +622,7 @@ class ConfigHelper
 
     public function getSynonyms($storeId = null)
     {
-        $synonyms = unserialize($this->configInterface->getValue(self::SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
+        $synonyms = $this->unserialize($this->configInterface->getValue(self::SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($synonyms)) {
             return $synonyms;
@@ -633,7 +633,7 @@ class ConfigHelper
 
     public function getOnewaySynonyms($storeId = null)
     {
-        $onewaySynonyms = unserialize($this->configInterface->getValue(self::ONEWAY_SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
+        $onewaySynonyms = $this->unserialize($this->configInterface->getValue(self::ONEWAY_SYNONYMS, ScopeInterface::SCOPE_STORE, $storeId));
 
         if (is_array($onewaySynonyms)) {
             return $onewaySynonyms;
@@ -688,5 +688,14 @@ class ConfigHelper
         }
 
         return $attributes;
+    }
+
+    private function unserialize($value)
+    {
+        if (version_compare($this->getMagentoVersion(), '2.2.0-dev', '>=') === true) {
+            return json_decode($value, true);
+        }
+
+        return unserialize($value);
     }
 }

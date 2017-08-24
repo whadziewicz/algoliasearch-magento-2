@@ -5,6 +5,12 @@ Algolia Search for Magento 2
 ![PHP >= 5.5.22](https://img.shields.io/badge/PHP-%3E=5.5.22-green.svg)
 [![Build Status](https://travis-ci.org/algolia/algoliasearch-magento-2.svg?branch=master)](https://travis-ci.org/algolia/algoliasearch-magento-2)
 
+-------
+
+🔎 Are you a Magento engineer? [Join our team](https://www.algolia.com/careers#!?j=eed58660-f684-436d-a2ff-e9947d2b65a2) and help us deliver the best search solution for Magento stores!
+
+-------
+
 - **Auto-completion menu:** Offer End-Users immediate access to your whole catalog from the dropdown menu, whatever your number of categories or attributes.
 
 - **Instant search results page:** Have your search results page, navigation and pagination updated in realtime, after each keystroke.

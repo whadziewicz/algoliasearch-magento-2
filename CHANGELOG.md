@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.2.1
+
+- Added configuration option to turn on debug regime for autocomplete menu (#281)
+- Fixed the infinite loop in queue processing when ran with `EMPTY_QUEUE=1` (#286)
+- Fixed PHP notice on reindex / save settings when `categories` attribute was missing from attributes to index (#293)
+- Products with visibility set to `catalog` only are still indexed to show them on category pages (#294)
+- Fixed issue which indexed categories within products which shouldn't be displayed in menu (#295)
+- Optimized `getPopularQueries` method (#297)
+- Fixed issue with missing config default values on Magento 2.1.0 and higher (#300)
+
 ## 1.2.0
 
 ### FEATURES

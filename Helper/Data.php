@@ -12,7 +12,6 @@ use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Search\Model\Query;
@@ -38,16 +37,16 @@ class Data
     private $emulationRuns = false;
 
     public function __construct(AlgoliaHelper $algoliaHelper,
-                                ConfigHelper $configHelper,
-                                ProductHelper $producthelper,
-                                CategoryHelper $categoryHelper,
-                                PageHelper $pageHelper,
-                                SuggestionHelper $suggestionHelper,
-                                AdditionalSectionHelper $additionalSectionHelper,
-                                Emulation $emulation,
-                                Logger $logger,
-                                ResourceConnection $resource,
-                                ManagerInterface $eventManager)
+        ConfigHelper $configHelper,
+        ProductHelper $producthelper,
+        CategoryHelper $categoryHelper,
+        PageHelper $pageHelper,
+        SuggestionHelper $suggestionHelper,
+        AdditionalSectionHelper $additionalSectionHelper,
+        Emulation $emulation,
+        Logger $logger,
+        ResourceConnection $resource,
+        ManagerInterface $eventManager)
     {
         $this->algoliaHelper = $algoliaHelper;
 
@@ -412,6 +411,8 @@ class Data
         $this->logger->start('CREATE RECORDS ' . $this->logger->getStoreName($storeId));
         $this->logger->log(count($collection) . ' product records to create');
 
+        $salesData = $this->getSalesData($storeId, $collection);
+
         /** @var Product $product */
         foreach ($collection as $product) {
             $product->setStoreId($storeId);
@@ -434,6 +435,11 @@ class Data
             ) {
                 $productsToRemove[$productId] = $productId;
                 continue;
+            }
+
+            if (isset($salesData[$productId])) {
+                $product->setData('ordered_qty', $salesData[$productId]['ordered_qty']);
+                $product->setData('total_ordered', $salesData[$productId]['total_ordered']);
             }
 
             $productsToIndex[$productId] = $this->productHelper->getObject($product);
@@ -463,14 +469,9 @@ class Data
             $this->startEmulation($storeId);
         }
 
-        $objectManager = ObjectManager::getInstance();
-
-        /** @var \Magento\Framework\App\ResourceConnection $resource */
-        $resource = $objectManager->create('\Magento\Framework\App\ResourceConnection');
-        $ordersTableName = $resource->getTableName('sales_order_item');
-        $superTableName = $resource->getTableName('catalog_product_super_link');
-        $reviewTableName = $resource->getTableName('review_entity_summary');
-        $stockTableName = $resource->getTableName('cataloginventory_stock_item');
+        $superTableName = $this->resource->getTableName('catalog_product_super_link');
+        $reviewTableName = $this->resource->getTableName('review_entity_summary');
+        $stockTableName = $this->resource->getTableName('cataloginventory_stock_item');
 
         $additionalAttributes = $this->configHelper->getProductAdditionalAttributes($storeId);
 
@@ -483,14 +484,6 @@ class Data
 
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
             $collection->getSelect()->columns('(SELECT MAX(qty) FROM ' . $stockTableName . ' AS o LEFT JOIN ' . $superTableName . ' AS l ON l.product_id = o.product_id WHERE o.product_id = e.entity_id OR l.parent_id = e.entity_id) as stock_qty');
-        }
-
-        if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'ordered_qty')) {
-            $collection->getSelect()->columns('(SELECT SUM(qty_ordered) FROM ' . $ordersTableName . ' AS o LEFT JOIN ' . $superTableName . ' AS l ON l.product_id = o.product_id WHERE o.product_id = e.entity_id OR l.parent_id = e.entity_id) as ordered_qty');
-        }
-
-        if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'total_ordered')) {
-            $collection->getSelect()->columns('(SELECT SUM(row_total) FROM ' . $ordersTableName . ' AS o LEFT JOIN ' . $superTableName . ' AS l ON l.product_id = o.product_id WHERE o.product_id = e.entity_id OR l.parent_id = e.entity_id) as total_ordered');
         }
 
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
@@ -636,5 +629,31 @@ class Data
         }
 
         return true;
+    }
+
+    private function getSalesData($storeId, Collection $collection)
+    {
+        $additionalAttributes = $this->configHelper->getProductAdditionalAttributes($storeId);
+        if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'ordered_qty') === false && $this->productHelper->isAttributeEnabled($additionalAttributes, 'total_ordered') === false) {
+            return [];
+        }
+
+        $ordersTableName = $this->resource->getTableName('sales_order_item');
+
+        $ids = $collection->getAllIds();
+        $ids[] = '0'; // Makes sure the imploded string is not empty
+
+        $ids = implode(', ', $ids);
+
+        try {
+            $salesConnection = $this->resource->getConnectionByName('sales');
+        } catch(\DomainException $e) {
+            $salesConnection = $this->resource->getConnection();
+        }
+
+        $query = 'SELECT product_id, SUM(qty_ordered) AS ordered_qty, SUM(row_total) AS total_ordered FROM ' . $ordersTableName . ' WHERE product_id IN (' . $ids . ') GROUP BY product_id';
+        $salesData = $salesConnection->query($query)->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE|\PDO::FETCH_ASSOC);
+
+        return $salesData;
     }
 }

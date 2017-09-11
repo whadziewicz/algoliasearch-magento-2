@@ -50,6 +50,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         'algoliasearch_queue/queue/active' => '0',
         'algoliasearch_queue/queue/number_of_job_to_run' => '10',
+        'algoliasearch_queue/queue/number_of_retries' => '3',
 
         'algoliasearch_analytics/analytics_group/enable' => '0',
         'algoliasearch_analytics/analytics_group/delay' => '3000',
@@ -299,6 +300,31 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'type' => Table::TYPE_TEXT,
                     'length' => '2M',
                 ]);
+        }
+
+        if (version_compare($context->getVersion(), '1.3.0') < 0) {
+            $connection = $setup->getConnection();
+
+            $connection->addColumn(
+                $setup->getTable('algoliasearch_queue'),
+                'created',
+                [
+                    'type' => Table::TYPE_DATETIME,
+                    'nullabled' => true,
+                    'after' => 'job_id',
+                    'comment' => 'Date and time of job creation',
+                ]);
+
+            // LOG TABLE
+            $table = $connection->newTable($setup->getTable('algoliasearch_queue_log'));
+
+            $table->addColumn('id', $table::TYPE_INTEGER, 20, ['identity' => true, 'nullable' => false, 'primary' => true]);
+            $table->addColumn('started', $table::TYPE_DATETIME, null, ['nullable' => false]);
+            $table->addColumn('duration', $table::TYPE_INTEGER, 20, ['nullable' => false]);
+            $table->addColumn('processed_jobs', $table::TYPE_INTEGER, null, ['nullable' => false]);
+            $table->addColumn('with_empty_queue', $table::TYPE_INTEGER, 1, ['nullable' => false]);
+
+            $connection->createTable($table);
         }
 
         $setup->endSetup();

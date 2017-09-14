@@ -55,6 +55,7 @@ class ConfigHelper
 
     const IS_ACTIVE = 'algoliasearch_queue/queue/active';
     const NUMBER_OF_JOB_TO_RUN = 'algoliasearch_queue/queue/number_of_job_to_run';
+    const RETRY_LIMIT = 'algoliasearch_queue/queue/number_of_retries';
 
     const XML_PATH_IMAGE_WIDTH = 'algoliasearch_images/image/width';
     const XML_PATH_IMAGE_HEIGHT = 'algoliasearch_images/image/height';
@@ -311,6 +312,11 @@ class ConfigHelper
     public function getNumberOfJobToRun($storeId = null)
     {
         return $this->configInterface->getValue(self::NUMBER_OF_JOB_TO_RUN, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function getRetryLimit($storeId = null)
+    {
+        return (int) $this->configInterface->getValue(self::RETRY_LIMIT, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isQueueActive($storeId = null)

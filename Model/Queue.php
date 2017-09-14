@@ -14,6 +14,7 @@ class Queue
 
     private $db;
     private $table;
+    private $logTable;
     private $objectManager;
 
     private $elementsPerPage;
@@ -26,11 +27,15 @@ class Queue
 
     protected $maxSingleJobDataSize;
 
+    private $noOfFailedJobs = 0;
+
     private $staticJobMethods = [
         'saveConfigurationToAlgolia',
         'moveIndex',
         'deleteObjects',
     ];
+
+    private $logRecord;
 
     public function __construct(ConfigHelper $configHelper, Logger $logger, ResourceConnection $resourceConnection, ObjectManagerInterface $objectManager)
     {
@@ -38,6 +43,8 @@ class Queue
         $this->logger = $logger;
 
         $this->table = $resourceConnection->getTableName('algoliasearch_queue');
+        $this->logTable = $resourceConnection->getTableName('algoliasearch_queue_log');
+
         $this->db = $resourceConnection->getConnection('core_write');
 
         $this->objectManager = $objectManager;
@@ -64,6 +71,7 @@ class Queue
     private function insert($class, $method, $data, $data_size)
     {
         $this->db->insert($this->table, [
+            'created'   => date('Y-m-d H:i:s'),
             'class'     => $class,
             'method'    => $method,
             'data'      => json_encode($data),
@@ -72,19 +80,36 @@ class Queue
         ]);
     }
 
-    public function runCron()
+    public function runCron($nbJobs = null, $force = false)
     {
-        if (!$this->configHelper->isQueueActive()) {
+        if (!$this->configHelper->isQueueActive() && $force === false) {
             return;
         }
 
-        $nbJobs = $this->configHelper->getNumberOfJobToRun();
+        $this->clearOldLogRecords();
 
-        if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') == '1') {
-            $nbJobs = -1;
+        $this->logRecord = array(
+            'started' => date('Y-m-d H:i:s'),
+            'processed_jobs' => 0,
+            'with_empty_queue' => 0,
+        );
+
+        $started = time();
+
+        if ($nbJobs === null) {
+            $nbJobs = $this->configHelper->getNumberOfJobToRun();
+            if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') == '1') {
+                $nbJobs = -1;
+
+                $this->logRecord['with_empty_queue'] = 1;
+            }
         }
 
         $this->run($nbJobs);
+
+        $this->logRecord['duration'] = time() - $started;
+
+        $this->db->insert($this->logTable, $this->logRecord);
     }
 
     public function run($maxJobs)
@@ -99,6 +124,16 @@ class Queue
 
         // Run all reserved jobs
         foreach ($jobs as $job) {
+            // If there are some failed jobs before move, we want to skip the move
+            // as most probably not all products have prices reindexed
+            // and therefore are not indexed yet in TMP index
+            if ($job['method'] === 'moveIndex' && $this->noOfFailedJobs > 0) {
+                // Set pid to NULL so it's not deleted after
+                $this->db->query("UPDATE {$this->table} SET pid = NULL WHERE job_id = ".$job['job_id']);
+
+                continue;
+            }
+
             try {
                 $model = $this->objectManager->get($job['class']);
 
@@ -106,7 +141,15 @@ class Queue
                 $data = $job['data'];
 
                 call_user_func_array([$model, $method], $data);
+
+                $this->logRecord['processed_jobs'] += count($job['merged_ids']);
             } catch (\Exception $e) {
+                $this->noOfFailedJobs++;
+
+                // Increment retries, set the job ID back to NULL
+                $updateQuery = "UPDATE {$this->table} SET pid = NULL, retries = retries + 1 WHERE job_id IN (".implode(', ', (array) $job['merged_ids']).")";
+                $this->db->query($updateQuery);
+
                 // Log error information
                 $this->logger->log("Queue processing {$job['pid']} [KO]: Mage::getSingleton({$job['class']})->{$job['method']}(".json_encode($job['data']).')');
                 $this->logger->log(date('c').' ERROR: '.get_class($e).": '{$e->getMessage()}' in {$e->getFile()}:{$e->getLine()}\n"."Stack trace:\n".$e->getTraceAsString());
@@ -127,6 +170,15 @@ class Queue
 
     private function getJobs($maxJobs, $pid)
     {
+        // Clear jobs with crossed max retries count
+        $retryLimit = $this->configHelper->getRetryLimit();
+        if ($retryLimit > 0) {
+            $where = $this->db->quoteInto('retries >= ?', $retryLimit);
+            $this->db->delete($this->table, $where);
+        } else {
+            $this->db->delete($this->table, 'retries > max_retries');
+        }
+
         $jobs = [];
 
         $limit = $maxJobs = ($maxJobs === -1) ? $this->configHelper->getNumberOfJobToRun() : $maxJobs;
@@ -193,8 +245,7 @@ class Queue
 
 
         if (isset($firstJobId)) {
-            // Last job has always assigned the last processed ID
-            $lastJobId = $jobs[count($jobs) - 1]['job_id'];
+            $lastJobId = $this->maxValueInArray($jobs, 'job_id');
 
             // Reserve all new jobs since last run
             $this->db->query("UPDATE {$this->db->quoteIdentifier($this->table, true)} SET pid = ".$pid.' WHERE job_id >= '.$firstJobId." AND job_id <= $lastJobId");
@@ -207,6 +258,7 @@ class Queue
     {
         foreach ($jobs as &$job) {
             $job['data'] = json_decode($job['data'], true);
+            $job['merged_ids'][] = $job['job_id'];
         }
 
         return $jobs;
@@ -228,6 +280,8 @@ class Queue
                 if ($this->mergeable($currentJob, $nextJob)) {
                     // Use the job_id of the the very last job to properly mark processed jobs
                     $currentJob['job_id'] = max((int) $currentJob['job_id'], (int) $nextJob['job_id']);
+
+                    $currentJob['merged_ids'][] = $nextJob['job_id'];
 
                     if (isset($currentJob['data']['product_ids'])) {
                         $currentJob['data']['product_ids'] = array_merge($currentJob['data']['product_ids'], $nextJob['data']['product_ids']);
@@ -357,5 +411,30 @@ class Queue
         call_user_func_array('array_multisort', $args);
 
         return array_pop($args);
+    }
+
+    private function maxValueInArray($array, $keyToSearch)
+    {
+        $currentMax = null;
+
+        foreach ($array as $arr) {
+            foreach ($arr as $key => $value) {
+                if ($key == $keyToSearch && ($value >= $currentMax)) {
+                    $currentMax = $value;
+                }
+            }
+        }
+
+        return $currentMax;
+    }
+
+    private function clearOldLogRecords()
+    {
+        $idsToDelete = $this->db->query("SELECT id FROM {$this->logTable} ORDER BY started DESC, id DESC LIMIT 25000, ".PHP_INT_MAX)
+                                ->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+        if ($idsToDelete) {
+            $this->db->query("DELETE FROM {$this->logTable} WHERE id IN (" . implode(", ", $idsToDelete) . ")");
+        }
     }
 }

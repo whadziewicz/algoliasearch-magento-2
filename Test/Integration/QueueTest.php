@@ -68,7 +68,7 @@ class QueueTest extends TestCase
         $queue = $this->getObjectManager()->create('Algolia\AlgoliaSearch\Model\Queue');
 
         // Run the first two jobs - saveSettings, batch
-        $queue->run(2);
+        $queue->runCron(2, true);
 
         $this->algoliaHelper->waitLastTask();
 
@@ -84,7 +84,7 @@ class QueueTest extends TestCase
         $this->assertTrue($existsDefaultTmpIndex, 'Default products production index does not exists and it should');
 
         // Run the second two jobs - batch, move
-        $queue->run(2);
+        $queue->runCron(2, true);
 
         $this->algoliaHelper->waitLastTask();
 
@@ -155,6 +155,7 @@ class QueueTest extends TestCase
         $data = [
             [
                 'job_id' => 1,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -165,6 +166,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 2,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -175,6 +177,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 3,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -185,6 +188,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 4,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -195,6 +199,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 5,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -205,6 +210,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 6,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -215,6 +221,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 7,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -225,6 +232,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 8,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -235,6 +243,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 9,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -245,6 +254,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 10,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -255,6 +265,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 11,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -265,6 +276,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 12,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -289,6 +301,7 @@ class QueueTest extends TestCase
 
         $expectedCategoryJob = [
             'job_id' => 7,
+            'created' => '2017-09-01 12:00:00',
             'pid' => NULL,
             'class' => 'Algolia\AlgoliaSearch\Helper\Data',
             'method' => 'rebuildStoreCategoryIndex',
@@ -304,6 +317,7 @@ class QueueTest extends TestCase
             'retries' => '0',
             'error_log' => '',
             'data_size' => 3,
+            'merged_ids' => ['1', '7'],
             'store_id' => '1',
         ];
 
@@ -311,6 +325,7 @@ class QueueTest extends TestCase
 
         $expectedProductJob = [
             'job_id' => 10,
+            'created' => '2017-09-01 12:00:00',
             'pid' => NULL,
             'class' => 'Algolia\AlgoliaSearch\Helper\Data',
             'method' => 'rebuildStoreProductIndex',
@@ -325,6 +340,7 @@ class QueueTest extends TestCase
             'retries' => '0',
             'error_log' => '',
             'data_size' => 2,
+            'merged_ids' => ['4', '10'],
             'store_id' => '1',
         ];
 
@@ -491,6 +507,7 @@ class QueueTest extends TestCase
         $data = [
             [
                 'job_id' => 1,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -501,6 +518,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 2,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -511,6 +529,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 3,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -521,6 +540,7 @@ class QueueTest extends TestCase
                 'data_size' => 2,
             ], [
                 'job_id' => 4,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -531,6 +551,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 5,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -541,6 +562,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 6,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -551,6 +573,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 7,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -561,6 +584,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 8,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -571,6 +595,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 9,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreCategoryIndex',
@@ -581,6 +606,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 10,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -591,6 +617,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 11,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -601,6 +628,7 @@ class QueueTest extends TestCase
                 'data_size' => 10,
             ], [
                 'job_id' => 12,
+                'created' => '2017-09-01 12:00:00',
                 'pid' => null,
                 'class' => 'Algolia\AlgoliaSearch\Helper\Data',
                 'method' => 'rebuildStoreProductIndex',
@@ -623,6 +651,7 @@ class QueueTest extends TestCase
 
         $expectedFirstJob = array(
             'job_id' => 7,
+            'created' => '2017-09-01 12:00:00',
             'pid' => NULL,
             'class' => 'Algolia\AlgoliaSearch\Helper\Data',
             'method' => 'rebuildStoreCategoryIndex',
@@ -638,11 +667,13 @@ class QueueTest extends TestCase
             'retries' => '0',
             'error_log' => '',
             'data_size' => 3,
+            'merged_ids' => ['1', '7'],
             'store_id' => '1',
         );
 
         $expectedLastJob = array(
             'job_id' => 12,
+            'created' => '2017-09-01 12:00:00',
             'pid' => NULL,
             'class' => 'Algolia\AlgoliaSearch\Helper\Data',
             'method' => 'rebuildStoreProductIndex',
@@ -657,6 +688,7 @@ class QueueTest extends TestCase
             'retries' => '0',
             'error_log' => '',
             'data_size' => 2,
+            'merged_ids' => ['6', '12'],
             'store_id' => '3',
         );
 

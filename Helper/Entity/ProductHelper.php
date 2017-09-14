@@ -349,6 +349,10 @@ class ProductHelper extends BaseHelper
         } elseif ($saveToTmpIndicesToo === true) {
             $this->algoliaHelper->copySynonyms($this->getIndexName($storeId), $this->getIndexName($storeId, $saveToTmpIndicesToo));
         }
+
+        if ($saveToTmpIndicesToo === true) {
+            $this->algoliaHelper->copyQueryRules($this->getIndexName($storeId), $this->getIndexName($storeId, $saveToTmpIndicesToo));
+        }
     }
 
     protected function getFields($store)

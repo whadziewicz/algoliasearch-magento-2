@@ -236,6 +236,40 @@ class AlgoliaHelper extends AbstractHelper
         self::$lastTaskId = $res['taskID'];
     }
 
+    public function copyQueryRules($fromIndexName, $toIndexName)
+    {
+        $fromIndex = $this->getIndex($fromIndexName);
+        $toIndex = $this->getIndex($toIndexName);
+
+        $queryRulesToSet = [];
+
+        $hitsPerPage = 100;
+        $page = 0;
+        do {
+            $fetchedQueryRules = $fromIndex->searchRules([
+                'page' => $page,
+                'hitsPerPage' => $hitsPerPage,
+            ]);
+
+            foreach ($fetchedQueryRules['hits'] as $hit) {
+                unset($hit['_highlightResult']);
+
+                $queryRulesToSet[] = $hit;
+            }
+
+            $page++;
+        } while (($page * $hitsPerPage) < $fetchedQueryRules['nbHits']);
+
+        if (empty($queryRulesToSet)) {
+            $res = $toIndex->clearRules(true);
+        } else {
+            $res = $toIndex->batchRules($queryRulesToSet, true, true);
+        }
+
+        self::$lastUsedIndexName= $toIndex;
+        self::$lastTaskId = $res['taskID'];
+    }
+
     private function checkClient($methodName)
     {
         if (isset($this->client)) {

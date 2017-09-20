@@ -56,6 +56,16 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			urlSync: {
 				useHash: true,
 				trackedParameters: ['query', 'page', 'attribute:*', 'index']
+			},
+			searchFunction: function(helper) {
+				if (helper.state.query === '' && !algoliaConfig.isSearchPage) {
+					$('.algolia-instant-replaced-content').show();
+					$('.algolia-instant-selector-results').hide();
+				} else {
+					helper.search();
+					$('.algolia-instant-replaced-content').hide();
+					$('.algolia-instant-selector-results').show();
+				}
 			}
 		};
 		

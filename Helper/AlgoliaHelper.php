@@ -13,7 +13,11 @@ class AlgoliaHelper extends AbstractHelper
 {
     /** @var Client */
     protected $client;
+
+    /** @var ConfigHelper */
     protected $config;
+
+    /** @var ManagerInterface */
     protected $messageManager;
 
     /** @var string */
@@ -211,12 +215,12 @@ class AlgoliaHelper extends AbstractHelper
         $fromIndex = $this->getIndex($fromIndexName);
         $toIndex = $this->getIndex($toIndexName);
 
-        $synonymsToSet = array();
+        $synonymsToSet = [];
 
         $hitsPerPage = 100;
         $page = 0;
         do {
-            $fetchedSynonyms = $fromIndex->searchSynonyms('', array(), $page, $hitsPerPage);
+            $fetchedSynonyms = $fromIndex->searchSynonyms('', [], $page, $hitsPerPage);
             foreach ($fetchedSynonyms['hits'] as $hit) {
                 unset($hit['_highlightResult']);
 
@@ -306,7 +310,7 @@ class AlgoliaHelper extends AbstractHelper
         $currentCET = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
         $currentCET = $currentCET->format('Y-m-d H:i:s');
 
-        $modifiedIds = array();
+        $modifiedIds = [];
         foreach ($objects as $key => &$object) {
             $object['algoliaLastUpdateAtCET'] = $currentCET;
 

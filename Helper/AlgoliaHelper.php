@@ -16,6 +16,12 @@ class AlgoliaHelper extends AbstractHelper
     protected $config;
     protected $messageManager;
 
+    /** @var int */
+    protected $maxRecordSize = 20000;
+
+    /** @var array */
+    protected $potentiallyLongAttributes = ['description', 'short_description', 'meta_description', 'content'];
+
     /** @var string */
     private static $lastUsedIndexName;
 
@@ -331,14 +337,10 @@ class AlgoliaHelper extends AbstractHelper
 
     public function handleTooBigRecord(&$object)
     {
-        $sizeLimit = 20000;
-
-        $longAttributes = array('description', 'short_description', 'meta_description', 'content');
-
         $size = mb_strlen(json_encode($object));
 
-        if ($size > $sizeLimit) {
-            foreach ($longAttributes as $attribute) {
+        if ($size > $this->maxRecordSize) {
+            foreach ($this->potentiallyLongAttributes as $attribute) {
                 if (isset($object[$attribute])) {
                     unset($object[$attribute]);
                 }
@@ -346,7 +348,7 @@ class AlgoliaHelper extends AbstractHelper
 
             $size = mb_strlen(json_encode($object));
 
-            if ($size > $sizeLimit) {
+            if ($size > $this->maxRecordSize) {
                 $object = false;
             }
         }

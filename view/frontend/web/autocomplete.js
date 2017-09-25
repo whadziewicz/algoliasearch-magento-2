@@ -96,6 +96,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				})
 				.on('autocomplete:updated', function (e) {
 					fixAutocompleteCssHeight(menu);
+				}).on('autocomplete:selected', function (e, suggestion, dataset) {
+					location.assign(suggestion.url);
 				});
 			
 			$(window).resize(function () {

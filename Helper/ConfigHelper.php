@@ -218,16 +218,11 @@ class ConfigHelper
         return (bool) $this->configInterface->getValue(self::USE_SECURE_IN_FRONTEND, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    public function noProcess($storeId = null)
-    {
-        return $this->configInterface->getValue(self::NO_PROCESS, ScopeInterface::SCOPE_STORE, $storeId);
-    }
-
     public function getImageWidth($storeId = null)
     {
         $imageWidth = $this->configInterface->getValue(self::XML_PATH_IMAGE_WIDTH, ScopeInterface::SCOPE_STORE, $storeId);
         if (empty($imageWidth)) {
-            return;
+            return 265;
         }
 
         return $imageWidth;
@@ -237,7 +232,7 @@ class ConfigHelper
     {
         $imageHeight = $this->configInterface->getValue(self::XML_PATH_IMAGE_HEIGHT, ScopeInterface::SCOPE_STORE, $storeId);
         if (empty($imageHeight)) {
-            return;
+            return 265;
         }
 
         return $imageHeight;
@@ -272,11 +267,6 @@ class ConfigHelper
         }
 
         return [];
-    }
-
-    public function getNumberOfQuerySuggestions($storeId = null)
-    {
-        return $this->configInterface->getValue(self::NUMBER_QUERY_SUGGESTIONS, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getMinPopularity($storeId = null)
@@ -399,6 +389,7 @@ class ConfigHelper
             $sortAttribute = false;
 
             if ($this->isCustomerGroupsEnabled($storeId) && $attr['attribute'] === 'price') {
+                /** @var Magento\Customer\Model\ResourceModel\Group\Collection $groupCollection */
                 $groupCollection = $this->objectManager->get('Magento\Customer\Model\ResourceModel\Group\Collection');
 
                 foreach ($groupCollection as $group) {
@@ -543,7 +534,9 @@ class ConfigHelper
 
     public function getCurrency($storeId = null)
     {
-        $currencySymbol = $this->currency->getCurrency($this->storeManager->getStore()->getCurrentCurrencyCode())->getSymbol();
+        /** @var Magento\Store\Model\Store $store */
+        $store = $this->storeManager->getStore($storeId);
+        $currencySymbol = $this->currency->getCurrency($store->getCurrentCurrencyCode())->getSymbol();
 
         return $currencySymbol;
     }

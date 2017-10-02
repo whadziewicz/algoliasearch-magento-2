@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 1.3.0
+
+Since this release, the extension is **Enterprise Edition compliant**!
+
+### FEATURES
+- Support of **Magento 2.2** (#319)
+- Processing of queue runner is now logged in `algoliasearch_queue_log` table (#310)
+- Enabled selection of autocomplete items (#316)
+
+### UPDATES
+- Refactored ConfigHelper - removed unused methods (#317)
+
+### FIXES
+- API is not called on a non-product page (#311)
+- Query rules are not erased on full reindex with queue enabled (#312)
+
 ## 1.2.1
 
 - Added configuration option to turn on debug regime for autocomplete menu (#281)

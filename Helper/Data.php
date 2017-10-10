@@ -416,6 +416,7 @@ class Data
         /** @var Product $product */
         foreach ($collection as $product) {
             $product->setStoreId($storeId);
+            $product->setPriceCalculation(false);
 
             $productId = $product->getId();
 

@@ -218,7 +218,7 @@ class ProductHelper extends BaseHelper
 
         foreach ($this->getAdditionalAttributes() as $attribute) {
             if ($attribute['searchable'] == '1') {
-                if ($attribute['order'] == 'ordered') {
+                if (!isset($attribute['order']) || $attribute['order'] == 'ordered') {
                     $searchableAttributes[] = $attribute['attribute'];
                 } else {
                     $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';

@@ -610,6 +610,7 @@ class ConfigHelper
         $attributes = $transport->getData();
 
         $attributes = array_unique($attributes);
+        $attributes = array_values($attributes);
 
         return ['attributesToRetrieve' => $attributes];
     }

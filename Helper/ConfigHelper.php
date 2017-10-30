@@ -691,8 +691,10 @@ class ConfigHelper
 
     private function unserialize($value)
     {
-        if (version_compare($this->getMagentoVersion(), '2.2.0-dev', '>=') === true) {
-            return json_decode($value, true);
+        $unserialized = json_decode($value, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $unserialized;
         }
 
         return unserialize($value);

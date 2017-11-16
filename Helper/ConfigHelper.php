@@ -410,6 +410,11 @@ class ConfigHelper
 
             if ($indexName && $sortAttribute) {
                 $attr['name'] = $indexName;
+
+                if (!array_key_exists('label', $attr) && array_key_exists('sortLabel', $attr)) {
+                    $attr['label'] = $attr['sortLabel'];
+                }
+
                 $attr['ranking'] = [
                     $attr['sort'].'('.$sortAttribute.')',
                     'typo',

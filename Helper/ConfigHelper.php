@@ -44,7 +44,6 @@ class ConfigHelper
     const NUMBER_OF_PRODUCT_RESULTS = 'algoliasearch_products/products/number_product_results';
     const PRODUCT_ATTRIBUTES = 'algoliasearch_products/products/product_additional_attributes';
     const PRODUCT_CUSTOM_RANKING = 'algoliasearch_products/products/custom_ranking_product_attributes';
-    const RESULTS_LIMIT = 'algoliasearch_products/products/results_limit';
     const SHOW_SUGGESTIONS_NO_RESULTS = 'algoliasearch_products/products/show_suggestions_on_no_result_page';
     const INDEX_OUT_OF_STOCK_OPTIONS = 'algoliasearch_products/products/index_out_of_stock_options';
 
@@ -322,11 +321,6 @@ class ConfigHelper
     public function getNumberOfProductResults($storeId = null)
     {
         return (int) $this->configInterface->getValue(self::NUMBER_OF_PRODUCT_RESULTS, ScopeInterface::SCOPE_STORE, $storeId);
-    }
-
-    public function getResultsLimit($storeId = null)
-    {
-        return $this->configInterface->getValue(self::RESULTS_LIMIT, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isPopupEnabled($storeId = null)

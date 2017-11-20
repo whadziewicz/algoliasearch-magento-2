@@ -1,4 +1,26 @@
-# CHANGELOG
+# CHANGE LOG
+
+## 1.4.0
+
+### FEATURES
+- When a record is too big to be indexed in Algolia the description displays which attribute is the longest and why the record cannot be indexed (#367)
+
+### UPDATES
+- Algolia configuration menu was moved lower (#329)
+- Optimized TravisCI (#335)
+- More restricted search adapter (#357)
+- Indexed product URLs now will never contain SID (#361)
+
+### FIXES
+- Fixed price calculations (#330)
+- Fixed instant search page with no results - now it displays better "no results" message (#336)
+- Fixed attributes to retrieve (#338)
+- Fixed `unserialize` method for Magento 2.2 (#339)
+- Fixed undefined array index `order` (#340)
+- Fixed buggy hover on in autocomplete menu on iOS devices (#351)
+- Fixed issue with mixed facets and sorts labels (#354)
+- Fixed special prices for customer groups (#359)
+- Fixed categories fetching (#366)
 
 ## 1.3.0
 

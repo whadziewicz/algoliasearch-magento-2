@@ -224,12 +224,26 @@ abstract class BaseHelper
         $storeId = intval($storeId);
         $categoryId = intval($categoryId);
         $path = null;
-        $key = $storeId . '-' . $categoryId;
+
+        $categoryKeyId = $categoryId;
+
+        if ($this->getCorrectIdColumn() === 'row_id') {
+            $category = $this->getCategoryById($categoryId);
+            if ($category) {
+                $categoryKeyId = $category->getRowId();
+            }
+        }
+
+        if(is_null($categoryKeyId)) {
+            return $path;
+        }
+
+        $key = $storeId . '-' . $categoryKeyId;
 
         if (isset($categories[$key])) {
             $path = ($categories[$key]['value'] == 1) ? strval($categories[$key]['path']) : null;
         } elseif ($storeId !== 0) {
-            $key = '0-' . $categoryId;
+            $key = '0-' . $categoryKeyId;
 
             if (isset($categories[$key])) {
                 $path = ($categories[$key]['value'] == 1) ? strval($categories[$key]['path']) : null;
@@ -335,7 +349,7 @@ abstract class BaseHelper
             $categoryName = strval(self::$_categoryNames[$key]);
         } elseif ($storeId != 0) {
             // Check whether the category name is present for the default store
-            $key = '0-' . $categoryId;
+            $key = '0-' . $categoryKeyId;
             if (isset(self::$_categoryNames[$key])) {
                 $categoryName = strval(self::$_categoryNames[$key]);
             }

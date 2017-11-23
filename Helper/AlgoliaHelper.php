@@ -8,6 +8,7 @@ use AlgoliaSearch\Version;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Message\ManagerInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class AlgoliaHelper extends AbstractHelper
 {
@@ -19,6 +20,9 @@ class AlgoliaHelper extends AbstractHelper
 
     /** @var ManagerInterface */
     protected $messageManager;
+
+    /** @var ConsoleOutput */
+    protected $consoleOutput;
 
     /** @var int */
     protected $maxRecordSize = 20000;
@@ -32,12 +36,13 @@ class AlgoliaHelper extends AbstractHelper
     /** @var int */
     private static $lastTaskId;
 
-    public function __construct(Context $context, ConfigHelper $configHelper, ManagerInterface $messageManager)
+    public function __construct(Context $context, ConfigHelper $configHelper, ManagerInterface $messageManager, ConsoleOutput $consoleOutput)
     {
         parent::__construct($context);
 
-        $this->messageManager = $messageManager;
         $this->config = $configHelper;
+        $this->messageManager = $messageManager;
+        $this->consoleOutput = $consoleOutput;
 
         $this->resetCredentialsFromConfig();
 
@@ -323,24 +328,33 @@ class AlgoliaHelper extends AbstractHelper
 
             $previousObject = $object;
 
-            $this->handleTooBigRecord($object);
-
-            if ($previousObject !== $object) {
-                $modifiedIds[] = $indexName.' objectID('.$previousObject['objectID'].')';
-            }
+            $object = $this->handleTooBigRecord($object);
 
             if ($object === false) {
+                $longestAttribute = $this->getLongestAttribute($previousObject);
+                $modifiedIds[] = $indexName.' - ID '.$previousObject['objectID'].' - skipped - longest attribute: '.$longestAttribute;
+
                 unset($objects[$key]);
-                continue;
+            } elseif ($previousObject !== $object) {
+                $modifiedIds[] = $indexName.' - ID '.$previousObject['objectID'].' - truncated';
             }
         }
 
         if (!empty($modifiedIds)) {
-            $this->messageManager->addError('Algolia reindexing: You have some records (' . implode(',', array_keys($modifiedIds)) . ') that are too big. They have either been truncated or skipped');
+            $separator = php_sapi_name() === 'cli' ? "\n" : '<br>';
+
+            $errorMessage = 'Algolia reindexing: You have some records which are too big to be indexed in Algolia. They have either been truncated (removed attributes: '.implode(', ', $this->potentiallyLongAttributes).') or skipped completely: '.$separator.implode($separator, $modifiedIds);
+
+            if (php_sapi_name() === 'cli') {
+                $this->consoleOutput->writeln($errorMessage);
+                return;
+            }
+
+            $this->messageManager->addError($errorMessage);
         }
     }
 
-    public function handleTooBigRecord(&$object)
+    public function handleTooBigRecord($object)
     {
         $size = mb_strlen(json_encode($object));
 
@@ -357,5 +371,25 @@ class AlgoliaHelper extends AbstractHelper
                 $object = false;
             }
         }
+
+        return $object;
+    }
+
+    private function getLongestAttribute($object)
+    {
+        $maxLength = 0;
+        $longestAttribute = '';
+
+        foreach ($object as $attribute => $value) {
+            $attributeLenght = mb_strlen(json_encode($value));
+
+            if ($attributeLenght > $maxLength) {
+                $longestAttribute = $attribute;
+
+                $maxLength = $attributeLenght;
+            }
+        }
+
+        return $longestAttribute;
     }
 }

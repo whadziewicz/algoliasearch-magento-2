@@ -376,7 +376,7 @@ class ConfigHelper
 
         $attrs = $this->unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
 
-        $currencies = $this->currencyManager->getConfigAllowCurrencies();
+        $currency = $this->getCurrencyCode($storeId);
 
         foreach ($attrs as &$attr) {
             $indexName = false;
@@ -392,11 +392,11 @@ class ConfigHelper
                     $indexNameSuffix = 'group_'.$customerGroupId;
 
                     $indexName = $productHelper->getIndexName($storeId).'_'.$attr['attribute'].'_'.$indexNameSuffix.'_'.$attr['sort'];
-                    $sortAttribute = $attr['attribute'] . '.' . $currencies[0] . '.' . $indexNameSuffix;
+                    $sortAttribute = $attr['attribute'] . '.' . $currency . '.' . $indexNameSuffix;
                 }
             } elseif ($attr['attribute'] === 'price') {
                 $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . 'default' . '_' . $attr['sort'];
-                $sortAttribute = $attr['attribute'] . '.' . $currencies[0] . '.' . 'default';
+                $sortAttribute = $attr['attribute'] . '.' . $currency . '.' . 'default';
             } else {
                 $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $attr['sort'];
                 $sortAttribute = $attr['attribute'];
@@ -538,6 +538,15 @@ class ConfigHelper
         $currencySymbol = $this->currency->getCurrency($store->getCurrentCurrencyCode())->getSymbol();
 
         return $currencySymbol;
+    }
+
+    public function getCurrencyCode($storeId = null)
+    {
+        /** @var Magento\Store\Model\Store $store */
+        $store = $this->storeManager->getStore($storeId);
+        $code = $store->getCurrentCurrencyCode();
+
+        return $code;
     }
 
     public function getPopularQueries($storeId = null)

@@ -165,8 +165,10 @@ class ProductHelper extends BaseHelper
         /** @var $products \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
         $products = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
 
-        $products = $products->setStoreId($storeId)
-            ->addStoreFilter($storeId);
+        $products = $products
+            ->setStoreId($storeId)
+            ->addStoreFilter($storeId)
+            ->distinct(true);
 
         if ($only_visible) {
             $products = $products->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSiteIds()]);

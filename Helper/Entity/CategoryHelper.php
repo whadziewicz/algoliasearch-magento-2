@@ -90,6 +90,7 @@ class CategoryHelper extends BaseHelper
         }
 
         $categories
+            ->distinct(true)
             ->addPathFilter($storeRootCategoryPath)
             ->addNameToResult()
             ->addUrlRewriteToResult()

@@ -788,7 +788,7 @@ class ProductHelper extends BaseHelper
                             $customData[$attribute['attribute']] = array_values(array_unique($values));
                         }
 
-                        if ($customData['in_stock'] && $all_sub_products_out_of_stock) {
+                        if (isset($customData['in_stock']) && $customData['in_stock'] && $all_sub_products_out_of_stock) {
                             // Set main product out of stock if all
                             // sub-products is out of stock.
                             $customData['in_stock'] = 0;

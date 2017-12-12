@@ -130,7 +130,13 @@ abstract class BaseHelper
 
     protected function castProductObject(&$productData)
     {
+        $nonCastableAttributes = array('sku', 'name', 'description');
+
         foreach ($productData as $key => &$data) {
+            if (in_array($key, $nonCastableAttributes, true) === true) {
+                continue;
+            }
+
             $data = $this->try_cast($data);
 
             if (is_array($data) === false) {

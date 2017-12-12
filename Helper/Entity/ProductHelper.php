@@ -556,6 +556,8 @@ class ProductHelper extends BaseHelper
 
                                 if ($min === $max) {
                                     $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $customData[$field][$currencyCode]['default_formated'];
+                                } else {
+                                    $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $dashedFormat;
                                 }
                             }
                         }

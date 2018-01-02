@@ -160,7 +160,7 @@ class ProductHelper extends BaseHelper
         return false;
     }
 
-    public function getProductCollectionQuery($storeId, $productIds = null, $only_visible = true)
+    public function getProductCollectionQuery($storeId, $productIds = null, $onlyVisible = true)
     {
         /** @var $products \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
         $products = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
@@ -170,11 +170,11 @@ class ProductHelper extends BaseHelper
             ->addStoreFilter($storeId)
             ->distinct(true);
 
-        if ($only_visible) {
+        if ($onlyVisible) {
             $products = $products->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSiteIds()]);
         }
 
-        if ($this->config->getShowOutOfStock($storeId) === false) {
+        if ($onlyVisible && $this->config->getShowOutOfStock($storeId) === false) {
             $this->stock->addInStockFilterToCollection($products);
         }
 

@@ -380,10 +380,10 @@ class Data
 
             $category->setStoreId($storeId);
 
-            $category_obj = $this->categoryHelper->getObject($category);
+            $categoryObject = $this->categoryHelper->getObject($category);
 
-            if ($category_obj['product_count'] > 0) {
-                array_push($indexData, $category_obj);
+            if ($this->configHelper->shouldIndexEmptyCategories($storeId) === true || $categoryObject['product_count'] > 0) {
+                array_push($indexData, $categoryObject);
             }
         }
 

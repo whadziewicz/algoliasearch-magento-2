@@ -450,6 +450,15 @@
                         ]]>
                     </comment>
                 </field>
+                <field id="index_empty_categories" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Index empty categories?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            If set to Yes, Algolia will display all categories in both the autocomplete menu and instant search page ignoring if they contain products or not. Default value: No
+                        ]]>
+                    </comment>
+                </field>
             </group>
         </section>
         <section id="algoliasearch_images" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">

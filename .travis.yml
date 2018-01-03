@@ -52,5 +52,8 @@ install:
   # set the right tests config for DB and administration
   - mv $TRAVIS_BUILD_DIR/dev/tests/install-config-mysql.php $HOME/magento20/dev/tests/integration/etc/install-config-mysql.php
 
+before_script:
+  - wget http://api-key-dealer.herokuapp.com/clients/algolia-keys && chmod +x algolia-keys
+
 script:
-  - cd $HOME/magento20/dev/tests/integration && ../../../vendor/bin/phpunit ../../../vendor/algolia/algoliasearch-magento-2/Test
+  - eval $(./algolia-keys export) && cd $HOME/magento20/dev/tests/integration && ../../../vendor/bin/phpunit ../../../vendor/algolia/algoliasearch-magento-2/Test

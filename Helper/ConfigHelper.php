@@ -51,6 +51,7 @@ class ConfigHelper
     const INDEX_PRODUCT_COUNT = 'algoliasearch_categories/categories/index_product_count';
     const CATEGORY_CUSTOM_RANKING = 'algoliasearch_categories/categories/custom_ranking_category_attributes';
     const SHOW_CATS_NOT_INCLUDED_IN_NAVIGATION = 'algoliasearch_categories/categories/show_cats_not_included_in_navigation';
+    const INDEX_EMPTY_CATEGORIES = 'algoliasearch_categories/categories/index_empty_categories';
 
     const IS_ACTIVE = 'algoliasearch_queue/queue/active';
     const NUMBER_OF_JOB_TO_RUN = 'algoliasearch_queue/queue/number_of_job_to_run';
@@ -134,6 +135,11 @@ class ConfigHelper
     public function showCatsNotIncludedInNavigation($storeId = null)
     {
         return $this->configInterface->getValue(self::SHOW_CATS_NOT_INCLUDED_IN_NAVIGATION, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function shouldIndexEmptyCategories($storeId = null)
+    {
+        return $this->configInterface->isSetFlag(self::INDEX_EMPTY_CATEGORIES, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getMagentoVersion()

@@ -491,10 +491,6 @@ class Data
         $collection->addCategoryIds();
         $collection->addUrlRewrite();
 
-        if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
-            $collection->getSelect()->columns('(SELECT MAX(qty) FROM ' . $stockTableName . ' AS o LEFT JOIN ' . $superTableName . ' AS l ON l.product_id = o.product_id WHERE o.product_id = e.entity_id OR l.parent_id = e.entity_id) as stock_qty');
-        }
-
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
             $collection->getSelect()->columns('(SELECT MAX(rating_summary) FROM ' . $reviewTableName . ' AS o WHERE o.entity_pk_value = e.entity_id AND o.store_id = '.$storeId.') as rating_summary');
         }

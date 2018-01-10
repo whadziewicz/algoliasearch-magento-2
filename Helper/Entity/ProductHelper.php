@@ -727,7 +727,6 @@ class ProductHelper extends BaseHelper
 
         if (false === isset($defaultData['in_stock'])) {
             $stockItem = $this->stockRegistry->getStockItem($product->getId());
-
             $customData['in_stock'] = $stockItem && (int) $stockItem->getIsInStock();
         }
 
@@ -741,7 +740,12 @@ class ProductHelper extends BaseHelper
         }
 
         if (false === isset($defaultData['stock_qty']) && $this->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
-            $customData['stock_qty'] = (int) $product->getStockQty();
+            $customData['stock_qty'] = 0;
+
+            $stockItem = $this->stockRegistry->getStockItem($product->getId());
+            if($stockItem) {
+                $customData['stock_qty'] = (int) $stockItem->getQty();
+            }
         }
 
         if ($this->isAttributeEnabled($additionalAttributes, 'rating_summary')) {

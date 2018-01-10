@@ -25,7 +25,7 @@
         </description>
     </indexer>
     <indexer id="algolia_additional_sections" view_id="algolia_additional_sections" class="Algolia\AlgoliaSearch\Model\Indexer\AdditionalSection">
-        <title translate="true">Algolia Search Suggestions</title>
+        <title translate="true">Algolia Additional Sections</title>
         <description translate="true">
             Rebuild additional sections index.
         </description>

@@ -478,10 +478,6 @@ class Data
             $this->startEmulation($storeId);
         }
 
-        $superTableName = $this->resource->getTableName('catalog_product_super_link');
-        $reviewTableName = $this->resource->getTableName('review_entity_summary');
-        $stockTableName = $this->resource->getTableName('cataloginventory_stock_item');
-
         $additionalAttributes = $this->configHelper->getProductAdditionalAttributes($storeId);
 
         /** @var Collection $collection */
@@ -492,6 +488,7 @@ class Data
         $collection->addUrlRewrite();
 
         if ($this->productHelper->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
+            $reviewTableName = $this->resource->getTableName('review_entity_summary');
             $collection->getSelect()->columns('(SELECT MAX(rating_summary) FROM ' . $reviewTableName . ' AS o WHERE o.entity_pk_value = e.entity_id AND o.store_id = '.$storeId.') as rating_summary');
         }
 

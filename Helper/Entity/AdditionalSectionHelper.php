@@ -2,11 +2,27 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Eav\Model\Config;
 use Magento\Framework\DataObject;
 
-class AdditionalSectionHelper extends BaseHelper
+class AdditionalSectionHelper
 {
-    protected function getIndexNameSuffix()
+    private $eventManager;
+
+    private $objectManager;
+
+    private $eavConfig;
+
+    public function __construct(ManagerInterface $eventManager, ObjectManagerInterface $objectManager, Config $eavConfig)
+    {
+        $this->eventManager = $eventManager;
+        $this->objectManager = $objectManager;
+        $this->eavConfig = $eavConfig;
+    }
+
+    public function getIndexNameSuffix()
     {
         return '_section';
     }
@@ -52,7 +68,6 @@ class AdditionalSectionHelper extends BaseHelper
         }
 
         $values = array_map(function ($value) use ($section, $storeId) {
-
             $record = [
                 'objectID' => $value,
                 'value'    => $value,

@@ -34,6 +34,10 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $catalogSearchHelper = $this->getCatalogSearchHelper();
 
+        $coreHelper = $this->getCoreHelper();
+
+        $categoryHelper = $this->getCategoryHelper();
+
         $productHelper = $this->getProductHelper();
 
         $algoliaHelper = $this->getAlgoliaHelper();
@@ -75,7 +79,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                         $path .= ' /// ';
                     }
 
-                    $path .= $productHelper->getCategoryName($treeCategoryId, $this->getStoreId());
+                    $path .= $categoryHelper->getCategoryName($treeCategoryId, $this->getStoreId());
 
                     if ($path) {
                         $level++;
@@ -140,12 +144,12 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             ],
             'extensionVersion' => $config->getExtensionVersion(),
             'applicationId' => $config->getApplicationID(),
-            'indexName' => $productHelper->getBaseIndexName(),
+            'indexName' => $coreHelper->getBaseIndexName(),
             'apiKey' => $algoliaHelper->generateSearchSecuredApiKey($config->getSearchOnlyAPIKey(), $config->getAttributesToRetrieve($customerGroupId)),
             'facets' => $facets,
             'areCategoriesInFacets' => $areCategoriesInFacets,
             'hitsPerPage' => (int) $config->getNumberOfProductResults(),
-            'sortingIndices' => array_values($config->getSortingIndices()),
+            'sortingIndices' => array_values($config->getSortingIndices($coreHelper->getIndexName($productHelper->getIndexNameSuffix()))),
             'isSearchPage' => $this->isSearchPage(),
             'isCategoryPage' => $isCategoryPage,
             'removeBranding' => (bool) $config->isRemoveBranding(),

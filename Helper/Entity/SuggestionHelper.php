@@ -2,14 +2,34 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\App\Cache\Type\Config as ConfigCache;
 use Magento\Framework\DataObject;
 use Magento\Search\Model\Query;
 
-class SuggestionHelper extends BaseHelper
+class SuggestionHelper
 {
+    private $eventManager;
+
+    private $objectManager;
+
+    private $cache;
+
+    private $configHelper;
+
     private $popularQueriesCacheId = 'algoliasearch_popular_queries_cache_tag';
 
-    protected function getIndexNameSuffix()
+    public function __construct(ManagerInterface $eventManager, ObjectManagerInterface $objectManager, ConfigCache $cache, ConfigHelper $configHelper)
+    {
+        $this->eventManager = $eventManager;
+        $this->objectManager = $objectManager;
+        $this->cache = $cache;
+        $this->configHelper = $configHelper;
+    }
+
+    public function getIndexNameSuffix()
     {
         return '_suggestions';
     }
@@ -53,9 +73,9 @@ class SuggestionHelper extends BaseHelper
         if ($queries !== false) {
             return unserialize($queries);
         }
-
+        
         $collection = $this->objectManager->create('\Magento\Search\Model\ResourceModel\Query\Collection');
-        $collection->getSelect()->where('num_results >= ' . $this->config->getMinNumberOfResults() . ' AND popularity >= ' . $this->config->getMinPopularity() . ' AND query_text != "__empty__"');
+        $collection->getSelect()->where('num_results >= ' . $this->configHelper->getMinNumberOfResults() . ' AND popularity >= ' . $this->configHelper->getMinPopularity() . ' AND query_text != "__empty__"');
         $collection->getSelect()->limit(12);
         $collection->setOrder('popularity', 'DESC');
         $collection->setOrder('num_results', 'DESC');
@@ -88,7 +108,7 @@ class SuggestionHelper extends BaseHelper
         $collection = $this->objectManager->create('\Magento\Search\Model\ResourceModel\Query\Collection');
         $collection = $collection->addStoreFilter($storeId)->setStoreId($storeId);
 
-        $collection->getSelect()->where('num_results >= ' . $this->config->getMinNumberOfResults($storeId) . ' AND popularity >= ' . $this->config->getMinPopularity($storeId) . ' AND query_text != "__empty__"');
+        $collection->getSelect()->where('num_results >= ' . $this->configHelper->getMinNumberOfResults($storeId) . ' AND popularity >= ' . $this->configHelper->getMinPopularity($storeId) . ' AND query_text != "__empty__"');
 
         $this->eventManager->dispatch('algolia_after_suggestions_collection_build', ['store' => $storeId, 'collection' => $collection]);
 

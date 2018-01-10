@@ -103,8 +103,8 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
 
             if ($useTmpIndex) {
                 $this->queue->addToQueue($this->fullAction, 'moveIndex', [
-                    'tmpIndexName' => $this->productHelper->getIndexName($storeId, true),
-                    'indexName' => $this->productHelper->getIndexName($storeId, false),
+                    'tmpIndexName' => $this->fullAction->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId, true),
+                    'indexName' => $this->fullAction->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId, false),
                     'store_id' => $storeId,
                 ]);
             }

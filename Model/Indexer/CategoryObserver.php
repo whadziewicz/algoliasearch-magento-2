@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Model\Indexer;
 
 use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Framework\Model\AbstractModel;
 
 class CategoryObserver
 {
@@ -16,7 +17,7 @@ class CategoryObserver
     public function aroundSave(
         \Magento\Catalog\Model\ResourceModel\Category $categoryResource,
         \Closure $proceed,
-        \Magento\Framework\Model\AbstractModel $category
+        AbstractModel $category
     ) {
         $categoryResource->addCommitCallback(function () use ($category) {
             if (!$this->indexer->isScheduled()) {
@@ -31,7 +32,7 @@ class CategoryObserver
     public function aroundDelete(
         \Magento\Catalog\Model\ResourceModel\Category $categoryResource,
         \Closure $proceed,
-        \Magento\Framework\Model\AbstractModel $category
+        AbstractModel $category
     ) {
         $categoryResource->addCommitCallback(function () use ($category) {
             if (!$this->indexer->isScheduled()) {

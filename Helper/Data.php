@@ -151,24 +151,24 @@ class Data
             return;
         }
 
-        $additional_sections = $this->configHelper->getAutocompleteSections();
+        $additionalSections = $this->configHelper->getAutocompleteSections();
 
-        foreach ($additional_sections as $section) {
+        foreach ($additionalSections as $section) {
             if ($section['name'] === 'products' || $section['name'] === 'categories' || $section['name'] === 'pages' || $section['name'] === 'suggestions') {
                 continue;
             }
 
-            $index_name = $this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId) . '_' . $section['name'];
+            $indexName = $this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId) . '_' . $section['name'];
 
-            $attribute_values = $this->additionalSectionHelper->getAttributeValues($storeId, $section);
+            $attributeValues = $this->additionalSectionHelper->getAttributeValues($storeId, $section);
 
-            foreach (array_chunk($attribute_values, 100) as $chunk) {
-                $this->algoliaHelper->addObjects($chunk, $index_name . '_tmp');
+            foreach (array_chunk($attributeValues, 100) as $chunk) {
+                $this->algoliaHelper->addObjects($chunk, $indexName . '_tmp');
             }
 
-            $this->algoliaHelper->moveIndex($index_name . '_tmp', $index_name);
+            $this->algoliaHelper->moveIndex($indexName . '_tmp', $indexName);
 
-            $this->algoliaHelper->setSettings($index_name, $this->additionalSectionHelper->getIndexSettings($storeId));
+            $this->algoliaHelper->setSettings($indexName, $this->additionalSectionHelper->getIndexSettings($storeId));
         }
     }
 
@@ -180,17 +180,17 @@ class Data
 
         $this->startEmulation($storeId);
 
-        $index_name = $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId);
+        $indexName = $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId);
 
         $pages = $this->pageHelper->getPages($storeId);
 
         foreach (array_chunk($pages, 100) as $chunk) {
-            $this->algoliaHelper->addObjects($chunk, $index_name . '_tmp');
+            $this->algoliaHelper->addObjects($chunk, $indexName . '_tmp');
         }
 
-        $this->algoliaHelper->moveIndex($index_name . '_tmp', $index_name);
+        $this->algoliaHelper->moveIndex($indexName . '_tmp', $indexName);
 
-        $this->algoliaHelper->setSettings($index_name, $this->pageHelper->getIndexSettings($storeId));
+        $this->algoliaHelper->setSettings($indexName, $this->pageHelper->getIndexSettings($storeId));
 
         $this->stopEmulation();
     }
@@ -337,7 +337,7 @@ class Data
         $collection->setCurPage($page)->setPageSize($pageSize);
         $collection->load();
 
-        $index_name = $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId, true);
+        $indexName = $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId, true);
 
         $indexData = [];
 
@@ -345,15 +345,15 @@ class Data
         foreach ($collection as $suggestion) {
             $suggestion->setStoreId($storeId);
 
-            $suggestion_obj = $this->suggestionHelper->getObject($suggestion);
+            $suggestionObject = $this->suggestionHelper->getObject($suggestion);
 
-            if (strlen($suggestion_obj['query']) >= 3) {
-                array_push($indexData, $suggestion_obj);
+            if (strlen($suggestionObject['query']) >= 3) {
+                array_push($indexData, $suggestionObject);
             }
         }
 
         if (count($indexData) > 0) {
-            $this->algoliaHelper->addObjects($indexData, $index_name);
+            $this->algoliaHelper->addObjects($indexData, $indexName);
         }
 
         unset($indexData);
@@ -375,7 +375,7 @@ class Data
         $collection->setCurPage($page)->setPageSize($pageSize);
         $collection->load();
 
-        $index_name = $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId);
+        $indexName = $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId);
 
         $indexData = [];
 
@@ -395,7 +395,7 @@ class Data
         }
 
         if (count($indexData) > 0) {
-            $this->algoliaHelper->addObjects($indexData, $index_name);
+            $this->algoliaHelper->addObjects($indexData, $indexName);
         }
 
         unset($indexData);

@@ -119,7 +119,7 @@ class ProductHelper
         return '_products';
     }
 
-    public function getAllAttributes($add_empty_row = false)
+    public function getAllAttributes($addEmptyRow = false)
     {
         if (is_null(self::$_productAttributes)) {
             self::$_productAttributes = [];
@@ -157,7 +157,7 @@ class ProductHelper
 
         $attributes = self::$_productAttributes;
 
-        if ($add_empty_row === true) {
+        if ($addEmptyRow === true) {
             $attributes[''] = '';
         }
 
@@ -168,10 +168,10 @@ class ProductHelper
         return $attributes;
     }
 
-    public function isAttributeEnabled($additionalAttributes, $attr_name)
+    public function isAttributeEnabled($additionalAttributes, $attributeName)
     {
         foreach ($additionalAttributes as $attr) {
-            if ($attr['attribute'] === $attr_name) {
+            if ($attr['attribute'] === $attributeName) {
                 return true;
             }
         }
@@ -313,8 +313,6 @@ class ProductHelper
             'index_settings' => $transport,
         ]);
         $indexSettings = $transport->getData();
-
-        // $mergeSettings = $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
 
         $this->algoliaHelper->setSettings($indexName, $indexSettings, false, true);
         if ($saveToTmpIndicesToo === true) {
@@ -637,7 +635,7 @@ class ProductHelper
         }
 
         $categories = [];
-        $categories_with_path = [];
+        $categoriesWithPath = [];
 
         $_categoryIds = $product->getCategoryIds();
 
@@ -649,8 +647,8 @@ class ProductHelper
                 // Check and skip all categories that is not
                 // in the path of the current store.
                 $path = $category->getPath();
-                $path_parts = explode('/', $path);
-                if (isset($path_parts[1]) && $path_parts[1] != $rootCat) {
+                $pathParts = explode('/', $path);
+                if (isset($pathParts[1]) && $pathParts[1] != $rootCat) {
                     continue;
                 }
 
@@ -676,51 +674,51 @@ class ProductHelper
                     }
                 }
 
-                $categories_with_path[] = $path;
+                $categoriesWithPath[] = $path;
             }
         }
 
-        foreach ($categories_with_path as $result) {
+        foreach ($categoriesWithPath as $result) {
             for ($i = count($result) - 1; $i > 0; $i--) {
-                $categories_with_path[] = array_slice($result, 0, $i);
+                $categoriesWithPath[] = array_slice($result, 0, $i);
             }
         }
 
-        $categories_with_path = array_intersect_key($categories_with_path, array_unique(array_map('serialize', $categories_with_path)));
+        $categoriesWithPath = array_intersect_key($categoriesWithPath, array_unique(array_map('serialize', $categoriesWithPath)));
 
-        $categories_hierarchical = [];
+        $categoriesHierarchical = [];
 
-        $level_name = 'level';
+        $levelName = 'level';
 
-        foreach ($categories_with_path as $category) {
+        foreach ($categoriesWithPath as $category) {
             for ($i = 0; $i < count($category); $i++) {
-                if (isset($categories_hierarchical[$level_name . $i]) === false) {
-                    $categories_hierarchical[$level_name . $i] = [];
+                if (isset($categoriesHierarchical[$levelName . $i]) === false) {
+                    $categoriesHierarchical[$levelName . $i] = [];
                 }
 
                 if ($category[$i] === null) {
                     continue;
                 }
 
-                $categories_hierarchical[$level_name . $i][] = implode(' /// ', array_slice($category, 0, $i + 1));
+                $categoriesHierarchical[$levelName . $i][] = implode(' /// ', array_slice($category, 0, $i + 1));
             }
         }
 
-        foreach ($categories_hierarchical as &$level) {
+        foreach ($categoriesHierarchical as &$level) {
             $level = array_values(array_unique($level));
         }
 
-        foreach ($categories_with_path as &$category) {
+        foreach ($categoriesWithPath as &$category) {
             $category = implode(' /// ', $category);
         }
 
-        $customData['categories'] = $categories_hierarchical;
+        $customData['categories'] = $categoriesHierarchical;
 
         $customData['categories_without_path'] = $categories;
 
         $customData = $this->addImageData($customData, $product, $additionalAttributes);
 
-        $sub_products = [];
+        $subProducts = [];
         $ids = null;
 
         if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
@@ -740,7 +738,7 @@ class ProductHelper
             }
 
             if (count($ids)) {
-                $sub_products = $this->getProductCollectionQuery($product->getStoreId(), $ids, false)->load();
+                $subProducts = $this->getProductCollectionQuery($product->getStoreId(), $ids, false)->load();
             }
         }
 
@@ -778,43 +776,43 @@ class ProductHelper
 
             $value = $product->getData($attribute['attribute']);
 
-            $attribute_resource = $product->getResource()->getAttribute($attribute['attribute']);
+            $attributeResource = $product->getResource()->getAttribute($attribute['attribute']);
 
-            if ($attribute_resource) {
-                $attribute_resource = $attribute_resource->setStoreId($product->getStoreId());
+            if ($attributeResource) {
+                $attributeResource = $attributeResource->setStoreId($product->getStoreId());
 
                 if ($value === null) {
                     /* Get values as array in children */
                     if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
                         $values = [];
 
-                        $all_sub_products_out_of_stock = true;
+                        $allProductsAreOutOfStock = true;
 
                         /** @var Product $sub_product */
-                        foreach ($sub_products as $sub_product) {
+                        foreach ($subProducts as $sub_product) {
                             $isInStock = (int) $this->stockRegistry->getStockItem($sub_product->getId())->getIsInStock();
 
                             if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($product->getStoreId()) == false) {
                                 continue;
                             }
 
-                            $all_sub_products_out_of_stock = false;
+                            $allProductsAreOutOfStock = false;
 
                             $value = $sub_product->getData($attribute['attribute']);
 
                             if ($value) {
-                                $value_text = $sub_product->getAttributeText($attribute['attribute']);
+                                $valueText = $sub_product->getAttributeText($attribute['attribute']);
 
-                                if ($value_text) {
-                                    if (is_array($value_text)) {
-                                        foreach ($value_text as $value_text_elt) {
-                                            $values[] = $value_text_elt;
+                                if ($valueText) {
+                                    if (is_array($valueText)) {
+                                        foreach ($valueText as $valueText_elt) {
+                                            $values[] = $valueText_elt;
                                         }
                                     } else {
-                                        $values[] = $value_text;
+                                        $values[] = $valueText;
                                     }
                                 } else {
-                                    $values[] = $attribute_resource->getFrontend()->getValue($sub_product);
+                                    $values[] = $attributeResource->getFrontend()->getValue($sub_product);
                                 }
                             }
                         }
@@ -823,24 +821,24 @@ class ProductHelper
                             $customData[$attribute['attribute']] = array_values(array_unique($values));
                         }
 
-                        if (isset($customData['in_stock']) && $customData['in_stock'] && $all_sub_products_out_of_stock) {
+                        if (isset($customData['in_stock']) && $customData['in_stock'] && $allProductsAreOutOfStock) {
                             // Set main product out of stock if all
                             // sub-products is out of stock.
                             $customData['in_stock'] = 0;
                         }
                     }
                 } else {
-                    $value_text = null;
+                    $valueText = null;
 
                     if (!is_array($value)) {
-                        $value_text = $product->getAttributeText($attribute['attribute']);
+                        $valueText = $product->getAttributeText($attribute['attribute']);
                     }
 
-                    if ($value_text) {
-                        $value = $value_text;
+                    if ($valueText) {
+                        $value = $valueText;
                     } else {
-                        $attribute_resource = $attribute_resource->setStoreId($product->getStoreId());
-                        $value = $attribute_resource->getFrontend()->getValue($product);
+                        $attributeResource = $attributeResource->setStoreId($product->getStoreId());
+                        $value = $attributeResource->getFrontend()->getValue($product);
                     }
 
                     if ($value) {
@@ -850,12 +848,12 @@ class ProductHelper
             }
         }
 
-        $this->handlePrice($product, $sub_products, $customData);
+        $this->handlePrice($product, $subProducts, $customData);
 
         $customData['type_id'] = $type;
 
         $transport = new DataObject($customData);
-        $this->eventManager->dispatch('algolia_subproducts_index', ['custom_data' => $transport, 'sub_products' => $sub_products, 'productObject' => $product]);
+        $this->eventManager->dispatch('algolia_subproducts_index', ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]);
         $customData = $transport->getData();
 
         $customData = array_merge($customData, $defaultData);
@@ -863,7 +861,7 @@ class ProductHelper
         $this->algoliaHelper->castProductObject($customData);
 
         $transport = new DataObject($customData);
-        $this->eventManager->dispatch('algolia_after_create_product_object', ['custom_data' => $transport, 'sub_products' => $sub_products, 'productObject' => $product]);
+        $this->eventManager->dispatch('algolia_after_create_product_object', ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]);
         $customData = $transport->getData();
 
         $this->logger->stop('CREATE RECORD ' . $product->getId() . ' ' . $this->logger->getStoreName($product->getStoreId()));

@@ -17,6 +17,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Search\Model\Query;
 use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Data
 {
@@ -35,6 +36,7 @@ class Data
     protected $emulation;
     protected $resource;
     protected $eventManager;
+    protected $storeManager;
 
     private $emulationRuns = false;
 
@@ -49,7 +51,8 @@ class Data
         Emulation $emulation,
         Logger $logger,
         ResourceConnection $resource,
-        ManagerInterface $eventManager)
+        ManagerInterface $eventManager,
+        StoreManagerInterface $storeManager)
     {
         $this->algoliaHelper = $algoliaHelper;
 
@@ -65,6 +68,7 @@ class Data
         $this->emulation = $emulation;
         $this->resource = $resource;
         $this->eventManager = $eventManager;
+        $this->storeManager = $storeManager;
     }
 
     public function deleteObjects($storeId, $ids, $indexName)
@@ -86,20 +90,22 @@ class Data
             return;
         }
 
-        $this->algoliaHelper->setSettings($this->categoryHelper->getIndexName($storeId), $this->categoryHelper->getIndexSettings($storeId));
-
-        $this->algoliaHelper->setSettings($this->pageHelper->getIndexName($storeId), $this->pageHelper->getIndexSettings($storeId));
-        $this->algoliaHelper->setSettings($this->suggestionHelper->getIndexName($storeId), $this->suggestionHelper->getIndexSettings($storeId));
+        $this->algoliaHelper->setSettings($this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId), $this->categoryHelper->getIndexSettings($storeId), false, true);
+        $this->algoliaHelper->setSettings($this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId), $this->pageHelper->getIndexSettings($storeId));
+        $this->algoliaHelper->setSettings($this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId), $this->suggestionHelper->getIndexSettings($storeId));
 
         foreach ($this->configHelper->getAutocompleteSections() as $section) {
             if ($section['name'] === 'products' || $section['name'] === 'categories' || $section['name'] === 'pages' || $section['name'] === 'suggestions') {
                 continue;
             }
 
-            $this->algoliaHelper->setSettings($this->additionalSectionHelper->getIndexName($storeId) . '_' . $section['name'], $this->additionalSectionHelper->getIndexSettings($storeId));
+            $this->algoliaHelper->setSettings($this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId) . '_' . $section['name'], $this->additionalSectionHelper->getIndexSettings($storeId));
         }
 
-        $this->productHelper->setSettings($storeId, $useTmpIndex);
+        $productsIndexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
+        $productsIndexNameTmp = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId, true);
+        
+        $this->productHelper->setSettings($productsIndexName, $productsIndexNameTmp, $storeId, $useTmpIndex);
 
         $this->setExtraSettings($storeId, $useTmpIndex);
     }
@@ -152,7 +158,7 @@ class Data
                 continue;
             }
 
-            $index_name = $this->additionalSectionHelper->getIndexName($storeId) . '_' . $section['name'];
+            $index_name = $this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId) . '_' . $section['name'];
 
             $attribute_values = $this->additionalSectionHelper->getAttributeValues($storeId, $section);
 
@@ -174,7 +180,7 @@ class Data
 
         $this->startEmulation($storeId);
 
-        $index_name = $this->pageHelper->getIndexName($storeId);
+        $index_name = $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId);
 
         $pages = $this->pageHelper->getPages($storeId);
 
@@ -265,7 +271,8 @@ class Data
             return;
         }
 
-        $this->algoliaHelper->moveIndex($this->suggestionHelper->getIndexName($storeId) . '_tmp', $this->suggestionHelper->getIndexName($storeId));
+        $indexNameSuffix = $this->suggestionHelper->getIndexNameSuffix();
+        $this->algoliaHelper->moveIndex($this->getIndexName($indexNameSuffix, $storeId, true), $this->getIndexName($indexNameSuffix, $storeId));
     }
 
     public function rebuildStoreProductIndex($storeId, $productIds)
@@ -330,7 +337,7 @@ class Data
         $collection->setCurPage($page)->setPageSize($pageSize);
         $collection->load();
 
-        $index_name = $this->suggestionHelper->getIndexName($storeId) . '_tmp';
+        $index_name = $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId, true);
 
         $indexData = [];
 
@@ -368,7 +375,7 @@ class Data
         $collection->setCurPage($page)->setPageSize($pageSize);
         $collection->load();
 
-        $index_name = $this->categoryHelper->getIndexName($storeId);
+        $index_name = $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId);
 
         $indexData = [];
 
@@ -504,7 +511,7 @@ class Data
         $this->logger->log('Loaded ' . count($collection) . ' products');
         $this->logger->stop('LOADING ' . $this->logger->getStoreName($storeId) . ' collection page ' . $page . ', pageSize ' . $pageSize);
 
-        $indexName = $this->productHelper->getIndexName($storeId, $useTmpIndex);
+        $indexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId, $useTmpIndex);
 
         $indexData = $this->getProductsRecords($storeId, $collection, $productIds);
 
@@ -586,11 +593,11 @@ class Data
     private function setExtraSettings($storeId, $saveToTmpIndicesToo)
     {
         $sections = [
-            'products' => $this->productHelper->getIndexName($storeId),
-            'categories' => $this->categoryHelper->getIndexName($storeId),
-            'pages' => $this->pageHelper->getIndexName($storeId),
-            'suggestions' => $this->suggestionHelper->getIndexName($storeId),
-            'additional_sections' => $this->additionalSectionHelper->getIndexName($storeId),
+            'products' => $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId),
+            'categories' => $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId),
+            'pages' => $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId),
+            'suggestions' => $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId),
+            'additional_sections' => $this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId),
         ];
 
         $error = [];
@@ -657,5 +664,15 @@ class Data
         $salesData = $salesConnection->query($query)->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE|\PDO::FETCH_ASSOC);
 
         return $salesData;
+    }
+
+    public function getIndexName($indexSuffix, $storeId = null, $tmp = false)
+    {
+        return $this->getBaseIndexName($storeId) . $indexSuffix . ($tmp ? '_tmp' : '');
+    }
+
+    public function getBaseIndexName($storeId = null)
+    {
+        return $this->configHelper->getIndexPrefix($storeId) . $this->storeManager->getStore($storeId)->getCode();
     }
 }

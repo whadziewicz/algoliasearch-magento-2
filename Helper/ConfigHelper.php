@@ -375,11 +375,8 @@ class ConfigHelper
         return $this->configInterface->isSetFlag(self::AUTOCOMPLETE_MENU_DEBUG, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    public function getSortingIndices($storeId = null)
+    public function getSortingIndices($originalIndexName, $storeId = null)
     {
-        /** @var ProductHelper $productHelper */
-        $productHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Entity\ProductHelper');
-
         $attrs = $this->unserialize($this->configInterface->getValue(self::SORTING_INDICES, ScopeInterface::SCOPE_STORE, $storeId));
 
         $currency = $this->getCurrencyCode($storeId);
@@ -397,14 +394,14 @@ class ConfigHelper
 
                     $indexNameSuffix = 'group_'.$customerGroupId;
 
-                    $indexName = $productHelper->getIndexName($storeId).'_'.$attr['attribute'].'_'.$indexNameSuffix.'_'.$attr['sort'];
+                    $indexName = $originalIndexName.'_'.$attr['attribute'].'_'.$indexNameSuffix.'_'.$attr['sort'];
                     $sortAttribute = $attr['attribute'] . '.' . $currency . '.' . $indexNameSuffix;
                 }
             } elseif ($attr['attribute'] === 'price') {
-                $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . 'default' . '_' . $attr['sort'];
+                $indexName = $originalIndexName . '_' . $attr['attribute'] . '_' . 'default' . '_' . $attr['sort'];
                 $sortAttribute = $attr['attribute'] . '.' . $currency . '.' . 'default';
             } else {
-                $indexName = $productHelper->getIndexName($storeId) . '_' . $attr['attribute'] . '_' . $attr['sort'];
+                $indexName = $originalIndexName . '_' . $attr['attribute'] . '_' . $attr['sort'];
                 $sortAttribute = $attr['attribute'];
             }
 

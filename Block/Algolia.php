@@ -4,8 +4,11 @@ namespace Algolia\AlgoliaSearch\Block;
 
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Algolia\AlgoliaSearch\Helper\Data as CoreHelper;
+use Algolia\AlgoliaSearch\Helper\Entity\CategoryHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento\Framework\App\ActionInterface;
+use Magento\Framework\Data\CollectionDataSourceInterface;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Locale\Currency;
 use Magento\Framework\Registry;
@@ -15,7 +18,7 @@ use Magento\Search\Helper\Data as CatalogSearchHelper;
 use Magento\Framework\App\Http\Context as HttpContext;
 use Magento\Customer\Model\Context as CustomerContext;
 
-class Algolia extends Template implements \Magento\Framework\Data\CollectionDataSourceInterface
+class Algolia extends Template implements CollectionDataSourceInterface
 {
     protected $config;
     protected $catalogSearchHelper;
@@ -28,6 +31,8 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
     protected $urlHelper;
     protected $formKey;
     protected $httpContext;
+    protected $coreHelper;
+    protected $categoryHelper;
 
     protected $priceKey;
 
@@ -42,6 +47,8 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
         Data $urlHelper,
         FormKey $formKey,
         HttpContext $httpContext,
+        CoreHelper $coreHelper,
+        CategoryHelper $categoryHelper,
         array $data = []
     ) {
         $this->config = $config;
@@ -53,6 +60,8 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
         $this->urlHelper = $urlHelper;
         $this->formKey = $formKey;
         $this->httpContext = $httpContext;
+        $this->coreHelper = $coreHelper;
+        $this->categoryHelper = $categoryHelper;
 
         parent::__construct($context, $data);
     }
@@ -62,9 +71,19 @@ class Algolia extends Template implements \Magento\Framework\Data\CollectionData
         return $this->config;
     }
 
+    public function getCoreHelper()
+    {
+        return $this->coreHelper;
+    }
+
     public function getProductHelper()
     {
         return $this->productHelper;
+    }
+
+    public function getCategoryHelper()
+    {
+        return $this->categoryHelper;
     }
 
     public function getCatalogSearchHelper()

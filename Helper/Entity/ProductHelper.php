@@ -5,7 +5,6 @@ namespace Algolia\AlgoliaSearch\Helper\Entity;
 use Algolia\AlgoliaSearch\Helper\Image;
 use Magento\Catalog\Model\Product;
 use Magento\Directory\Model\Currency;
-use Magento\Framework\App\Cache\Type\Config as ConfigCache;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Tax\Model\Config as TaxConfig;
@@ -17,22 +16,34 @@ use Magento\Catalog\Model\Product\Visibility;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Helper\Stock;
 use Magento\CatalogRule\Model\ResourceModel\Rule;
-use Magento\Cms\Model\Template\FilterProvider;
-use Magento\Directory\Helper\Data as CurrencyDirectory;
 use Magento\Directory\Model\Currency as CurrencyHelper;
 use Magento\Eav\Model\Config;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Helper\Data;
 
-class ProductHelper extends BaseHelper
+class ProductHelper
 {
-    /**
-     * @var Image $imageHelper
-     */
-    protected $imageHelper;
+    private $eavConfig;
+    private $configHelper;
+    private $algoliaHelper;
+    private $logger;
+    private $storeManager;
+    private $eventManager;
+    private $visibility;
+    private $stockHelper;
+    private $taxHelper;
+    private $stockRegistry;
+    private $objectManager;
+    private $catalogHelper;
+    private $currencyManager;
+    private $priceCurrency;
+    private $rule;
+    private $categoryHelper;
+
+    /** @var Image $imageHelper */
+    private $imageHelper;
 
     protected static $_productAttributes;
     protected static $_currencies;
@@ -67,35 +78,43 @@ class ProductHelper extends BaseHelper
         StoreManagerInterface $storeManager,
         ManagerInterface $eventManager,
         Visibility $visibility,
-        Stock $stock,
+        Stock $stockHelper,
         Data $taxHelper,
         StockRegistryInterface $stockRegistry,
-        CurrencyDirectory $currencyDirectory,
-        CurrencyHelper $currencyHelper,
         ObjectManagerInterface $objectManager,
         CatalogHelper $catalogHelper,
-        ResourceConnection $queryResource,
         CurrencyHelper $currencyManager,
-        FilterProvider $filterProvider,
         PriceCurrencyInterface $priceCurrency,
         Rule $rule,
-        ConfigCache $cache
+        CategoryHelper $categoryHelper
     ) {
-        parent::__construct($eavConfig, $configHelper, $algoliaHelper, $logger, $storeManager,
-            $eventManager, $visibility, $stock, $taxHelper, $stockRegistry, $currencyDirectory,
-            $currencyHelper, $objectManager, $catalogHelper, $queryResource, $currencyManager,
-            $filterProvider, $priceCurrency, $rule, $cache);
+        $this->eavConfig = $eavConfig;
+        $this->configHelper = $configHelper;
+        $this->algoliaHelper = $algoliaHelper;
+        $this->logger = $logger;
+        $this->storeManager = $storeManager;
+        $this->eventManager = $eventManager;
+        $this->visibility = $visibility;
+        $this->stockHelper = $stockHelper;
+        $this->taxHelper = $taxHelper;
+        $this->stockRegistry = $stockRegistry;
+        $this->objectManager = $objectManager;
+        $this->catalogHelper = $catalogHelper;
+        $this->currencyManager = $currencyManager;
+        $this->priceCurrency = $priceCurrency;
+        $this->rule = $rule;
+        $this->categoryHelper = $categoryHelper;
 
         $this->imageHelper = $this->objectManager->create(
             'Algolia\AlgoliaSearch\Helper\Image',
             [
                 'options' =>[
-                    'shouldRemovePubDir' => $this->config->shouldRemovePubDirectory(),
+                    'shouldRemovePubDir' => $this->configHelper->shouldRemovePubDirectory(),
                 ]
             ]);
     }
 
-    protected function getIndexNameSuffix()
+    public function getIndexNameSuffix()
     {
         return '_products';
     }
@@ -174,8 +193,8 @@ class ProductHelper extends BaseHelper
             $products = $products->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSiteIds()]);
         }
 
-        if ($onlyVisible && $this->config->getShowOutOfStock($storeId) === false) {
-            $this->stock->addInStockFilterToCollection($products);
+        if ($onlyVisible && $this->configHelper->getShowOutOfStock($storeId) === false) {
+            $this->stockHelper->addInStockFilterToCollection($products);
         }
 
         /* @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
@@ -209,10 +228,10 @@ class ProductHelper extends BaseHelper
 
     public function getAdditionalAttributes($storeId = null)
     {
-        return $this->config->getProductAdditionalAttributes($storeId);
+        return $this->configHelper->getProductAdditionalAttributes($storeId);
     }
 
-    public function setSettings($storeId, $saveToTmpIndicesToo = false)
+    public function setSettings($indexName, $indexNameTmp, $storeId, $saveToTmpIndicesToo = false)
     {
         $searchableAttributes = [];
         $unretrievableAttributes = [];
@@ -236,11 +255,11 @@ class ProductHelper extends BaseHelper
             }
         }
 
-        $customRankings = $this->config->getProductCustomRanking($storeId);
+        $customRankings = $this->configHelper->getProductCustomRanking($storeId);
 
         $customRankingsArr = [];
 
-        $facets = $this->config->getFacets();
+        $facets = $this->configHelper->getFacets();
 
         $currencies = $this->currencyManager->getConfigAllowCurrencies();
 
@@ -249,7 +268,7 @@ class ProductHelper extends BaseHelper
                 foreach ($currencies as $currency_code) {
                     $facet['attribute'] = 'price.' . $currency_code . '.default';
 
-                    if ($this->config->isCustomerGroupsEnabled($storeId)) {
+                    if ($this->configHelper->isCustomerGroupsEnabled($storeId)) {
                         $groupCollection = $this->objectManager->create('Magento\Customer\Model\ResourceModel\Group\Collection');
 
                         foreach ($groupCollection as $group) {
@@ -270,7 +289,7 @@ class ProductHelper extends BaseHelper
             $customRankingsArr[] = $ranking['order'] . '(' . $ranking['attribute'] . ')';
         }
 
-        if ($this->config->replaceCategories($storeId) && !in_array('categories', $attributesForFaceting, true)) {
+        if ($this->configHelper->replaceCategories($storeId) && !in_array('categories', $attributesForFaceting, true)) {
             $attributesForFaceting[] = 'categories';
         }
 
@@ -279,8 +298,8 @@ class ProductHelper extends BaseHelper
             'customRanking'           => $customRankingsArr,
             'unretrievableAttributes' => $unretrievableAttributes,
             'attributesForFaceting'   => $attributesForFaceting,
-            'maxValuesPerFacet'       => (int) $this->config->getMaxValuesPerFacet($storeId),
-            'removeWordsIfNoResults'  => $this->config->getRemoveWordsIfNoResult($storeId),
+            'maxValuesPerFacet'       => (int) $this->configHelper->getMaxValuesPerFacet($storeId),
+            'removeWordsIfNoResults'  => $this->configHelper->getRemoveWordsIfNoResult($storeId),
         ];
 
         // Additional index settings from event observer
@@ -295,39 +314,39 @@ class ProductHelper extends BaseHelper
         ]);
         $indexSettings = $transport->getData();
 
-        $mergeSettings = $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
+        // $mergeSettings = $this->algoliaHelper->mergeSettings($this->getIndexName($storeId), $indexSettings);
 
-        $this->algoliaHelper->setSettings($this->getIndexName($storeId), $mergeSettings);
+        $this->algoliaHelper->setSettings($indexName, $indexSettings, false, true);
         if ($saveToTmpIndicesToo === true) {
-            $this->algoliaHelper->setSettings($this->getIndexName($storeId, true), $mergeSettings);
+            $this->algoliaHelper->setSettings($indexNameTmp, $indexSettings, false, true);
         }
 
         /*
          * Handle replicas
          */
-        $isInstantSearchEnabled = (bool) $this->config->isInstantEnabled($storeId);
-        $sortingIndices = $this->config->getSortingIndices($storeId);
+        $isInstantSearchEnabled = (bool) $this->configHelper->isInstantEnabled($storeId);
+        $sortingIndices = $this->configHelper->getSortingIndices($indexName, $storeId);
 
         if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
             $replicas = array_values(array_map(function($sortingIndex) {
                 return $sortingIndex['name'];
             }, $sortingIndices));
 
-            $this->algoliaHelper->setSettings($this->getIndexName($storeId), ['replicas' => $replicas]);
+            $this->algoliaHelper->setSettings($indexName, ['replicas' => $replicas]);
 
             foreach ($sortingIndices as $values) {
-                $mergeSettings['ranking'] = $values['ranking'];
-                $this->algoliaHelper->setSettings($values['name'], $mergeSettings);
+                $indexSettings['ranking'] = $values['ranking'];
+                $this->algoliaHelper->setSettings($values['name'], $indexSettings, false, true);
             }
         }
 
-        if ($this->config->isEnabledSynonyms($storeId) === true) {
-            if ($synonymsFile = $this->config->getSynonymsFile($storeId)) {
+        if ($this->configHelper->isEnabledSynonyms($storeId) === true) {
+            if ($synonymsFile = $this->configHelper->getSynonymsFile($storeId)) {
                 $synonymsToSet = json_decode(file_get_contents($synonymsFile));
             } else {
                 $synonymsToSet = [];
 
-                $synonyms = $this->config->getSynonyms($storeId);
+                $synonyms = $this->configHelper->getSynonyms($storeId);
                 foreach ($synonyms as $objectID => $synonym) {
                     $synonymsToSet[] = [
                         'objectID' => $objectID,
@@ -336,7 +355,7 @@ class ProductHelper extends BaseHelper
                     ];
                 }
 
-                $onewaySynonyms = $this->config->getOnewaySynonyms($storeId);
+                $onewaySynonyms = $this->configHelper->getOnewaySynonyms($storeId);
                 foreach ($onewaySynonyms as $objectID => $onewaySynonym) {
                     $synonymsToSet[] = [
                         'objectID' => $objectID,
@@ -347,13 +366,13 @@ class ProductHelper extends BaseHelper
                 }
             }
 
-            $this->algoliaHelper->setSynonyms($this->getIndexName($storeId, $saveToTmpIndicesToo), $synonymsToSet);
+            $this->algoliaHelper->setSynonyms($saveToTmpIndicesToo ? $indexNameTmp : $indexName, $synonymsToSet);
         } elseif ($saveToTmpIndicesToo === true) {
-            $this->algoliaHelper->copySynonyms($this->getIndexName($storeId), $this->getIndexName($storeId, $saveToTmpIndicesToo));
+            $this->algoliaHelper->copySynonyms($indexName, $indexNameTmp);
         }
 
         if ($saveToTmpIndicesToo === true) {
-            $this->algoliaHelper->copyQueryRules($this->getIndexName($storeId), $this->getIndexName($storeId, $saveToTmpIndicesToo));
+            $this->algoliaHelper->copyQueryRules($indexName, $indexNameTmp);
         }
     }
 
@@ -377,7 +396,7 @@ class ProductHelper extends BaseHelper
 
         $fields = $this->getFields($store);
 
-        $areCustomersGroupsEnabled = $this->config->isCustomerGroupsEnabled($product->getStoreId());
+        $areCustomersGroupsEnabled = $this->configHelper->isCustomerGroupsEnabled($product->getStoreId());
 
         $currencies = $store->getAvailableCurrencyCodes();
         $baseCurrencyCode = $store->getBaseCurrencyCode();
@@ -569,7 +588,7 @@ class ProductHelper extends BaseHelper
 
     public function getAllCategories($categoryIds)
     {
-        $categories = $this->getCoreCategories();
+        $categories = $this->categoryHelper->getCoreCategories();
 
         $selectedCategories = [];
         foreach ($categoryIds as $id) {
@@ -598,7 +617,7 @@ class ProductHelper extends BaseHelper
         $visibleInSearch = $this->visibility->getVisibleInSearchIds();
 
         $urlParams = [
-            '_secure' => $this->config->useSecureUrlsInFrontend($product->getStoreId()),
+            '_secure' => $this->configHelper->useSecureUrlsInFrontend($product->getStoreId()),
             '_nosid' => true,
         ];
 
@@ -645,13 +664,13 @@ class ProductHelper extends BaseHelper
                 $path = [];
 
                 foreach ($category->getPathIds() as $treeCategoryId) {
-                    if (!$this->config->showCatsNotIncludedInNavigation($product->getStoreId()) && !$this->isCategoryVisibleInMenu($treeCategoryId, $product->getStoreId())) {
+                    if (!$this->configHelper->showCatsNotIncludedInNavigation($product->getStoreId()) && !$this->categoryHelper->isCategoryVisibleInMenu($treeCategoryId, $product->getStoreId())) {
                         // If the category should not be included in menu - skip it
                         $path[] = null;
                         continue;
                     }
 
-                    $name = $this->getCategoryName($treeCategoryId, $product->getStoreId());
+                    $name = $this->categoryHelper->getCategoryName($treeCategoryId, $product->getStoreId());
                     if ($name) {
                         $path[] = $name;
                     }
@@ -775,7 +794,7 @@ class ProductHelper extends BaseHelper
                         foreach ($sub_products as $sub_product) {
                             $isInStock = (int) $this->stockRegistry->getStockItem($sub_product->getId())->getIsInStock();
 
-                            if ($isInStock == false && $this->config->indexOutOfStockOptions($product->getStoreId()) == false) {
+                            if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($product->getStoreId()) == false) {
                                 continue;
                             }
 
@@ -841,7 +860,7 @@ class ProductHelper extends BaseHelper
 
         $customData = array_merge($customData, $defaultData);
 
-        $this->castProductObject($customData);
+        $this->algoliaHelper->castProductObject($customData);
 
         $transport = new DataObject($customData);
         $this->eventManager->dispatch('algolia_after_create_product_object', ['custom_data' => $transport, 'sub_products' => $sub_products, 'productObject' => $product]);
@@ -863,8 +882,8 @@ class ProductHelper extends BaseHelper
 
         if (false === isset($defaultData['image_url'])) {
             $this->imageHelper
-                ->init($product, $this->config->getImageType())
-                ->resize($this->config->getImageWidth(), $this->config->getImageHeight());
+                ->init($product, $this->configHelper->getImageType())
+                ->resize($this->configHelper->getImageWidth(), $this->configHelper->getImageHeight());
 
             $customData['image_url'] = $this->imageHelper->getUrl();
 

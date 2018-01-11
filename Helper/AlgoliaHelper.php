@@ -88,11 +88,15 @@ class AlgoliaHelper extends AbstractHelper
         return $this->getIndex($indexName)->getObjects($objectIds);
     }
 
-    public function setSettings($indexName, $settings, $forwardToReplicas = false)
+    public function setSettings($indexName, $settings, $forwardToReplicas = false, $mergeSettings = false)
     {
         $this->checkClient(__FUNCTION__);
 
         $index = $this->getIndex($indexName);
+
+        if ($mergeSettings === true) {
+            $settings = $this->mergeSettings($indexName, $settings);
+        }
 
         $res = $index->setSettings($settings, $forwardToReplicas);
 
@@ -338,6 +342,8 @@ class AlgoliaHelper extends AbstractHelper
             } elseif ($previousObject !== $object) {
                 $modifiedIds[] = $indexName.' - ID '.$previousObject['objectID'].' - truncated';
             }
+
+            $object = $this->castRecord($object);
         }
 
         if (!empty($modifiedIds)) {
@@ -354,7 +360,7 @@ class AlgoliaHelper extends AbstractHelper
         }
     }
 
-    public function handleTooBigRecord($object)
+    private function handleTooBigRecord($object)
     {
         $size = mb_strlen(json_encode($object));
 
@@ -391,5 +397,53 @@ class AlgoliaHelper extends AbstractHelper
         }
 
         return $longestAttribute;
+    }
+
+    public function castProductObject(&$productData)
+    {
+        $nonCastableAttributes = array('sku', 'name', 'description');
+
+        foreach ($productData as $key => &$data) {
+            if (in_array($key, $nonCastableAttributes, true) === true) {
+                continue;
+            }
+
+            $data = $this->castAttribute($data);
+
+            if (is_array($data) === false) {
+                $data = explode('|', $data);
+
+                if (count($data) == 1) {
+                    $data = $data[0];
+                    $data = $this->castAttribute($data);
+                } else {
+                    foreach ($data as &$element) {
+                        $element = $this->castAttribute($element);
+                    }
+                }
+            }
+        }
+    }
+
+    private function castRecord($object)
+    {
+        foreach ($object as &$value) {
+            $value = $this->castAttribute($value);
+        }
+
+        return $object;
+    }
+
+    private function castAttribute($value)
+    {
+        if (is_numeric($value) && floatval($value) == floatval(intval($value))) {
+            return intval($value);
+        }
+
+        if (is_numeric($value)) {
+            return floatval($value);
+        }
+
+        return $value;
     }
 }

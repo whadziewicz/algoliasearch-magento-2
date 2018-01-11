@@ -569,7 +569,7 @@ class ConfigHelper
         return $popularQueries;
     }
 
-    public function getAttributesToRetrieve($group_id)
+    public function getAttributesToRetrieve($groupId)
     {
         if (false === $this->isCustomerGroupsEnabled()) {
             return [];
@@ -610,8 +610,9 @@ class ConfigHelper
             $attributes[] = 'price.' . $currency . '.default';
             $attributes[] = 'price.' . $currency . '.default_formated';
             $attributes[] = 'price.' . $currency . '.default_original_formated';
-            $attributes[] = 'price.' . $currency . '.group_' . $group_id;
-            $attributes[] = 'price.' . $currency . '.group_' . $group_id . '_formated';
+            $attributes[] = 'price.' . $currency . '.group_' . $groupId;
+            $attributes[] = 'price.' . $currency . '.group_' . $groupId . '_formated';
+            $attributes[] = 'price.' . $currency . '.group_' . $groupId . '_original_formated';
             $attributes[] = 'price.' . $currency . '.special_from_date';
             $attributes[] = 'price.' . $currency . '.special_to_date';
         }

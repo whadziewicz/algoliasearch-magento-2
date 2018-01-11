@@ -356,7 +356,7 @@ class AlgoliaHelper extends AbstractHelper
                 return;
             }
 
-            $this->messageManager->addError($errorMessage);
+            $this->messageManager->addErrorMessage($errorMessage);
         }
     }
 

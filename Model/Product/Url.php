@@ -2,6 +2,9 @@
 
 namespace Algolia\AlgoliaSearch\Model\Product;
 
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Url as ProductUrl;
+use Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator;
 use Magento\Framework\Filter\FilterManager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Session\SidResolverInterface;
@@ -16,7 +19,7 @@ use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
  * E.g. if base url was www.foo.com and store url was www.bar.com, when indexing, the products for www.bar.com would be
  * indexed using the base url of www.foo.com
  */
-class Url extends \Magento\Catalog\Model\Product\Url
+class Url extends ProductUrl
 {
     const FRONTEND_URL = 'Magento\Framework\Url';
     const BACKEND_URL = 'Magento\Backend\Model\Url';
@@ -38,8 +41,12 @@ class Url extends \Magento\Catalog\Model\Product\Url
 
     /**
      * The only rewritten line in this method is the return statement
+     *
+     * @param Product $product
+     * @param array $params
+     * @return string
      */
-    public function getUrl(\Magento\Catalog\Model\Product $product, $params = [])
+    public function getUrl(Product $product, $params = [])
     {
         $routePath = '';
         $routeParams = $params;
@@ -60,7 +67,7 @@ class Url extends \Magento\Catalog\Model\Product\Url
             if (empty($requestPath) && $requestPath !== false) {
                 $filterData = [
                     UrlRewrite::ENTITY_ID   => $product->getId(),
-                    UrlRewrite::ENTITY_TYPE => \Magento\CatalogUrlRewrite\Model\ProductUrlRewriteGenerator::ENTITY_TYPE,
+                    UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
                     UrlRewrite::STORE_ID    => $storeId,
                 ];
                 if ($categoryId) {
@@ -112,6 +119,8 @@ class Url extends \Magento\Catalog\Model\Product\Url
     /**
      * If the store id passed in is admin (0), will return a Backend Url object (Default \Magento\Backend\Model\Url),
      * otherwise returns the default Url object (default \Magento\Framework\Url)
+     * @param int $storeId
+     * @return mixed
      */
     public function getStoreScopeUrlInstance($storeId)
     {

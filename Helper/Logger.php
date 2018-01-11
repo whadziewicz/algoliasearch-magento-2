@@ -9,22 +9,20 @@ class Logger
 {
     protected $enabled;
     protected $config;
+    protected $logger;
+
     protected $timers = [];
     protected $stores = [];
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
 
     public function __construct(StoreManagerInterface $storeManager, ConfigHelper $configHelper, LoggerInterface $logger)
     {
         $this->config = $configHelper;
         $this->enabled = $this->config->isLoggingEnabled();
+        $this->logger = $logger;
 
         foreach ($storeManager->getStores() as $store) {
             $this->stores[$store->getId()] = $store->getName();
         }
-        $this->logger = $logger;
     }
 
     public function isEnable()

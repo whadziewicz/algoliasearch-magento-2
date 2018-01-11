@@ -106,7 +106,7 @@ class PageHelper
         return $pages;
     }
 
-    private function getStoreUrl($store_id)
+    private function getStoreUrl($storeId)
     {
         if ($this->storeUrls == null) {
             $this->storeUrls = [];
@@ -123,32 +123,32 @@ class PageHelper
             }
         }
 
-        if (array_key_exists($store_id, $this->storeUrls)) {
-            return $this->storeUrls[$store_id];
+        if (array_key_exists($storeId, $this->storeUrls)) {
+            return $this->storeUrls[$storeId];
         }
 
         return null;
     }
 
-    private function getStores($store_id)
+    private function getStores($storeId)
     {
-        $store_ids = [];
+        $storeIds = [];
 
-        if ($store_id == null) {
+        if ($storeId == null) {
             foreach ($this->storeManager->getStores() as $store) {
                 if ($this->configHelper->isEnabledBackEnd($store->getId()) === false) {
                     continue;
                 }
 
                 if ($store->getIsActive()) {
-                    $store_ids[] = $store->getId();
+                    $storeIds[] = $store->getId();
                 }
             }
         } else {
-            $store_ids = [$store_id];
+            $storeIds = [$storeId];
         }
 
-        return $store_ids;
+        return $storeIds;
     }
 
     private function strip($s, $completeRemoveTags = [])

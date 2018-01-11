@@ -3,9 +3,12 @@
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Magento\Catalog\Model\Category as MagentoCategory;
+use Magento\Eav\Model\Config;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Algolia\AlgoliaSearch\Helper\Image;
 use Magento\Catalog\Model\Category;
@@ -24,6 +27,8 @@ class CategoryHelper
 
     private $resourceConnection;
 
+    private $eavConfig;
+
     private $configHelper;
 
     private $isCategoryVisibleInMenuCache;
@@ -31,13 +36,14 @@ class CategoryHelper
     protected static $_activeCategories;
     protected static $_categoryNames;
 
-    public function __construct(ManagerInterface $eventManager, ObjectManagerInterface $objectManager, StoreManagerInterface $storeManager, ResourceConnection $resourceConnection, ConfigHelper $configHelper)
+    public function __construct(ManagerInterface $eventManager, ObjectManagerInterface $objectManager, StoreManagerInterface $storeManager, ResourceConnection $resourceConnection, Config $eavConfig, ConfigHelper $configHelper)
     {
         $this->eventManager = $eventManager;
         $this->objectManager = $objectManager;
         $this->storeManager = $storeManager;
-        $this->configHelper = $configHelper;
         $this->resourceConnection = $resourceConnection;
+        $this->eavConfig = $eavConfig;
+        $this->configHelper = $configHelper;
     }
 
     public function getIndexNameSuffix()
@@ -168,7 +174,6 @@ class CategoryHelper
 
     public function getObject(Category $category)
     {
-        /** @var $productCollection Mage_Catalog_Model_Resource_Product_Collection */
         $productCollection = $category->getProductCollection();
         $productCollection = $productCollection->addMinimalPrice();
 
@@ -371,11 +376,11 @@ class CategoryHelper
 
     public function getCategoryName($categoryId, $storeId = null)
     {
-        if ($categoryId instanceof \Magento\Catalog\Model\Category) {
+        if ($categoryId instanceof MagentoCategory) {
             $categoryId = $categoryId->getId();
         }
 
-        if ($storeId instanceof  \Magento\Store\Model\Store) {
+        if ($storeId instanceof  Store) {
             $storeId = $storeId->getId();
         }
 
@@ -434,9 +439,9 @@ class CategoryHelper
 
     private function getCategoryById($categoryId)
     {
-        $catagories = $this->getCoreCategories();
+        $categories = $this->getCoreCategories();
 
-        return isset($catagories[$categoryId]) ? $catagories[$categoryId] : null;
+        return isset($categories[$categoryId]) ? $categories[$categoryId] : null;
     }
 
     public function isCategoryVisibleInMenu($categoryId, $storeId)

@@ -2,17 +2,23 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use Magento\Catalog\Model\Product\ImageFactory;
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\View\Asset\Repository;
+use Magento\Framework\View\ConfigInterface;
+
 class Image extends \Magento\Catalog\Helper\Image
 {
     protected $logger;
     protected $options;
 
-    public function __construct(\Magento\Framework\App\Helper\Context $context,
-                                \Magento\Catalog\Model\Product\ImageFactory $productImageFactory,
-                                \Magento\Framework\View\Asset\Repository $assetRepo,
-                                \Magento\Framework\View\ConfigInterface $viewConfig,
-                                Logger $logger,
-                                $options = []
+    public function __construct(
+        Context $context,
+        ImageFactory $productImageFactory,
+        Repository $assetRepo,
+        ConfigInterface $viewConfig,
+        Logger $logger,
+        $options = []
     ) {
         parent::__construct($context, $productImageFactory, $assetRepo, $viewConfig);
         $this->logger = $logger;

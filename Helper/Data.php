@@ -112,7 +112,7 @@ class Data
 
     public function getSearchResult($query, $storeId)
     {
-        $indexName = $this->productHelper->getIndexName($storeId);
+        $indexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
 
         $numberOfResults = 1000;
         if ($this->configHelper->isInstantEnabled()) {

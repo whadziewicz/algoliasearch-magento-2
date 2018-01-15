@@ -590,6 +590,17 @@ class Data
         $this->logger->stop('STOP EMULATION');
     }
 
+    public function isIndexingEnabled($storeId = null)
+    {
+        if ($this->configHelper->isEnabledBackend($storeId) === false) {
+            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
+
+            return false;
+        }
+
+        return true;
+    }
+
     private function setExtraSettings($storeId, $saveToTmpIndicesToo)
     {
         $sections = [
@@ -627,17 +638,6 @@ class Data
         if (!empty($error)) {
             throw new AlgoliaException('<br>'.implode('<br> ', $error));
         }
-    }
-
-    private function isIndexingEnabled($storeId = null)
-    {
-        if ($this->configHelper->isEnabledBackend($storeId) === false) {
-            $this->logger->log('INDEXING IS DISABLED FOR ' . $this->logger->getStoreName($storeId));
-
-            return false;
-        }
-
-        return true;
     }
 
     private function getSalesData($storeId, Collection $collection)

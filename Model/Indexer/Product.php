@@ -62,6 +62,10 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
         $storeIds = array_keys($this->storeManager->getStores());
 
         foreach ($storeIds as $storeId) {
+            if ($this->fullAction->isIndexingEnabled($storeId) === false) {
+                continue;
+            }
+
             $productsPerPage = $this->configHelper->getNumberOfElementByPage();
 
             if (is_array($productIds) && count($productIds) > 0) {

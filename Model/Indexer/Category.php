@@ -64,6 +64,10 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
         $affectedProductsCount = count(self::$affectedProductIds);
 
         foreach ($storeIds as $storeId) {
+            if ($this->fullAction->isIndexingEnabled($storeId) === false) {
+                continue;
+            }
+
             if ($categoryIds !== null) {
                 $indexName = $this->fullAction->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId);
                 $this->queue->addToQueue($this->fullAction, 'deleteObjects', ['store_id' => $storeId, 'category_ids' => $categoryIds, 'index_name' => $indexName], count($categoryIds));

@@ -52,6 +52,10 @@ class AdditionalSection implements Magento\Framework\Indexer\ActionInterface, Ma
         $storeIds = array_keys($this->storeManager->getStores());
 
         foreach ($storeIds as $storeId) {
+            if ($this->fullAction->isIndexingEnabled($storeId) === false) {
+                continue;
+            }
+
             $this->queue->addToQueue($this->fullAction, 'rebuildStoreAdditionalSectionsIndex', ['store_id' => $storeId], 1);
         }
     }

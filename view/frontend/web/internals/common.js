@@ -343,40 +343,12 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			instant_search_bar.val(search.helper.state.query);
 		};
 		
-		window.handleInputCrossInstant = function (input) {
-			if (input.val().length > 0) {
-				input.closest('#instant-search-box').find('.clear-query-instant').show();
-			}
-			else {
-				input.closest('#instant-search-box').find('.clear-query-instant').hide();
-			}
-		};
-		
 		window.createISWidgetContainer = function (attributeName) {
 			var div = document.createElement('div');
 			div.className = 'is-widget-container-' + attributeName.split('.').join('_');
 			
 			return div;
 		};
-		
-		var instant_selector = !algoliaConfig.autocomplete.enabled ? ".algolia-search-input" : "#instant-search-bar";
-		
-		$(document).on('input', algoliaConfig.autocomplete.selector, function () {
-			handleInputCrossAutocomplete($(this));
-		});
-		
-		$(document).on('input', instant_selector, function () {
-			handleInputCrossInstant($(this));
-		});
-		
-		$(document).on('click', '.clear-query-instant', function () {
-			var input = $(this).closest('#instant-search-box').find('input');
-			
-			input.val('');
-			input.get(0).dispatchEvent(new Event('input'));
-			
-			handleInputCrossInstant(input);
-		});
 		
 		$(document).on('click', '.clear-query-autocomplete', function () {
 			var input = $(this).closest('#algolia-searchbox').find('input');

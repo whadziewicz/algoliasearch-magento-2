@@ -210,42 +210,38 @@ a.ais-current-refined-values--link:hover
 
 /* RANGE SLIDER */
 
-.ais-range-slider--target {
-  position: relative;
-  direction: ltr;
-  background: #F3F4F7;
-  height: 6px;
+.ais-range-slider .rheostat {
+  overflow: visible;
   margin-top: 3em;
   margin-bottom: 4em;
   width: 88%;
   margin-left: 6%;
 }
 
-.ais-range-slider--base {
-  width: 100%;
-  height: 100%;
+.ais-range-slider .rheostat-background {
+  background-color: #F3F4F7;
+  border: 1px solid #DDD;
+  border-right-width: 2px;
+  border-left-width: 2px;
   position: relative;
-  z-index: 1;
-  border-top: 1px solid #DDD;
-  border-bottom: 1px solid #DDD;
-  border-left: 2px solid #DDD;
-  border-right: 2px solid #DDD;
 }
 
-.ais-range-slider--origin {
-  position: absolute;
-  right: 0;
+.ais-range-slider .rheostat-horizontal .rheostat-background {
+  height: 6px;
   top: 0;
-  left: 0;
-  bottom: 0;
+  width: 100%;
 }
 
-.ais-range-slider--connect {
-  background: #b5b6b9;
+.ais-range-slider .rheostat-horizontal .rheostat-progress {
+  background-color: #b5b6b9;
+  position: absolute;
+  height: 4px;
+  top: 1px;
 }
 
-.ais-range-slider--background {
-  background: #F3F4F7;
+.ais-range-slider .rheostat-horizontal .rheostat-handle {
+  margin-left: -12px;
+  top: -7px;
 }
 
 .ais-range-slider--handle {
@@ -260,13 +256,7 @@ a.ais-current-refined-values--link:hover
 }
 
 .ais-range-slider--handle-lower {
-  left: -10px;
-  bottom: 7px;
-}
-
-.ais-range-slider--handle-upper {
-  right: 10px;
-  bottom: 7px;
+  margin-left: -9px !important;
 }
 
 .ais-range-slider--tooltip {
@@ -278,15 +268,6 @@ a.ais-current-refined-values--link:hover
   font-size: .8em;
 }
 
-.ais-range-slider--pips {
-  box-sizing: border-box;
-  position: absolute;
-  height: 3em;
-  top: 100%;
-  left: 0;
-  width: 100%;
-}
-
 .ais-range-slider--value {
   width: 40px;
   position: absolute;
@@ -294,11 +275,6 @@ a.ais-current-refined-values--link:hover
   margin-left: -20px;
   padding-top: 15px;
   font-size: .8em;
-}
-
-.ais-range-slider--value-sub {
-  font-size: .8em;
-  padding-top: 15px;
 }
 
 .ais-range-slider--marker {
@@ -318,6 +294,7 @@ a.ais-current-refined-values--link:hover
 .ais-range-slider--marker-large:first-child {
   margin-left: 0;
 }
+
 /******************
 **
 ** Auto-completion menu
@@ -689,11 +666,6 @@ a.ais-current-refined-values--link:hover
 	right: 9px;
 }
 
-#algolia_instant_selector .clear-query-instant {
-	right: 13px;
-	top: 13px;
-}
-
 #algolia_instant_selector .cross-wrapper .clear-refinement {
 	display: block;
 	position: relative;
@@ -1044,12 +1016,46 @@ a.ais-current-refined-values--link:hover
   text-align: right;
 }
 
-#algolia_instant_selector #instant-search-box svg.magnifying-glass {
+.ais-search-box--magnifier {
+  background: transparent;
   position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   top: 8px;
-  left: 8px;
+  left: 7px;
+}
+
+.ais-search-box--magnifier svg {
+  display: block;
+  vertical-align: middle;
+  height: 23px;
+  width: 23px;
   fill: #FFFFFF;
   stroke: #FFFFFF;
+}
+
+.ais-search-box--reset {
+  background: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  margin: 0;
+  border: 0;
+  padding: 7px 8px !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.ais-search-box--reset svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: #636363;
 }
 
 #algolia_instant_selector .before_special {

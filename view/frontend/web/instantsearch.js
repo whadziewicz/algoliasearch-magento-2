@@ -57,6 +57,9 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				useHash: true,
 				trackedParameters: ['query', 'page', 'attribute:*', 'index']
 			},
+			searchParameters: {
+				hitsPerPage: algoliaConfig.hitsPerPage
+			},
 			searchFunction: function(helper) {
 				if (helper.state.query === '' && !algoliaConfig.isSearchPage) {
 					$('.algolia-instant-replaced-content').show();
@@ -138,8 +141,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 						
 						return hit;
 					}
-				},
-				hitsPerPage: algoliaConfig.hitsPerPage
+				}
 			},
 			custom: [
 				/**
@@ -317,7 +319,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				
 				hierarchicalMenuParams.templates.item = '' +
 					'<div class="ais-hierearchical-link-wrapper">' +
-					'<a class="{{cssClasses.link}}" href="{{url}}">{{name}}' +
+					'<a class="{{cssClasses.link}}" href="{{url}}">{{label}}' +
 					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
 					'<span class="{{cssClasses.count}}">{{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}}</span></a>' +
 					'</div>';
@@ -355,6 +357,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					limit: algoliaConfig.maxValuesPerFacet,
 					operator: 'and',
 					templates: templates,
+					sortBy: ['count:desc', 'name:asc'],
 					cssClasses: {
 						root: 'facet conjunctive'
 					}
@@ -368,6 +371,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					limit: algoliaConfig.maxValuesPerFacet,
 					operator: 'or',
 					templates: templates,
+					sortBy: ['count:desc', 'name:asc'],
 					cssClasses: {
 						root: 'facet disjunctive'
 					}
@@ -470,8 +474,6 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			if (typeof algoliaHookAfterInstantsearchStart === 'function') {
 				search = algoliaHookAfterInstantsearchStart(search);
 			}
-			
-			handleInputCrossInstant($(instant_selector));
 			
 			var instant_search_bar = $(instant_selector);
 			if (instant_search_bar.is(":focus") === false) {

@@ -33,7 +33,7 @@ class AlgoliaHelper extends AbstractHelper
     /** @var string */
     private static $lastUsedIndexName;
 
-    /** @var int */
+    /** @var string */
     private static $lastTaskId;
 
     public function __construct(Context $context, ConfigHelper $configHelper, ManagerInterface $messageManager, ConsoleOutput $consoleOutput)

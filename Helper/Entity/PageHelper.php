@@ -58,7 +58,9 @@ class PageHelper
         /** @var \Magento\Cms\Model\Page $pageModel */
         $pageModel = $this->objectManager->create('\Magento\Cms\Model\Page');
 
-        $magentoPages = $pageModel->getCollection()
+        /** @var \Magento\Cms\Model\ResourceModel\Page\Collection $magentoPages */
+        $magentoPages = $pageModel->getCollection();
+        $magentoPages = $magentoPages
             ->addStoreFilter($storeId)
             ->addFieldToFilter('is_active', 1);
 
@@ -81,7 +83,7 @@ class PageHelper
             $pageObject['slug'] = $page->getIdentifier();
             $pageObject['name'] = $page->getTitle();
 
-            $page->setStoreId($storeId);
+            $page->setData('store_id', $storeId);
 
             if (!$page->getId()) {
                 continue;
@@ -118,7 +120,7 @@ class PageHelper
 
                 /** @var Url $url */
                 $url = $this->objectManager->create('Magento\Framework\Url');
-                $url->setStore($storeId);
+                $url->setData('store', $storeId);
                 $this->storeUrls[$storeId] = $url;
             }
         }
@@ -135,12 +137,13 @@ class PageHelper
         $storeIds = [];
 
         if ($storeId == null) {
+            /** @var \Magento\Store\Model\Store $store */
             foreach ($this->storeManager->getStores() as $store) {
                 if ($this->configHelper->isEnabledBackEnd($store->getId()) === false) {
                     continue;
                 }
 
-                if ($store->getIsActive()) {
+                if ($store->getData('is_active')) {
                     $storeIds[] = $store->getId();
                 }
             }

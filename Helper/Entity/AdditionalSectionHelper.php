@@ -44,7 +44,7 @@ class AdditionalSectionHelper
     {
         $attributeCode = $section['name'];
 
-        /** @var $products \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $products */
         $products = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
         $products = $products->addStoreFilter($storeId)
             ->addAttributeToFilter($attributeCode, ['notnull' => true])

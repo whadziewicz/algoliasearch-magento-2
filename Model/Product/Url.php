@@ -55,16 +55,17 @@ class Url extends ProductUrl
 
         $categoryId = null;
 
-        if (!isset($params['_ignore_category']) && $product->getCategoryId() && !$product->getDoNotUseCategoryId()) {
+        if (!isset($params['_ignore_category']) && $product->getCategoryId() && !$product->getData('do_not_use_category_id')) {
             $categoryId = $product->getCategoryId();
         }
 
-        if ($product->hasUrlDataObject()) {
-            $requestPath = $product->getUrlDataObject()->getUrlRewrite();
-            $routeParams['_scope'] = $product->getUrlDataObject()->getStoreId();
+        $urlDataObject = $product->getData('url_data_object');
+        if ($urlDataObject !== null) {
+            $requestPath = $urlDataObject->getUrlRewrite();
+            $routeParams['_scope'] = $urlDataObject->getStoreId();
         } else {
             $requestPath = $product->getRequestPath();
-            if (empty($requestPath) && $requestPath !== false) {
+            if (empty($requestPath) && $requestPath != false) {
                 $filterData = [
                     UrlRewrite::ENTITY_ID   => $product->getId(),
                     UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,

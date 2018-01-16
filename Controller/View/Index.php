@@ -4,17 +4,15 @@ namespace Algolia\AlgoliaSearch\Controller\View;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
 {
-    /** @var  \Magento\Framework\View\Result\Page */
+    /** @var \Magento\Framework\View\Result\PageFactory */
     protected $resultPageFactory;
 
     public function __construct(
         Context $context,
-        ForwardFactory $resultForwardFactory,
         PageFactory $resultPageFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;

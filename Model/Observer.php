@@ -24,12 +24,15 @@ class Observer implements ObserverInterface
         if ($this->config->isEnabledFrontEnd()) {
             if ($this->config->getApplicationID() && $this->config->getAPIKey()) {
                 if ($this->config->isPopupEnabled() || $this->config->isInstantEnabled()) {
-                    $observer->getLayout()->getUpdate()->addHandle('algolia_search_handle');
+                    /** @var \Magento\Framework\View\Layout $layout */
+                    $layout = $observer->getData('layout');
+
+                    $layout->getUpdate()->addHandle('algolia_search_handle');
 
                     if ($this->config->isDefaultSelector()) {
-                        $observer->getLayout()->getUpdate()->addHandle('algolia_search_handle_with_topsearch');
+                        $layout->getUpdate()->addHandle('algolia_search_handle_with_topsearch');
                     } else {
-                        $observer->getLayout()->getUpdate()->addHandle('algolia_search_handle_no_topsearch');
+                        $layout->getUpdate()->addHandle('algolia_search_handle_no_topsearch');
                     }
                 }
             }

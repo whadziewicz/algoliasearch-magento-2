@@ -181,7 +181,7 @@ class ProductHelper
 
     public function getProductCollectionQuery($storeId, $productIds = null, $onlyVisible = true)
     {
-        /** @var $products \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $products */
         $products = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
 
         $products = $products
@@ -203,7 +203,7 @@ class ProductHelper
             ->addAttributeToSelect('special_from_date')
             ->addAttributeToSelect('special_to_date')
             ->addAttributeToSelect('visibility')
-            ->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+            ->addAttributeToFilter('status', ['=' => \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED]);
 
         $additionalAttr = $this->getAdditionalAttributes($storeId);
 
@@ -427,7 +427,7 @@ class ProductHelper
                     $groupId = (int) $group->getData('customer_group_id');
                     $specialPrices[$groupId] = [];
                     $specialPrices[$groupId][] = (double) $this->rule->getRulePrice(new \DateTime(), $store->getWebsiteId(), $groupId, $product->getId()); // The price with applied catalog rules
-                    $specialPrices[$groupId][] = (double) $product->getFinalPrice(); // The product's special price
+                    $specialPrices[$groupId][] = $product->getFinalPrice(); // The product's special price
 
                     $specialPrices[$groupId] = array_filter($specialPrices[$groupId], function ($price) {
                         return $price > 0;
@@ -449,12 +449,13 @@ class ProductHelper
                 }
 
                 if ($areCustomersGroupsEnabled) {
+                    /** @var \Magento\Customer\Model\Group $group */
                     foreach ($groups as $group) {
                         $groupId = (int) $group->getData('customer_group_id');
 
-                        $product->setCustomerGroupId($groupId);
+                        $product->setData('customer_group_id', $groupId);
 
-                        $discountedPrice = (double) $product->getPriceModel()->getFinalPrice(1, $product);
+                        $discountedPrice = $product->getPriceModel()->getFinalPrice(1, $product);
                         if ($currencyCode !== $baseCurrencyCode) {
                             $discountedPrice = $this->priceCurrency->convert($discountedPrice, $store, $currencyCode);
                         }
@@ -468,7 +469,7 @@ class ProductHelper
                         }
                     }
 
-                    $product->setCustomerGroupId(null);
+                    $product->setData('customer_group_id', null);
                 }
 
                 $customData[$field][$currencyCode]['special_from_date'] = strtotime($product->getSpecialFromDate());
@@ -496,8 +497,12 @@ class ProductHelper
                     $min = PHP_INT_MAX;
                     $max = 0;
 
+                    $dashedFormat = '';
+
                     if ($type == 'bundle') {
-                        list($min, $max) = $product->getPriceModel()->getTotalPrices($product, null, $withTax, true);
+                        /** @var \Magento\Bundle\Model\Product\Price $priceModel */
+                        $priceModel = $product->getPriceModel();
+                        list($min, $max) = $priceModel->getTotalPrices($product, null, $withTax, true);
                     }
 
                     if ($type == 'grouped' || $type == 'configurable') {
@@ -609,7 +614,7 @@ class ProductHelper
 
         $defaultData = $transport->getData();
 
-        $visibility = (int) $product->getVisibility();
+        $visibility = $product->getVisibility();
 
         $visibleInCatalog = $this->visibility->getVisibleInCatalogIds();
         $visibleInSearch = $this->visibility->getVisibleInSearchIds();
@@ -631,7 +636,7 @@ class ProductHelper
         $groups = null;
 
         if ($this->isAttributeEnabled($additionalAttributes, 'description')) {
-            $customData['description'] = $product->getDescription();
+            $customData['description'] = $product->getData('description');
         }
 
         $categories = [];
@@ -641,7 +646,10 @@ class ProductHelper
 
         if (is_array($_categoryIds) && count($_categoryIds) > 0) {
             $categoryCollection = $this->getAllCategories($_categoryIds);
-            $rootCat = $this->storeManager->getStore($product->getStoreId())->getRootCategoryId();
+
+            /** @var \Magento\Store\Model\Store $store */
+            $store = $this->storeManager->getStore($product->getStoreId());
+            $rootCat = $store->getRootCategoryId();
 
             foreach ($categoryCollection as $category) {
                 // Check and skip all categories that is not
@@ -725,15 +733,17 @@ class ProductHelper
             if ($type == 'bundle') {
                 $ids = [];
 
-                $selection = $product->getTypeInstance(true)->getSelectionsCollection($product->getTypeInstance(true)->getOptionsIds($product), $product);
+                /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
+                $typeInstance = $product->getTypeInstance();
 
+                $selection = $typeInstance->getSelectionsCollection($typeInstance->getOptionsIds($product), $product);
                 foreach ($selection as $option) {
                     $ids[] = $option->getProductId();
                 }
             }
 
             if ($type == 'configurable' || $type == 'grouped') {
-                $ids = $product->getTypeInstance(true)->getChildrenIds($product->getId());
+                $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
                 $ids = call_user_func_array('array_merge', $ids);
             }
 
@@ -749,11 +759,11 @@ class ProductHelper
 
         // skip default calculation if we have provided these attributes via the observer in $defaultData
         if (false === isset($defaultData['ordered_qty']) && $this->isAttributeEnabled($additionalAttributes, 'ordered_qty')) {
-            $customData['ordered_qty'] = (int) $product->getOrderedQty();
+            $customData['ordered_qty'] = (int) $product->getData('ordered_qty');
         }
 
         if (false === isset($defaultData['total_ordered']) && $this->isAttributeEnabled($additionalAttributes, 'total_ordered')) {
-            $customData['total_ordered'] = (int) $product->getTotalOrdered();
+            $customData['total_ordered'] = (int) $product->getData('total_ordered');
         }
 
         if (false === isset($defaultData['stock_qty']) && $this->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
@@ -766,7 +776,7 @@ class ProductHelper
         }
 
         if ($this->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
-            $customData['rating_summary'] = (int) $product->getRatingSummary();
+            $customData['rating_summary'] = (int) $product->getData('rating_summary');
         }
 
         foreach ($additionalAttributes as $attribute) {
@@ -776,10 +786,13 @@ class ProductHelper
 
             $value = $product->getData($attribute['attribute']);
 
-            $attributeResource = $product->getResource()->getAttribute($attribute['attribute']);
+            /** @var \Magento\Catalog\Model\ResourceModel\Product $resource */
+            $resource = $product->getResource();
 
+            /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attributeResource */
+            $attributeResource = $resource->getAttribute($attribute['attribute']);
             if ($attributeResource) {
-                $attributeResource = $attributeResource->setStoreId($product->getStoreId());
+                $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
 
                 if ($value === null) {
                     /* Get values as array in children */
@@ -788,9 +801,9 @@ class ProductHelper
 
                         $allProductsAreOutOfStock = true;
 
-                        /** @var Product $sub_product */
-                        foreach ($subProducts as $sub_product) {
-                            $isInStock = (int) $this->stockRegistry->getStockItem($sub_product->getId())->getIsInStock();
+                        /** @var Product $subProduct */
+                        foreach ($subProducts as $subProduct) {
+                            $isInStock = (int) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
 
                             if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($product->getStoreId()) == false) {
                                 continue;
@@ -798,10 +811,11 @@ class ProductHelper
 
                             $allProductsAreOutOfStock = false;
 
-                            $value = $sub_product->getData($attribute['attribute']);
+                            $value = $subProduct->getData($attribute['attribute']);
 
                             if ($value) {
-                                $valueText = $sub_product->getAttributeText($attribute['attribute']);
+                                /** @var string|array $valueText */
+                                $valueText = $subProduct->getAttributeText($attribute['attribute']);
 
                                 if ($valueText) {
                                     if (is_array($valueText)) {
@@ -812,7 +826,7 @@ class ProductHelper
                                         $values[] = $valueText;
                                     }
                                 } else {
-                                    $values[] = $attributeResource->getFrontend()->getValue($sub_product);
+                                    $values[] = $attributeResource->getFrontend()->getValue($subProduct);
                                 }
                             }
                         }
@@ -837,7 +851,7 @@ class ProductHelper
                     if ($valueText) {
                         $value = $valueText;
                     } else {
-                        $attributeResource = $attributeResource->setStoreId($product->getStoreId());
+                        $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
                         $value = $attributeResource->getFrontend()->getValue($product);
                     }
 
@@ -869,16 +883,16 @@ class ProductHelper
         return $customData;
     }
 
-    protected function addImageData(array $customData, $product, $additionalAttributes)
+    protected function addImageData(array $customData, Product $product, $additionalAttributes)
     {
-        if (false === isset($defaultData['thumbnail_url'])) {
+        if (false === isset($customData['thumbnail_url'])) {
             $customData['thumbnail_url'] = $this->imageHelper
                 ->init($product, 'thumbnail')
                 ->resize(75, 75)
                 ->getUrl();
         }
 
-        if (false === isset($defaultData['image_url'])) {
+        if (false === isset($customData['image_url'])) {
             $this->imageHelper
                 ->init($product, $this->configHelper->getImageType())
                 ->resize($this->configHelper->getImageWidth(), $this->configHelper->getImageHeight());
@@ -886,7 +900,7 @@ class ProductHelper
             $customData['image_url'] = $this->imageHelper->getUrl();
 
             if ($this->isAttributeEnabled($additionalAttributes, 'media_gallery')) {
-                $product->load('media_gallery');
+                $product->load($product->getId(), 'media_gallery');
 
                 $customData['media_gallery'] = [];
 

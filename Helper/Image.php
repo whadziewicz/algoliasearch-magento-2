@@ -12,6 +12,15 @@ class Image extends \Magento\Catalog\Helper\Image
     protected $logger;
     protected $options;
 
+    /**
+     * Image constructor.
+     * @param Context $context
+     * @param ImageFactory $productImageFactory
+     * @param Repository $assetRepo
+     * @param ConfigInterface $viewConfig
+     * @param Logger $logger
+     * @param array $options
+     */
     public function __construct(
         Context $context,
         ImageFactory $productImageFactory,

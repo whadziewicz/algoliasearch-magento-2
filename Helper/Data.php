@@ -28,6 +28,7 @@ class Data
     protected $pageHelper;
     protected $categoryHelper;
     protected $productHelper;
+    protected $suggestionHelper;
     protected $additionalSectionHelper;
     protected $stockRegistry;
 
@@ -439,7 +440,7 @@ class Data
 
             if ($product->isDeleted() === true
                 || $product->getStatus() == Status::STATUS_DISABLED
-                || !in_array((int) $product->getVisibility(), [Product\Visibility::VISIBILITY_BOTH, Product\Visibility::VISIBILITY_IN_SEARCH, Product\Visibility::VISIBILITY_IN_CATALOG], true)
+                || !in_array($product->getVisibility(), [Product\Visibility::VISIBILITY_BOTH, Product\Visibility::VISIBILITY_IN_SEARCH, Product\Visibility::VISIBILITY_IN_CATALOG])
             ) {
                 $productsToRemove[$productId] = $productId;
                 continue;

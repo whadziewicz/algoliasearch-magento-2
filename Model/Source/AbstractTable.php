@@ -37,6 +37,7 @@ abstract class AbstractTable extends AbstractFieldArray
     protected function getRenderer($columnId, $columnData)
     {
         if (!array_key_exists($columnId, $this->selectFields) || !$this->selectFields[$columnId]) {
+            /** @var \Algolia\AlgoliaSearch\Block\System\Form\Field\Select $select */
             $select = $this->getLayout()->createBlock('Algolia\AlgoliaSearch\Block\System\Form\Field\Select', '', ['data' => ['is_render_to_js_template' => true]]);
 
             $options = $columnData['values'];
@@ -46,7 +47,7 @@ abstract class AbstractTable extends AbstractFieldArray
             }
 
             $extraParams = $columnId === 'attribute' ? 'style="width:160px;"' : 'style="width:100px;"';
-            $select->setExtraParams($extraParams);
+            $select->setData('extra_params', $extraParams);
             $select->setOptions($options);
 
             $this->selectFields[$columnId] = $select;

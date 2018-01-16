@@ -33,6 +33,10 @@ class CategoryHelper
 
     private $isCategoryVisibleInMenuCache;
 
+    private $coreCategories;
+
+    private $idColumn;
+
     protected static $_activeCategories;
     protected static $_categoryNames;
 
@@ -109,7 +113,9 @@ class CategoryHelper
 
     public function getCategoryCollectionQuery($storeId, $categoryIds = null)
     {
-        $storeRootCategoryPath = sprintf('%d/%d', $this->getRootCategoryId(), $this->storeManager->getStore($storeId)->getRootCategoryId());
+        /** @var \Magento\Store\Model\Store $store */
+        $store = $this->storeManager->getStore($storeId);
+        $storeRootCategoryPath = sprintf('%d/%d', $this->getRootCategoryId(), $store->getRootCategoryId());
 
         /* @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
         $categories = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
@@ -165,7 +171,9 @@ class CategoryHelper
             $categoryAttributes = array_diff($categoryAttributes, $excludedAttributes);
 
             foreach ($categoryAttributes as $attributeCode) {
-                self::$_categoryAttributes[$attributeCode] = $this->eavConfig->getAttribute('catalog_category', $attributeCode)->getFrontendLabel();
+                /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute */
+                $attribute = $this->eavConfig->getAttribute('catalog_category', $attributeCode);
+                self::$_categoryAttributes[$attributeCode] = $attribute->getData('frontend_label');
             }
         }
 
@@ -174,6 +182,7 @@ class CategoryHelper
 
     public function getObject(Category $category)
     {
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
         $productCollection = $category->getProductCollection();
         $productCollection = $productCollection->addMinimalPrice();
 
@@ -184,7 +193,11 @@ class CategoryHelper
         $customData = $transport->getData();
 
         $storeId = $category->getStoreId();
-        $category->getUrlInstance()->setStore($storeId);
+
+        /** @var \Magento\Framework\Url $urlInstance */
+        $urlInstance = $category->getUrlInstance();
+        $urlInstance->setData('store', $storeId);
+
         $path = '';
         foreach ($category->getPathIds() as $categoryId) {
             if ($path != '') {
@@ -224,10 +237,12 @@ class CategoryHelper
         foreach ($this->configHelper->getCategoryAdditionalAttributes($storeId) as $attribute) {
             $value = $category->getData($attribute['attribute']);
 
-            $attribute_resource = $category->getResource()->getAttribute($attribute['attribute']);
+            /** @var \Magento\Catalog\Model\ResourceModel\Category $resource */
+            $resource = $category->getResource();
 
-            if ($attribute_resource) {
-                $value = $attribute_resource->getFrontend()->getValue($category);
+            $attributeResource = $resource->getAttribute($attribute['attribute']);
+            if ($attributeResource) {
+                $value = $attributeResource->getFrontend()->getValue($category);
             }
 
             if (isset($data[$attribute['attribute']])) {
@@ -251,10 +266,14 @@ class CategoryHelper
     public function getRootCategoryId()
     {
         if (-1 === self::$_rootCategoryId) {
+            /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
             $collection = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
             $collection->addFieldToFilter('parent_id', 0);
             $collection->getSelect()->limit(1);
+
+            /** @var \Magento\Catalog\Model\Category $rootCategory */
             $rootCategory = $collection->getFirstItem();
+
             self::$_rootCategoryId = $rootCategory->getId();
         }
 
@@ -453,7 +472,7 @@ class CategoryHelper
 
         $categoryId = (int) $categoryId;
 
-        /** @var Category $category */
+        /** @var \Magento\Catalog\Model\Category $category */
         $category = $this->objectManager->create('\Magento\Catalog\Model\Category');
         $category = $category->setStoreId($storeId)->load($categoryId);
 
@@ -475,6 +494,8 @@ class CategoryHelper
             ->addIsActiveFilter();
 
         $this->coreCategories = [];
+
+        /** @var \Magento\Catalog\Model\Category $category */
         foreach ($categoriesData as $category) {
             $this->coreCategories[$category->getId()] = $category;
         }

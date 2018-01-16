@@ -66,6 +66,17 @@ class Algolia extends Template implements CollectionDataSourceInterface
         parent::__construct($context, $data);
     }
 
+    /**
+     * @return \Magento\Store\Model\Store
+     */
+    public function getStore()
+    {
+        /** @var \Magento\Store\Model\Store $store */
+        $store = $this->_storeManager->getStore();
+
+        return $store;
+    }
+
     public function getConfigHelper()
     {
         return $this->config;
@@ -102,7 +113,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
     }
     public function getCurrencyCode()
     {
-        return $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        return $this->getStore()->getCurrentCurrencyCode();
     }
 
     public function getGroupId()
@@ -116,7 +127,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
             $groupId = $this->getGroupId();
             $currencyCode = $this->getCurrencyCode();
 
-            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
+            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->getStore()->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
         }
 
         return $this->priceKey;
@@ -124,7 +135,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
 
     public function getStoreId()
     {
-        return $this->_storeManager->getStore()->getStoreId();
+        return $this->getStore()->getStoreId();
     }
 
     public function getCurrentCategory()

@@ -232,7 +232,7 @@ class Algolia implements AdapterInterface
         return $connection->fetchAssoc($select);
     }
 
-    /** @return false|\Magento\Framework\DB\Adapter\AdapterInterface */
+    /** @return \Magento\Framework\DB\Adapter\AdapterInterface */
     private function getConnection()
     {
         return $this->resource->getConnection();

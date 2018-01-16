@@ -29,8 +29,12 @@ class Hit extends Template
     {
         if ($this->priceKey === null) {
             $groupId = $this->getGroupId();
-            $currencyCode = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-            $this->priceKey = $this->config->isCustomerGroupsEnabled($this->_storeManager->getStore()->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
+
+            /** @var \Magento\Store\Model\Store $store */
+            $store = $this->_storeManager->getStore();
+
+            $currencyCode = $store->getCurrentCurrencyCode();
+            $this->priceKey = $this->config->isCustomerGroupsEnabled($store->getStoreId()) ? '.' . $currencyCode . '.group_' . $groupId : '.' . $currencyCode . '.default';
         }
 
         return $this->priceKey;

@@ -1136,10 +1136,6 @@ a.ais-current-refined-values--link:hover
 ** GRID
 */
 
-.algolia-search-block {
-	clear: both;
-}
-
 #algolia_instant_selector, #algolia_instant_selector *,
 #search_mini_form, #search_mini_form * {
   -webkit-box-sizing: border-box;
@@ -1217,6 +1213,10 @@ a.ais-current-refined-values--link:hover
   #algolia_instant_selector .hidden-xs {
     display: none!important
   }
+  
+  .algolia-search-block {
+    clear: both;
+  }
 }
 
 @media (max-width: 992px) {
@@ -1229,8 +1229,7 @@ a.ais-current-refined-values--link:hover
   }
 }
 
-.algolia-clearfix
-{
+.algolia-clearfix {
   clear: both;
 }
 

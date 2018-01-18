@@ -463,6 +463,7 @@ class ProductHelper
                         if ($discountedPrice !== false) {
                             $customData[$field][$currencyCode]['group_' . $groupId] = (double) $this->catalogHelper->getTaxPrice($product, $discountedPrice, $withTax, null, null, null, $product->getStore(), null);
                             $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $this->priceCurrency->format($customData[$field][$currencyCode]['group_' . $groupId], false, PriceCurrencyInterface::DEFAULT_PRECISION, $store, $currencyCode);
+                            $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $customData[$field][$currencyCode]['default_formated'];
                         } else {
                             $customData[$field][$currencyCode]['group_' . $groupId] = $customData[$field][$currencyCode]['default'];
                             $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $customData[$field][$currencyCode]['default_formated'];
@@ -482,6 +483,7 @@ class ProductHelper
                         if ($specialPrice[$groupId] && $specialPrice[$groupId] < $customData[$field][$currencyCode]['group_' . $groupId]) {
                             $customData[$field][$currencyCode]['group_' . $groupId] = $specialPrice[$groupId];
                             $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $this->priceCurrency->format($specialPrice[$groupId], false, PriceCurrencyInterface::DEFAULT_PRECISION, $store, $currencyCode);
+                            $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $customData[$field][$currencyCode]['default_formated'];
                         }
                     }
                 } else {
@@ -925,4 +927,3 @@ class ProductHelper
         return array_map('trim', explode(',', $synonyms));
     }
 }
-

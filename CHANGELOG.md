@@ -1,5 +1,36 @@
 # CHANGE LOG
 
+## 1.5.0
+
+### FEATURES
+- Added option to index empty categories (#382)
+- Travis CI now correctly runs builds from community pull requests (#383, #384)
+- **BC Break** - Instant search page is now powered by InstantSearch.js v2 (#394)
+    - Migration guide: https://community.algolia.com/instantsearch.js/v2/guides/migration.html
+    - Magnifier glass and reset search icons are now added directly by ISv2 - old were removed
+    - Some template variables were changed (see migration guide)
+    - CSS for slider was refactored
+- The extension code is checked by [PHPStan](https://github.com/phpstan/phpstan) (#396)
+
+### UPDATES
+- Products' and categories' collections now uses `distinct` to fetch only unique records (#371)
+- SKUs, names and descriptions are not casted from string to numeric types (#375)
+- Configurable product is hidden from search when all its variants are out of stock and out of stock products shouldn't be displayed (#378)
+- Stock Qty is not fetched with inner query in collection, but with StockRegistry (#386)
+- Indexing jobs for disabled stores are not added to queue anymore (#392)
+- **BC Break** - `BaseHelper` class was completely removed (#388, #390)
+    - Entity helpers are not dependent on any base class
+    - Indexer names can be get from `Data` helper now
+
+### FIXES
+- Query suggestions are correctly escaped when displayed (#373)
+- Fixed error when `in_stock` comes from `$defaultData` (#374)
+- Grouped products now correctly display price ranges (#377)
+- The extension now correctly deletes out of stock products from Algolia (#381)
+- **BC Break** - Fixed fetching of group ID on frontend (#365)
+- Original prices is now displayed correctly with customer groups enabled (#391, #398, #399)
+- Cart icon is now clickable on mobile devices (#395, #397)
+
 ## 1.4.0
 
 ### FEATURES

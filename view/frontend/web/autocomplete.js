@@ -111,12 +111,19 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			var dropdown = data.dropdown;
 			var suggestionClass = '.' + dropdown.cssClasses.prefix + dropdown.cssClasses.suggestion;
 			
-			dropdown.$menu.on('touchstart', suggestionClass, function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				
-				var url = $(this).find('a').attr('href');
-				location.assign(url);
+			var touchmoved;
+			dropdown.$menu.on('touchend', suggestionClass, function (e) {
+				if(touchmoved === false) {
+					e.preventDefault();
+					e.stopPropagation();
+					
+					var url = $(this).find('a').attr('href');
+					location.assign(url);
+				}
+			}).on('touchmove', function (){
+				touchmoved = true;
+			}).on('touchstart', function(){
+				touchmoved = false;
 			});
 		});
 	});

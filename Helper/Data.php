@@ -741,6 +741,30 @@ class Data
         return $salesData;
     }
 
+    public function deleteInactiveProducts($storeId)
+    {
+        $indexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
+        $index = $this->algoliaHelper->getIndex($indexName);
+
+        $objectIds = array();
+        $counter = 0;
+        foreach ($index->browse('', array('attributesToRetrieve' => array('objectID'))) as $hit) {
+            $objectIds[] = $hit['objectID'];
+            $counter++;
+
+            if ($counter === 1000) {
+                $this->deleteInactiveIds($storeId, $objectIds, $indexName);
+
+                $objectIds = array();
+                $counter = 0;
+            }
+        }
+
+        if (!empty($objectIds)) {
+            $this->deleteInactiveIds($storeId, $objectIds, $indexName);
+        }
+    }
+
     public function getIndexName($indexSuffix, $storeId = null, $tmp = false)
     {
         return $this->getBaseIndexName($storeId) . $indexSuffix . ($tmp ? '_tmp' : '');
@@ -749,5 +773,16 @@ class Data
     public function getBaseIndexName($storeId = null)
     {
         return $this->configHelper->getIndexPrefix($storeId) . $this->storeManager->getStore($storeId)->getCode();
+    }
+
+    private function deleteInactiveIds($storeId, $objectIds, $indexName)
+    {
+        $collection = $this->productHelper->getProductCollectionQuery($storeId, $objectIds);
+        $dbIds = $collection->getAllIds();
+
+        $collection = null;
+
+        $idsToDeleteFromAlgolia = array_diff($objectIds, $dbIds);
+        $this->algoliaHelper->deleteObjects($idsToDeleteFromAlgolia, $indexName);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-/**
- * @var \Algolia\AlgoliaSearch\Block\Instant\Hit $block
- */
+/** @var \Algolia\AlgoliaSearch\Block\Instant\Hit $block */
 
 $priceKey = $block->getPriceKey();
+
+$origFormatedVar = 'price' . $priceKey . '_original_formated';
 
 ?>
 
@@ -27,7 +27,9 @@ $priceKey = $block->getPriceKey();
                                     <div class="rating-summary">
                                         <span class="label"><span>Rating:</span></span>
                                         <div class="rating-result" title="{{rating_summary}}%">
-                                            <span style="width:{{rating_summary}}%"><span>{{rating_summary}}%</span></span>
+                                            <span style="width:{{rating_summary}}%">
+                                                <span>{{rating_summary}}%</span>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -35,15 +37,18 @@ $priceKey = $block->getPriceKey();
                                 <div class="price">
                                     <div class="price-wrapper">
                                         <div>
-                                            <span class="after_special {{#price<?php echo $priceKey; ?>_original_formated}}promotion{{/price<?php echo $priceKey; ?>_original_formated}}">
-                                                {{price<?php echo $priceKey; ?>_formated}}
+                                            <span class="after_special
+                                                    {{#<?php echo $block->escapeHtml($origFormatedVar); ?>}}
+                                                        promotion
+                                                    {{/<?php echo $block->escapeHtml($origFormatedVar); ?>}}">
+                                                {{price<?php echo $block->escapeHtml($priceKey); ?>_formated}}
                                             </span>
 
-                                            {{#price<?php echo $priceKey; ?>_original_formated}}
+                                            {{#<?php echo $block->escapeHtml($origFormatedVar); ?>}}
                                                 <span class="before_special">
-                                                    {{price<?php echo $priceKey; ?>_original_formated}}
+                                                    {{<?php echo $block->escapeHtml($origFormatedVar); ?>}}
                                                 </span>
-                                            {{/price<?php echo $priceKey; ?>_original_formated}}
+                                            {{/<?php echo $block->escapeHtml($origFormatedVar); ?>}}
                                         </div>
                                     </div>
                                 </div>

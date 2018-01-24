@@ -35,6 +35,10 @@ class Facets extends AbstractTable
             'label' => [
                 'label' => 'Label',
             ],
+            'searchable' => [
+                'label'  => 'Searchable?',
+                'values' => ['1' => 'Yes', '2' => 'No'],
+            ],
         ];
     }
 }

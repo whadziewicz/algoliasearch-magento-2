@@ -299,7 +299,12 @@ class ProductHelper
                     $attributesForFaceting[] = $facet['attribute'];
                 }
             } else {
-                $attributesForFaceting[] = $facet['attribute'];
+                $attribute = $facet['attribute'];
+                if (array_key_exists('searchable', $facet) && $facet['searchable'] === '1') {
+                    $attribute = 'searchable('.$attribute.')';
+                }
+
+                $attributesForFaceting[] = $attribute;
             }
         }
 

@@ -28,6 +28,8 @@ class ConfigTest extends TestCase
                     $attributesMatched++;
                 } elseif ($facet['attribute'] === $indexFacet) {
                     $attributesMatched++;
+                } elseif ($facet['attribute'] === 'color' && 'searchable(color)' === $indexFacet) {
+                    $attributesMatched++;
                 }
             }
         }

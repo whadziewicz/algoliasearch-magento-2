@@ -5,7 +5,6 @@
     if ($block->getConfigHelper()->isInstantEnabled() && $block->isSearchPage() === true) :
         $css = '<style type="text/css">'.$block->getConfigHelper()->getInstantSelector().' {display:none}</style>';
     ?>
-
         // Hide the instant-search selector ASAP to remove flickering. Will be re-displayed later with JS.
         document.write('<?php /* @noEscape */ echo $css; ?>');
     <?php

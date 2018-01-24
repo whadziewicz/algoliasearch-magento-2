@@ -89,16 +89,19 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'attribute' => 'price',
                 'type' => 'slider',
                 'label' => 'Price',
+                'searchable' => '2',
             ],
             [
                 'attribute' => 'categories',
                 'type' => 'conjunctive',
                 'label' => 'Categories',
+                'searchable' => '2',
             ],
             [
                 'attribute' => 'color',
                 'type' => 'disjunctive',
                 'label' => 'Colors',
+                'searchable' => '1',
             ],
         ],
         'algoliasearch_instant/instant/sorts' => [

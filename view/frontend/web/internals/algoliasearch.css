@@ -199,9 +199,42 @@ a.ais-current-refined-values--link:hover {
 .ais-hierarchical-menu--link:hover {
   color: #636363;
 }
+
 .ais-menu--count, .ais-hierarchical-menu--count, .ais-refinement-list--count {
   float: right;
   color: #666;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sbx-sffv__wrapper {
+  width: 94%;
+  margin: 0 auto 5px;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sbx-sffv__submit {
+  display: none;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sbx-sffv__reset {
+  width: 10px;
+  margin-top: -30px;
+  margin-right: 7px;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sbx-sffv__reset:hover {
+  background: none;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sbx-sffv__reset svg {
+  width: 15px;
+  height: 15px;
+  fill: #636363;
+}
+
+#algolia_instant_selector .ais-refinement-list--list .sffv-no-results {
+  padding-left: 3%;
 }
 
 /** RANGE SLIDER */

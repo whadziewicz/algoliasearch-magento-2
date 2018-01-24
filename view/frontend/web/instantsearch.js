@@ -351,7 +351,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 			
 			if (facet.type === 'conjunctive') {
-				return ['refinementList', {
+				var refinementListOptions = {
 					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					limit: algoliaConfig.maxValuesPerFacet,
@@ -361,11 +361,15 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					cssClasses: {
 						root: 'facet conjunctive'
 					}
-				}];
+				};
+				
+				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
+				
+				return ['refinementList', refinementListOptions];
 			}
 			
 			if (facet.type === 'disjunctive') {
-				return ['refinementList', {
+				var refinementListOptions = {
 					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributeName: facet.attribute,
 					limit: algoliaConfig.maxValuesPerFacet,
@@ -375,7 +379,11 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					cssClasses: {
 						root: 'facet disjunctive'
 					}
-				}];
+				};
+				
+				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
+				
+				return ['refinementList', refinementListOptions];
 			}
 			
 			if (facet.type === 'slider') {
@@ -503,5 +511,18 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		}
 		
 		search.addWidget(algoliaBundle.instantsearch.widgets[type](config));
+	}
+	
+	function addSearchForFacetValues(facet, options) {
+		if (facet.searchable === '1') {
+			options['searchForFacetValues'] = {
+				placeholder: algoliaConfig.translations.searchForFacetValuesPlaceholder,
+				templates: {
+					noResults: '<div class="sffv-no-results">' + algoliaConfig.translations.noResults + '</div>'
+				}
+			};
+		}
+		
+		return options;
 	}
 });

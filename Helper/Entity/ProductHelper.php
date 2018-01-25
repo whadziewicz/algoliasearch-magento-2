@@ -4,9 +4,12 @@ namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use Algolia\AlgoliaSearch\Helper\Image;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Customer\Model\Group;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Store\Model\Store;
 use Magento\Tax\Model\Config as TaxConfig;
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
@@ -249,76 +252,14 @@ class ProductHelper
 
     public function setSettings($indexName, $indexNameTmp, $storeId, $saveToTmpIndicesToo = false)
     {
-        $searchableAttributes = [];
-        $unretrievableAttributes = [];
-        $attributesForFaceting = [];
-
-        foreach ($this->getAdditionalAttributes() as $attribute) {
-            if ($attribute['searchable'] == '1') {
-                if (!isset($attribute['order']) || $attribute['order'] == 'ordered') {
-                    $searchableAttributes[] = $attribute['attribute'];
-                } else {
-                    $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
-                }
-            }
-
-            if ($attribute['retrievable'] != '1') {
-                $unretrievableAttributes[] = $attribute['attribute'];
-            }
-
-            if ($attribute['attribute'] == 'categories') {
-                $searchableAttributes[] = (isset($attribute['order']) && $attribute['order'] == 'ordered') ?
-                    'categories_without_path' : 'unordered(categories_without_path)';
-            }
-        }
-
-        $customRankings = $this->configHelper->getProductCustomRanking($storeId);
-
-        $customRankingsArr = [];
-
-        $facets = $this->configHelper->getFacets();
-
-        $currencies = $this->currencyManager->getConfigAllowCurrencies();
-
-        foreach ($facets as $facet) {
-            if ($facet['attribute'] === 'price') {
-                foreach ($currencies as $currency_code) {
-                    $facet['attribute'] = 'price.' . $currency_code . '.default';
-
-                    if ($this->configHelper->isCustomerGroupsEnabled($storeId)) {
-                        $groupCollection = $this->objectManager
-                            ->create('Magento\Customer\Model\ResourceModel\Group\Collection');
-
-                        foreach ($groupCollection as $group) {
-                            $group_id = (int) $group->getData('customer_group_id');
-
-                            $attributesForFaceting[] = 'price.' . $currency_code . '.group_' . $group_id;
-                        }
-                    }
-
-                    $attributesForFaceting[] = $facet['attribute'];
-                }
-            } else {
-                $attribute = $facet['attribute'];
-                if (array_key_exists('searchable', $facet) && $facet['searchable'] === '1') {
-                    $attribute = 'searchable('.$attribute.')';
-                }
-
-                $attributesForFaceting[] = $attribute;
-            }
-        }
-
-        foreach ($customRankings as $ranking) {
-            $customRankingsArr[] = $ranking['order'] . '(' . $ranking['attribute'] . ')';
-        }
-
-        if ($this->configHelper->replaceCategories($storeId) && !in_array('categories', $attributesForFaceting, true)) {
-            $attributesForFaceting[] = 'categories';
-        }
+        $searchableAttributes = $this->getSearchableAttributes();
+        $customRanking = $this->getCustomRanking($storeId);
+        $unretrievableAttributes = $this->getUnretrieveableAttributes();
+        $attributesForFaceting = $this->getAttributesForFaceting($storeId);
 
         $indexSettings = [
-            'searchableAttributes'    => array_values(array_unique($searchableAttributes)),
-            'customRanking'           => $customRankingsArr,
+            'searchableAttributes'    => $searchableAttributes,
+            'customRanking'           => $customRanking,
             'unretrievableAttributes' => $unretrievableAttributes,
             'attributesForFaceting'   => $attributesForFaceting,
             'maxValuesPerFacet'       => (int) $this->configHelper->getMaxValuesPerFacet($storeId),
@@ -454,271 +395,438 @@ class ProductHelper
                     $currencyCode
                 );
 
-                $specialPrices   = [];
-                $specialPrice    = [];
-                foreach ($groups as $group) {
-                    $groupId = (int) $group->getData('customer_group_id');
-                    $specialPrices[$groupId] = [];
-                    $specialPrices[$groupId][] = (double) $this->rule->getRulePrice(
-                        new \DateTime(),
-                        $store->getWebsiteId(),
-                        $groupId,
-                        $product->getId()
-                    ); // The price with applied catalog rules
-                    $specialPrices[$groupId][] = $product->getFinalPrice(); // The product's special price
-
-                    $specialPrices[$groupId] = array_filter($specialPrices[$groupId], function ($price) {
-                        return $price > 0;
-                    });
-
-                    $specialPrice[$groupId] = false;
-                    if (!empty($specialPrices[$groupId])) {
-                        $specialPrice[$groupId] = min($specialPrices[$groupId]);
-                    }
-
-                    if ($specialPrice[$groupId]) {
-                        if ($currencyCode !== $baseCurrencyCode) {
-                            $specialPrice[$groupId] = $this->priceCurrency->convert(
-                                $specialPrice[$groupId],
-                                $store,
-                                $currencyCode
-                            );
-                            $specialPrice[$groupId] = $this->priceCurrency->round($specialPrice[$groupId]);
-                        }
-
-                        $specialPrice[$groupId] = (double) $this->catalogHelper->getTaxPrice(
-                            $product,
-                            $specialPrice[$groupId],
-                            $withTax,
-                            null,
-                            null,
-                            null,
-                            $product->getStore(),
-                            null
-                        );
-                    }
-                }
+                $specialPrice = $this->getSpecialPrice(
+                    $groups,
+                    $store,
+                    $product,
+                    $currencyCode,
+                    $baseCurrencyCode,
+                    $withTax
+                );
 
                 if ($areCustomersGroupsEnabled) {
-                    /** @var \Magento\Customer\Model\Group $group */
-                    foreach ($groups as $group) {
-                        $groupId = (int) $group->getData('customer_group_id');
-
-                        $product->setData('customer_group_id', $groupId);
-
-                        $discountedPrice = $product->getPriceModel()->getFinalPrice(1, $product);
-                        if ($currencyCode !== $baseCurrencyCode) {
-                            $discountedPrice = $this->priceCurrency->convert($discountedPrice, $store, $currencyCode);
-                        }
-
-                        if ($discountedPrice !== false) {
-                            $taxPrice = (double) $this->catalogHelper->getTaxPrice(
-                                $product,
-                                $discountedPrice,
-                                $withTax,
-                                null,
-                                null,
-                                null,
-                                $product->getStore(),
-                                null
-                            );
-
-                            $customData[$field][$currencyCode]['group_' . $groupId] = $taxPrice;
-
-                            $formated = $this->priceCurrency->format(
-                                $customData[$field][$currencyCode]['group_' . $groupId],
-                                false,
-                                PriceCurrencyInterface::DEFAULT_PRECISION,
-                                $store,
-                                $currencyCode
-                            );
-                            $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $formated;
-
-                            if ($customData[$field][$currencyCode]['default'] >
-                                $customData[$field][$currencyCode]['group_' . $groupId]) {
-                                $original = $customData[$field][$currencyCode]['default_formated'];
-                                $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $original;
-                            }
-                        } else {
-                            $default = $customData[$field][$currencyCode]['default'];
-                            $customData[$field][$currencyCode]['group_' . $groupId] = $default;
-
-                            $defaultFormated = $customData[$field][$currencyCode]['default_formated'];
-                            $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $defaultFormated;
-                        }
-                    }
-
-                    $product->setData('customer_group_id', null);
+                    $customData = $this->addCustomerGroupsPrices(
+                        $customData,
+                        $groups,
+                        $product,
+                        $store,
+                        $currencyCode,
+                        $baseCurrencyCode,
+                        $withTax,
+                        $field
+                    );
                 }
 
                 $customData[$field][$currencyCode]['special_from_date'] = strtotime($product->getSpecialFromDate());
                 $customData[$field][$currencyCode]['special_to_date'] = strtotime($product->getSpecialToDate());
 
-                if ($areCustomersGroupsEnabled) {
-                    foreach ($groups as $group) {
-                        $groupId = (int) $group->getData('customer_group_id');
-
-                        if ($specialPrice[$groupId]
-                            && $specialPrice[$groupId] < $customData[$field][$currencyCode]['group_' . $groupId]) {
-                            $customData[$field][$currencyCode]['group_' . $groupId] = $specialPrice[$groupId];
-
-                            $formated = $this->priceCurrency->format(
-                                $specialPrice[$groupId],
-                                false,
-                                PriceCurrencyInterface::DEFAULT_PRECISION,
-                                $store,
-                                $currencyCode
-                            );
-                            $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $formated;
-
-                            if ($customData[$field][$currencyCode]['default'] >
-                                $customData[$field][$currencyCode]['group_' . $groupId]) {
-                                $original = $customData[$field][$currencyCode]['default_formated'];
-                                $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $original;
-                            }
-                        }
-                    }
-                } else {
-                    if ($specialPrice[0] && $specialPrice[0] < $customData[$field][$currencyCode]['default']) {
-                        $defaultOriginalFormated = $customData[$field][$currencyCode]['default_formated'];
-                        $customData[$field][$currencyCode]['default_original_formated'] = $defaultOriginalFormated;
-
-                        $defaultFormated = $this->priceCurrency->format(
-                            $specialPrice[0],
-                            false,
-                            PriceCurrencyInterface::DEFAULT_PRECISION,
-                            $store,
-                            $currencyCode
-                        );
-                        $customData[$field][$currencyCode]['default'] = $this->priceCurrency->round($specialPrice[0]);
-                        $customData[$field][$currencyCode]['default_formated'] = $defaultFormated;
-                    }
-                }
+                $customData = $this->addSpecialPrices(
+                    $customData,
+                    $areCustomersGroupsEnabled,
+                    $groups,
+                    $specialPrice,
+                    $field,
+                    $currencyCode,
+                    $store
+                );
 
                 if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
-                    $min = PHP_INT_MAX;
-                    $max = 0;
+                    list($min, $max) = $this->getMinMaxPrices(
+                        $product,
+                        $withTax,
+                        $subProducts,
+                        $currencyCode,
+                        $baseCurrencyCode,
+                        $store
+                    );
 
-                    $dashedFormat = '';
-
-                    if ($type == 'bundle') {
-                        /** @var \Magento\Bundle\Model\Product\Price $priceModel */
-                        $priceModel = $product->getPriceModel();
-                        list($min, $max) = $priceModel->getTotalPrices($product, null, $withTax, true);
-                    }
-
-                    if ($type == 'grouped' || $type == 'configurable') {
-                        if (count($subProducts) > 0) {
-                            /** @var Product $subProduct */
-                            foreach ($subProducts as $subProduct) {
-                                $price = (double) $this->catalogHelper->getTaxPrice(
-                                    $product,
-                                    $subProduct->getFinalPrice(),
-                                    $withTax,
-                                    null,
-                                    null,
-                                    null,
-                                    $product->getStore(),
-                                    null
-                                );
-
-                                $min = min($min, $price);
-                                $max = max($max, $price);
-                            }
-                        } else {
-                            $min = $max;
-                        }
-                    }
+                    $dashedFormat = $this->getDashedPriceFormat($min, $max, $store, $currencyCode);
 
                     if ($min != $max) {
-                        if ($currencyCode !== $baseCurrencyCode) {
-                            $min = $this->priceCurrency->convert($min, $store, $currencyCode);
-                        }
-
-                        if ($currencyCode !== $baseCurrencyCode) {
-                            $max = $this->priceCurrency->convert($max, $store, $currencyCode);
-                        }
-
-                        $dashedFormat =
-                            $this->priceCurrency->format(
-                                $min,
-                                false,
-                                PriceCurrencyInterface::DEFAULT_PRECISION,
-                                $store,
-                                $currencyCode
-                            )
-                            . ' - ' .
-                            $this->priceCurrency->format(
-                                $max,
-                                false,
-                                PriceCurrencyInterface::DEFAULT_PRECISION,
-                                $store,
-                                $currencyCode
-                            );
-
-                        if (isset($customData[$field][$currencyCode]['default_original_formated']) === false
-                            || $min <= $customData[$field][$currencyCode]['default']) {
-                            $customData[$field][$currencyCode]['default_formated'] = $dashedFormat;
-
-                            //// Do not keep special price that is already taken into account in min max
-                            unset($customData['price']['special_from_date']);
-                            unset($customData['price']['special_to_date']);
-                            unset($customData['price']['default_original_formated']);
-
-                            $customData[$field][$currencyCode]['default'] = 0; // will be reset just after
-                        }
-
-                        if ($areCustomersGroupsEnabled) {
-                            foreach ($groups as $group) {
-                                $groupId = (int) $group->getData('customer_group_id');
-
-                                if ($min != $max && $min <= $customData[$field][$currencyCode]['group_' . $groupId]) {
-                                    $customData[$field][$currencyCode]['group_'.$groupId] = 0;
-                                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $dashedFormat;
-                                }
-                            }
-                        }
+                        $customData = $this->handleNonEqualMinMaxPrices(
+                            $customData,
+                            $field,
+                            $currencyCode,
+                            $min,
+                            $max,
+                            $dashedFormat,
+                            $areCustomersGroupsEnabled,
+                            $groups
+                        );
                     }
 
                     if ($customData[$field][$currencyCode]['default'] == 0) {
-                        $customData[$field][$currencyCode]['default'] = $min;
-
-                        if ($min === $max) {
-                            if ($currencyCode !== $baseCurrencyCode) {
-                                $min = $this->priceCurrency->convert($min, $store, $currencyCode);
-                            }
-
-                            $minFormated = $this->priceCurrency->format(
-                                $min,
-                                false,
-                                PriceCurrencyInterface::DEFAULT_PRECISION,
-                                $store,
-                                $currencyCode
-                            );
-                            $customData[$field][$currencyCode]['default'] = $min;
-                            $customData[$field][$currencyCode]['default_formated'] = $minFormated;
-                        }
+                        $customData = $this->handleZeroDefaultPrice(
+                            $customData,
+                            $field,
+                            $currencyCode,
+                            $baseCurrencyCode,
+                            $min,
+                            $max,
+                            $store
+                        );
                     }
 
                     if ($areCustomersGroupsEnabled) {
-                        foreach ($groups as $group) {
-                            $groupId = (int) $group->getData('customer_group_id');
-
-                            if ($customData[$field][$currencyCode]['group_' . $groupId] == 0) {
-                                $customData[$field][$currencyCode]['group_' . $groupId] = $min;
-
-                                if ($min === $max) {
-                                    $default = $customData[$field][$currencyCode]['default_formated'];
-                                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $default;
-                                } else {
-                                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $dashedFormat;
-                                }
-                            }
-                        }
+                        $customData = $this->setFinalGroupPrices(
+                            $customData,
+                            $groups,
+                            $field,
+                            $currencyCode,
+                            $min,
+                            $max,
+                            $dashedFormat
+                        );
                     }
                 }
             }
         }
+    }
+
+    private function getSpecialPrice(
+        $groups,
+        Store $store,
+        Product $product,
+        $currencyCode,
+        $baseCurrencyCode,
+        $withTax
+    ) {
+        $specialPrice = [];
+
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            $groupId = (int) $group->getData('customer_group_id');
+            $specialPrices[$groupId] = [];
+            $specialPrices[$groupId][] = (double) $this->rule->getRulePrice(
+                new \DateTime(),
+                $store->getWebsiteId(),
+                $groupId,
+                $product->getId()
+            ); // The price with applied catalog rules
+            $specialPrices[$groupId][] = $product->getFinalPrice(); // The product's special price
+
+            $specialPrices[$groupId] = array_filter($specialPrices[$groupId], function ($price) {
+                return $price > 0;
+            });
+
+            $specialPrice[$groupId] = false;
+            if (!empty($specialPrices[$groupId])) {
+                $specialPrice[$groupId] = min($specialPrices[$groupId]);
+            }
+
+            if ($specialPrice[$groupId]) {
+                if ($currencyCode !== $baseCurrencyCode) {
+                    $specialPrice[$groupId] = $this->priceCurrency->convert(
+                        $specialPrice[$groupId],
+                        $store,
+                        $currencyCode
+                    );
+                    $specialPrice[$groupId] = $this->priceCurrency->round($specialPrice[$groupId]);
+                }
+
+                $specialPrice[$groupId] = (double) $this->catalogHelper->getTaxPrice(
+                    $product,
+                    $specialPrice[$groupId],
+                    $withTax,
+                    null,
+                    null,
+                    null,
+                    $product->getStore(),
+                    null
+                );
+            }
+        }
+
+        return $specialPrice;
+    }
+
+    private function addCustomerGroupsPrices(
+        $customData,
+        $groups,
+        Product $product,
+        Store $store,
+        $currencyCode,
+        $baseCurrencyCode,
+        $withTax,
+        $field
+    ) {
+        /** @var \Magento\Customer\Model\Group $group */
+        foreach ($groups as $group) {
+            $groupId = (int) $group->getData('customer_group_id');
+
+            $product->setData('customer_group_id', $groupId);
+
+            $discountedPrice = $product->getPriceModel()->getFinalPrice(1, $product);
+            if ($currencyCode !== $baseCurrencyCode) {
+                $discountedPrice = $this->priceCurrency->convert($discountedPrice, $store, $currencyCode);
+            }
+
+            if ($discountedPrice !== false) {
+                $taxPrice = (double) $this->catalogHelper->getTaxPrice(
+                    $product,
+                    $discountedPrice,
+                    $withTax,
+                    null,
+                    null,
+                    null,
+                    $product->getStore(),
+                    null
+                );
+
+                $customData[$field][$currencyCode]['group_' . $groupId] = $taxPrice;
+
+                $formated = $this->priceCurrency->format(
+                    $customData[$field][$currencyCode]['group_' . $groupId],
+                    false,
+                    PriceCurrencyInterface::DEFAULT_PRECISION,
+                    $store,
+                    $currencyCode
+                );
+                $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $formated;
+
+                if ($customData[$field][$currencyCode]['default'] >
+                    $customData[$field][$currencyCode]['group_' . $groupId]) {
+                    $original = $customData[$field][$currencyCode]['default_formated'];
+                    $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $original;
+                }
+            } else {
+                $default = $customData[$field][$currencyCode]['default'];
+                $customData[$field][$currencyCode]['group_' . $groupId] = $default;
+
+                $defaultFormated = $customData[$field][$currencyCode]['default_formated'];
+                $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $defaultFormated;
+            }
+        }
+
+        $product->setData('customer_group_id', null);
+
+        return $customData;
+    }
+
+    private function addSpecialPrices(
+        $customData,
+        $areCustomersGroupsEnabled,
+        $groups,
+        $specialPrice,
+        $field,
+        $currencyCode,
+        Store $store
+    ) {
+        if ($areCustomersGroupsEnabled) {
+            /** @var \Magento\Customer\Model\Group $group */
+            foreach ($groups as $group) {
+                $groupId = (int) $group->getData('customer_group_id');
+
+                if ($specialPrice[$groupId]
+                    && $specialPrice[$groupId] < $customData[$field][$currencyCode]['group_' . $groupId]) {
+                    $customData[$field][$currencyCode]['group_' . $groupId] = $specialPrice[$groupId];
+
+                    $formated = $this->priceCurrency->format(
+                        $specialPrice[$groupId],
+                        false,
+                        PriceCurrencyInterface::DEFAULT_PRECISION,
+                        $store,
+                        $currencyCode
+                    );
+                    $customData[$field][$currencyCode]['group_' . $groupId . '_formated'] = $formated;
+
+                    if ($customData[$field][$currencyCode]['default'] >
+                        $customData[$field][$currencyCode]['group_' . $groupId]) {
+                        $original = $customData[$field][$currencyCode]['default_formated'];
+                        $customData[$field][$currencyCode]['group_'.$groupId.'_original_formated'] = $original;
+                    }
+                }
+            }
+
+            return $customData;
+        }
+
+        if ($specialPrice[0] && $specialPrice[0] < $customData[$field][$currencyCode]['default']) {
+            $defaultOriginalFormated = $customData[$field][$currencyCode]['default_formated'];
+            $customData[$field][$currencyCode]['default_original_formated'] = $defaultOriginalFormated;
+
+            $defaultFormated = $this->priceCurrency->format(
+                $specialPrice[0],
+                false,
+                PriceCurrencyInterface::DEFAULT_PRECISION,
+                $store,
+                $currencyCode
+            );
+
+            $customData[$field][$currencyCode]['default'] = $this->priceCurrency->round($specialPrice[0]);
+            $customData[$field][$currencyCode]['default_formated'] = $defaultFormated;
+        }
+
+        return $customData;
+    }
+
+    private function getMinMaxPrices(
+        Product $product,
+        $withTax,
+        $subProducts,
+        $currencyCode,
+        $baseCurrencyCode,
+        Store $store
+    ) {
+        $type = $product->getTypeId();
+
+        $min = PHP_INT_MAX;
+        $max = 0;
+
+        if ($type == 'bundle') {
+            /** @var \Magento\Bundle\Model\Product\Price $priceModel */
+            $priceModel = $product->getPriceModel();
+            list($min, $max) = $priceModel->getTotalPrices($product, null, $withTax, true);
+        }
+
+        if ($type == 'grouped' || $type == 'configurable') {
+            if (count($subProducts) > 0) {
+                /** @var Product $subProduct */
+                foreach ($subProducts as $subProduct) {
+                    $price = (double) $this->catalogHelper->getTaxPrice(
+                        $product,
+                        $subProduct->getFinalPrice(),
+                        $withTax,
+                        null,
+                        null,
+                        null,
+                        $product->getStore(),
+                        null
+                    );
+
+                    $min = min($min, $price);
+                    $max = max($max, $price);
+                }
+            } else {
+                $min = $max;
+            }
+        }
+
+        if ($currencyCode !== $baseCurrencyCode) {
+            $min = $this->priceCurrency->convert($min, $store, $currencyCode);
+
+            if ($min != $max) {
+                $max = $this->priceCurrency->convert($max, $store, $currencyCode);
+            }
+        }
+
+        return [$min, $max];
+    }
+
+    private function getDashedPriceFormat($min, $max, Store $store, $currencyCode)
+    {
+        if ($min == $max) {
+            return '';
+        }
+
+        $minFormatted = $this->priceCurrency->format(
+            $min,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $store,
+            $currencyCode
+        );
+
+        $maxFormatted = $this->priceCurrency->format(
+            $max,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $store,
+            $currencyCode
+        );
+
+        return $minFormatted.' - '.$maxFormatted;
+    }
+
+    private function handleNonEqualMinMaxPrices(
+        $customData,
+        $field,
+        $currencyCode,
+        $min,
+        $max,
+        $dashedFormat,
+        $areCustomersGroupsEnabled,
+        $groups
+    ) {
+        if (isset($customData[$field][$currencyCode]['default_original_formated']) === false
+            || $min <= $customData[$field][$currencyCode]['default']) {
+            $customData[$field][$currencyCode]['default_formated'] = $dashedFormat;
+
+            //// Do not keep special price that is already taken into account in min max
+            unset($customData['price']['special_from_date']);
+            unset($customData['price']['special_to_date']);
+            unset($customData['price']['default_original_formated']);
+
+            $customData[$field][$currencyCode]['default'] = 0; // will be reset just after
+        }
+
+        if ($areCustomersGroupsEnabled) {
+            /** @var Group $group */
+            foreach ($groups as $group) {
+                $groupId = (int) $group->getData('customer_group_id');
+
+                if ($min != $max && $min <= $customData[$field][$currencyCode]['group_' . $groupId]) {
+                    $customData[$field][$currencyCode]['group_'.$groupId] = 0;
+                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $dashedFormat;
+                }
+            }
+        }
+
+        return $customData;
+    }
+
+    private function handleZeroDefaultPrice(
+        $customData,
+        $field,
+        $currencyCode,
+        $baseCurrencyCode,
+        $min,
+        $max,
+        Store $store
+    ) {
+        $customData[$field][$currencyCode]['default'] = $min;
+
+        if ($min !== $max) {
+            return $customData;
+        }
+
+        if ($currencyCode !== $baseCurrencyCode) {
+            $min = $this->priceCurrency->convert($min, $store, $currencyCode);
+        }
+
+        $minFormatted = $this->priceCurrency->format(
+            $min,
+            false,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $store,
+            $currencyCode
+        );
+
+        $customData[$field][$currencyCode]['default'] = $min;
+        $customData[$field][$currencyCode]['default_formated'] = $minFormatted;
+
+        return $customData;
+    }
+
+    private function setFinalGroupPrices($customData, $groups, $field, $currencyCode, $min, $max, $dashedFormat)
+    {
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            $groupId = (int) $group->getData('customer_group_id');
+
+            if ($customData[$field][$currencyCode]['group_' . $groupId] == 0) {
+                $customData[$field][$currencyCode]['group_' . $groupId] = $min;
+
+                if ($min === $max) {
+                    $default = $customData[$field][$currencyCode]['default_formated'];
+                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $default;
+                } else {
+                    $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $dashedFormat;
+                }
+            }
+        }
+
+        return $customData;
     }
 
     public function getAllCategories($categoryIds)
@@ -737,7 +845,6 @@ class ProductHelper
 
     public function getObject(Product $product)
     {
-        $type = $product->getTypeId();
         $storeId = $product->getStoreId();
 
         $this->logger->start('CREATE RECORD ' . $product->getId() . ' ' . $this->logger->getStoreName($storeId));
@@ -767,14 +874,97 @@ class ProductHelper
             'url'                => $product->getUrlModel()->getUrl($product, $urlParams),
             'visibility_search'  => (int) (in_array($visibility, $visibleInSearch)),
             'visibility_catalog' => (int) (in_array($visibility, $visibleInCatalog)),
+            'type_id'            => $product->getTypeId(),
         ];
 
         $additionalAttributes = $this->getAdditionalAttributes($product->getStoreId());
         $groups = null;
 
-        if ($this->isAttributeEnabled($additionalAttributes, 'description')) {
-            $customData['description'] = $product->getData('description');
+        $customData = $this->addAttribute('description', $defaultData, $customData, $additionalAttributes, $product);
+        $customData = $this->addAttribute('ordered_qty', $defaultData, $customData, $additionalAttributes, $product);
+        $customData = $this->addAttribute('total_ordered', $defaultData, $customData, $additionalAttributes, $product);
+        $customData = $this->addAttribute('rating_summary', $defaultData, $customData, $additionalAttributes, $product);
+
+        $customData = $this->addCategoryData($customData, $product);
+        $customData = $this->addImageData($customData, $product, $additionalAttributes);
+
+        $customData = $this->addInStock($defaultData, $customData, $product);
+        $customData = $this->addStockQty($defaultData, $customData, $additionalAttributes, $product);
+
+        $subProducts = $this->getSubProducts($product);
+
+        $customData = $this->addAdditionalAttributes($customData, $additionalAttributes, $product, $subProducts);
+
+        $this->handlePrice($product, $subProducts, $customData);
+
+        $transport = new DataObject($customData);
+        $this->eventManager->dispatch(
+            'algolia_subproducts_index',
+            ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]
+        );
+        $customData = $transport->getData();
+
+        $customData = array_merge($customData, $defaultData);
+
+        $this->algoliaHelper->castProductObject($customData);
+
+        $transport = new DataObject($customData);
+        $this->eventManager->dispatch(
+            'algolia_after_create_product_object',
+            ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]
+        );
+        $customData = $transport->getData();
+
+        $this->logger->stop('CREATE RECORD ' . $product->getId() . ' ' . $this->logger->getStoreName($storeId));
+
+        return $customData;
+    }
+
+    private function getSubProducts(Product $product)
+    {
+        $subProducts = [];
+        $ids = null;
+
+        $type = $product->getTypeId();
+        if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
+            if ($type == 'bundle') {
+                $ids = [];
+
+                /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
+                $typeInstance = $product->getTypeInstance();
+
+                $selection = $typeInstance->getSelectionsCollection($typeInstance->getOptionsIds($product), $product);
+                foreach ($selection as $option) {
+                    $ids[] = $option->getProductId();
+                }
+            }
+
+            if ($type == 'configurable' || $type == 'grouped') {
+                $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
+                $ids = call_user_func_array('array_merge', $ids);
+            }
+
+            if (count($ids)) {
+                $subProducts = $this->getProductCollectionQuery($product->getStoreId(), $ids, false)->load();
+            }
         }
+
+        return $subProducts;
+    }
+
+    private function addAttribute($attribute, $defaultData, $customData, $additionalAttributes, Product $product)
+    {
+        if (isset($defaultData[$attribute]) === false
+            && $this->isAttributeEnabled($additionalAttributes, $attribute)) {
+            $customData[$attribute] = $product->getData($attribute);
+        }
+
+        return $customData;
+    }
+
+    private function addCategoryData($customData, Product $product)
+    {
+        $storeId = $product->getStoreId();
 
         $categories = [];
         $categoriesWithPath = [];
@@ -784,7 +974,7 @@ class ProductHelper
         if (is_array($_categoryIds) && count($_categoryIds) > 0) {
             $categoryCollection = $this->getAllCategories($_categoryIds);
 
-            /** @var \Magento\Store\Model\Store $store */
+            /** @var Store $store */
             $store = $this->storeManager->getStore($product->getStoreId());
             $rootCat = $store->getRootCategoryId();
 
@@ -835,225 +1025,40 @@ class ProductHelper
             array_unique(array_map('serialize', $categoriesWithPath))
         );
 
-        $categoriesHierarchical = [];
+        $hierarchicalCategories = $this->getHierarchicalCategories($categoriesWithPath);
+
+        $customData['categories'] = $hierarchicalCategories;
+        $customData['categories_without_path'] = $categories;
+
+        return $customData;
+    }
+
+    private function getHierarchicalCategories($categoriesWithPath)
+    {
+        $hierachivalCategories = [];
 
         $levelName = 'level';
 
         foreach ($categoriesWithPath as $category) {
-            for ($i = 0; $i < count($category); $i++) {
-                if (isset($categoriesHierarchical[$levelName . $i]) === false) {
-                    $categoriesHierarchical[$levelName . $i] = [];
+            $categoryCount = count($category);
+            for ($i = 0; $i < $categoryCount; $i++) {
+                if (isset($hierachivalCategories[$levelName . $i]) === false) {
+                    $hierachivalCategories[$levelName . $i] = [];
                 }
 
                 if ($category[$i] === null) {
                     continue;
                 }
 
-                $categoriesHierarchical[$levelName . $i][] = implode(' /// ', array_slice($category, 0, $i + 1));
+                $hierachivalCategories[$levelName . $i][] = implode(' /// ', array_slice($category, 0, $i + 1));
             }
         }
 
-        foreach ($categoriesHierarchical as &$level) {
+        foreach ($hierachivalCategories as &$level) {
             $level = array_values(array_unique($level));
         }
 
-        foreach ($categoriesWithPath as &$category) {
-            $category = implode(' /// ', $category);
-        }
-
-        $customData['categories'] = $categoriesHierarchical;
-
-        $customData['categories_without_path'] = $categories;
-
-        $customData = $this->addImageData($customData, $product, $additionalAttributes);
-
-        $subProducts = [];
-        $ids = null;
-
-        if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
-            if ($type == 'bundle') {
-                $ids = [];
-
-                /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
-                $typeInstance = $product->getTypeInstance();
-
-                $selection = $typeInstance->getSelectionsCollection($typeInstance->getOptionsIds($product), $product);
-                foreach ($selection as $option) {
-                    $ids[] = $option->getProductId();
-                }
-            }
-
-            if ($type == 'configurable' || $type == 'grouped') {
-                $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
-                $ids = call_user_func_array('array_merge', $ids);
-            }
-
-            if (count($ids)) {
-                $subProducts = $this->getProductCollectionQuery($product->getStoreId(), $ids, false)->load();
-            }
-        }
-
-        if (false === isset($defaultData['in_stock'])) {
-            $stockItem = $this->stockRegistry->getStockItem($product->getId());
-            $customData['in_stock'] = $stockItem && (int) $stockItem->getIsInStock();
-        }
-
-        // skip default calculation if we have provided these attributes via the observer in $defaultData
-        if (false === isset($defaultData['ordered_qty'])
-            && $this->isAttributeEnabled($additionalAttributes, 'ordered_qty')) {
-            $customData['ordered_qty'] = (int) $product->getData('ordered_qty');
-        }
-
-        if (false === isset($defaultData['total_ordered'])
-            && $this->isAttributeEnabled($additionalAttributes, 'total_ordered')) {
-            $customData['total_ordered'] = (int) $product->getData('total_ordered');
-        }
-
-        if (false === isset($defaultData['stock_qty'])
-            && $this->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
-            $customData['stock_qty'] = 0;
-
-            $stockItem = $this->stockRegistry->getStockItem($product->getId());
-            if ($stockItem) {
-                $customData['stock_qty'] = (int) $stockItem->getQty();
-            }
-        }
-
-        if ($this->isAttributeEnabled($additionalAttributes, 'rating_summary')) {
-            $customData['rating_summary'] = (int) $product->getData('rating_summary');
-        }
-
-        foreach ($additionalAttributes as $attribute) {
-            if (isset($customData[$attribute['attribute']])) {
-                continue;
-            }
-
-            $value = $product->getData($attribute['attribute']);
-
-            /** @var \Magento\Catalog\Model\ResourceModel\Product $resource */
-            $resource = $product->getResource();
-
-            /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attributeResource */
-            $attributeResource = $resource->getAttribute($attribute['attribute']);
-            if ($attributeResource) {
-                $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
-
-                $subProductImages = [];
-
-                if ($value === null) {
-                    /* Get values as array in children */
-                    if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
-                        $values = [];
-
-                        $allProductsAreOutOfStock = true;
-
-                        /** @var Product $subProduct */
-                        foreach ($subProducts as $subProduct) {
-                            $isInStock = (int) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
-
-                            if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($storeId) == false) {
-                                continue;
-                            }
-
-                            $allProductsAreOutOfStock = false;
-
-                            $value = $subProduct->getData($attribute['attribute']);
-
-                            if ($value) {
-                                /** @var string|array $valueText */
-                                $valueText = $subProduct->getAttributeText($attribute['attribute']);
-
-                                if ($valueText) {
-                                    if (is_array($valueText)) {
-                                        foreach ($valueText as $valueText_elt) {
-                                            $values[] = $valueText_elt;
-                                        }
-                                    } else {
-                                        $values[] = $valueText;
-                                    }
-                                } else {
-                                    $values[] = $attributeResource->getFrontend()->getValue($subProduct);
-                                }
-
-                                if (mb_strtolower($attribute['attribute'], 'utf-8') === 'color') {
-                                    $image = $this->imageHelper
-                                        ->init($subProduct, $this->configHelper->getImageType())
-                                        ->resize(
-                                            $this->configHelper->getImageWidth(),
-                                            $this->configHelper->getImageHeight()
-                                        );
-
-                                    try {
-                                        $textValueInLower = mb_strtolower($valueText, 'utf-8');
-                                        $subProductImages[$textValueInLower] = $image->getUrl();
-                                    } catch (\Exception $e) {
-                                        $this->logger->log($e->getMessage());
-                                        $this->logger->log($e->getTraceAsString());
-                                    }
-                                }
-                            }
-                        }
-
-                        if (is_array($values) && count($values) > 0) {
-                            $customData[$attribute['attribute']] = array_values(array_unique($values));
-                        }
-
-                        if (count($subProductImages) > 0) {
-                            $customData['images_data'] = $subProductImages;
-                        }
-
-                        if (isset($customData['in_stock']) && $customData['in_stock'] && $allProductsAreOutOfStock) {
-                            // Set main product out of stock if all
-                            // sub-products is out of stock.
-                            $customData['in_stock'] = 0;
-                        }
-                    }
-                } else {
-                    $valueText = null;
-
-                    if (!is_array($value)) {
-                        $valueText = $product->getAttributeText($attribute['attribute']);
-                    }
-
-                    if ($valueText) {
-                        $value = $valueText;
-                    } else {
-                        $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
-                        $value = $attributeResource->getFrontend()->getValue($product);
-                    }
-
-                    if ($value) {
-                        $customData[$attribute['attribute']] = $value;
-                    }
-                }
-            }
-        }
-
-        $this->handlePrice($product, $subProducts, $customData);
-
-        $customData['type_id'] = $type;
-
-        $transport = new DataObject($customData);
-        $this->eventManager->dispatch(
-            'algolia_subproducts_index',
-            ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]
-        );
-        $customData = $transport->getData();
-
-        $customData = array_merge($customData, $defaultData);
-
-        $this->algoliaHelper->castProductObject($customData);
-
-        $transport = new DataObject($customData);
-        $this->eventManager->dispatch(
-            'algolia_after_create_product_object',
-            ['custom_data' => $transport, 'sub_products' => $subProducts, 'productObject' => $product]
-        );
-        $customData = $transport->getData();
-
-        $this->logger->stop('CREATE RECORD ' . $product->getId() . ' ' . $this->logger->getStoreName($storeId));
-
-        return $customData;
+        return $hierachivalCategories;
     }
 
     protected function addImageData(array $customData, Product $product, $additionalAttributes)
@@ -1091,6 +1096,263 @@ class ProductHelper
         }
 
         return $customData;
+    }
+
+    private function addInStock($defaultData, $customData, Product $product)
+    {
+        if (isset($defaultData['in_stock']) === false) {
+            $stockItem = $this->stockRegistry->getStockItem($product->getId());
+            $customData['in_stock'] = $stockItem && (int) $stockItem->getIsInStock();
+        }
+
+        return $customData;
+    }
+
+    private function addStockQty($defaultData, $customData, $additionalAttributes, Product $product)
+    {
+        if (isset($defaultData['stock_qty']) === false
+            && $this->isAttributeEnabled($additionalAttributes, 'stock_qty')) {
+            $customData['stock_qty'] = 0;
+
+            $stockItem = $this->stockRegistry->getStockItem($product->getId());
+            if ($stockItem) {
+                $customData['stock_qty'] = (int) $stockItem->getQty();
+            }
+        }
+
+        return $customData;
+    }
+
+    private function addAdditionalAttributes($customData, $additionalAttributes, Product $product, $subProducts)
+    {
+        foreach ($additionalAttributes as $attribute) {
+            if (isset($customData[$attribute['attribute']])) {
+                continue;
+            }
+
+            /** @var \Magento\Catalog\Model\ResourceModel\Product $resource */
+            $resource = $product->getResource();
+
+            /** @var AttributeResource $attributeResource */
+            $attributeResource = $resource->getAttribute($attribute['attribute']);
+            if (!$attributeResource) {
+                continue;
+            }
+
+            $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
+
+            $value = $product->getData($attribute['attribute']);
+
+            if ($value !== null) {
+                $customData = $this->addNonNullValue($customData, $value, $product, $attribute, $attributeResource);
+                continue;
+            }
+
+            $type = $product->getTypeId();
+            if ($type != 'configurable' && $type != 'grouped' && $type != 'bundle') {
+                continue;
+            }
+
+            $storeId = $product->getStoreId();
+            $customData = $this->addNullValue($customData, $subProducts, $storeId, $attribute, $attributeResource);
+        }
+
+        return $customData;
+    }
+
+    private function addNullValue($customData, $subProducts, $storeId, $attribute, AttributeResource $attributeResource)
+    {
+        $values = [];
+        $subProductImages = [];
+
+        /** @var Product $subProduct */
+        foreach ($subProducts as $subProduct) {
+            $isInStock = (int) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
+
+            if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($storeId) == false) {
+                continue;
+            }
+
+            $value = $subProduct->getData($attribute['attribute']);
+            if ($value) {
+                /** @var string|array $valueText */
+                $valueText = $subProduct->getAttributeText($attribute['attribute']);
+
+                $values = $this->getValues($valueText, $subProduct, $attributeResource);
+                $subProductImages = $this->addSubProductImage($subProductImages, $attribute, $subProduct, $valueText);
+            }
+        }
+
+        if (is_array($values) && count($values) > 0) {
+            $customData[$attribute['attribute']] = array_values(array_unique($values));
+        }
+
+        if (count($subProductImages) > 0) {
+            $customData['images_data'] = $subProductImages;
+        }
+
+        return $customData;
+    }
+
+    private function getValues($valueText, Product $subProduct, AttributeResource $attributeResource)
+    {
+        $values = [];
+
+        if ($valueText) {
+            if (is_array($valueText)) {
+                foreach ($valueText as $valueText_elt) {
+                    $values[] = $valueText_elt;
+                }
+            } else {
+                $values[] = $valueText;
+            }
+        } else {
+            $values[] = $attributeResource->getFrontend()->getValue($subProduct);
+        }
+
+        return $values;
+    }
+
+    private function addSubProductImage($subProductImages, $attribute, $subProduct, $valueText)
+    {
+        if (mb_strtolower($attribute['attribute'], 'utf-8') !== 'color') {
+            return $subProductImages;
+        }
+
+        $image = $this->imageHelper
+            ->init($subProduct, $this->configHelper->getImageType())
+            ->resize(
+                $this->configHelper->getImageWidth(),
+                $this->configHelper->getImageHeight()
+            );
+
+        try {
+            $textValueInLower = mb_strtolower($valueText, 'utf-8');
+            $subProductImages[$textValueInLower] = $image->getUrl();
+        } catch (\Exception $e) {
+            $this->logger->log($e->getMessage());
+            $this->logger->log($e->getTraceAsString());
+        }
+
+        return $subProductImages;
+    }
+
+    private function addNonNullValue(
+        $customData,
+        $value,
+        Product $product,
+        $attribute,
+        AttributeResource $attributeResource
+    ) {
+        $valueText = null;
+
+        if (!is_array($value)) {
+            $valueText = $product->getAttributeText($attribute['attribute']);
+        }
+
+        if ($valueText) {
+            $value = $valueText;
+        } else {
+            $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
+            $value = $attributeResource->getFrontend()->getValue($product);
+        }
+
+        if ($value) {
+            $customData[$attribute['attribute']] = $value;
+        }
+
+        return $customData;
+    }
+
+    private function getSearchableAttributes()
+    {
+        $searchableAttributes = [];
+
+        foreach ($this->getAdditionalAttributes() as $attribute) {
+            if ($attribute['searchable'] == '1') {
+                if (!isset($attribute['order']) || $attribute['order'] == 'ordered') {
+                    $searchableAttributes[] = $attribute['attribute'];
+                } else {
+                    $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
+                }
+            }
+
+            if ($attribute['attribute'] == 'categories') {
+                $searchableAttributes[] = (isset($attribute['order']) && $attribute['order'] == 'ordered') ?
+                    'categories_without_path' : 'unordered(categories_without_path)';
+            }
+        }
+
+        $searchableAttributes = array_values(array_unique($searchableAttributes));
+
+        return $searchableAttributes;
+    }
+
+    private function getCustomRanking($storeId)
+    {
+        $customRanking = [];
+
+        $customRankings = $this->configHelper->getProductCustomRanking($storeId);
+        foreach ($customRankings as $ranking) {
+            $customRanking[] = $ranking['order'] . '(' . $ranking['attribute'] . ')';
+        }
+
+        return $customRanking;
+    }
+
+    private function getUnretrieveableAttributes()
+    {
+        $unretrievableAttributes = [];
+
+        foreach ($this->getAdditionalAttributes() as $attribute) {
+            if ($attribute['retrievable'] != '1') {
+                $unretrievableAttributes[] = $attribute['attribute'];
+            }
+        }
+
+        return $unretrievableAttributes;
+    }
+
+    private function getAttributesForFaceting($storeId)
+    {
+        $attributesForFaceting = [];
+
+        $currencies = $this->currencyManager->getConfigAllowCurrencies();
+
+        $facets = $this->configHelper->getFacets();
+        foreach ($facets as $facet) {
+            if ($facet['attribute'] === 'price') {
+                foreach ($currencies as $currency_code) {
+                    $facet['attribute'] = 'price.' . $currency_code . '.default';
+
+                    if ($this->configHelper->isCustomerGroupsEnabled($storeId)) {
+                        $groupCollection = $this->objectManager
+                            ->create('Magento\Customer\Model\ResourceModel\Group\Collection');
+
+                        foreach ($groupCollection as $group) {
+                            $group_id = (int) $group->getData('customer_group_id');
+
+                            $attributesForFaceting[] = 'price.' . $currency_code . '.group_' . $group_id;
+                        }
+                    }
+
+                    $attributesForFaceting[] = $facet['attribute'];
+                }
+            } else {
+                $attribute = $facet['attribute'];
+                if (array_key_exists('searchable', $facet) && $facet['searchable'] === '1') {
+                    $attribute = 'searchable('.$attribute.')';
+                }
+
+                $attributesForFaceting[] = $attribute;
+            }
+        }
+
+        if ($this->configHelper->replaceCategories($storeId) && !in_array('categories', $attributesForFaceting, true)) {
+            $attributesForFaceting[] = 'categories';
+        }
+
+        return $attributesForFaceting;
     }
 
     private function explodeSynonyms($synonyms)

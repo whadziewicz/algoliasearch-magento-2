@@ -53,13 +53,7 @@ class Url extends ProductUrl
 
         $storeId = $product->getStoreId();
 
-        $categoryId = null;
-
-        if (!isset($params['_ignore_category'])
-            && $product->getCategoryId()
-            && !$product->getData('do_not_use_category_id')) {
-            $categoryId = $product->getCategoryId();
-        }
+        $categoryId = $this->getCategoryId($product, $params);
 
         $urlDataObject = $product->getData('url_data_object');
         if ($urlDataObject !== null) {
@@ -134,5 +128,18 @@ class Url extends ProductUrl
         } else {
             return $this->objectManager->create(self::FRONTEND_URL);
         }
+    }
+
+    private function getCategoryId(Product $product, $params)
+    {
+        $categoryId = null;
+
+        if (!isset($params['_ignore_category'])
+            && $product->getCategoryId()
+            && !$product->getData('do_not_use_category_id')) {
+            $categoryId = $product->getCategoryId();
+        }
+
+        return $categoryId;
     }
 }

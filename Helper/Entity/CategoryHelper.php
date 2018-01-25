@@ -460,14 +460,7 @@ class CategoryHelper
 
         $categoryName = null;
 
-        $categoryKeyId = $categoryId;
-
-        if ($this->getCorrectIdColumn() === 'row_id') {
-            $category = $this->getCategoryById($categoryId);
-            if ($category) {
-                $categoryKeyId = $category->getRowId();
-            }
-        }
+        $categoryKeyId = $this->getCategoryKeyId($categoryId);
 
         if ($categoryKeyId === null) {
             return $categoryName;
@@ -487,6 +480,20 @@ class CategoryHelper
         }
 
         return $categoryName;
+    }
+
+    private function getCategoryKeyId($categoryId)
+    {
+        $categoryKeyId = $categoryId;
+
+        if ($this->getCorrectIdColumn() === 'row_id') {
+            $category = $this->getCategoryById($categoryId);
+            if ($category) {
+                $categoryKeyId = $category->getRowId();
+            }
+        }
+
+        return $categoryKeyId;
     }
 
     private function getCategoryById($categoryId)

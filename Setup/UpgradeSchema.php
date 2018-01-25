@@ -25,6 +25,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         'algoliasearch_credentials/credentials/index_prefix' => 'magento2_',
         'algoliasearch_credentials/credentials/is_popup_enabled' => '1',
         'algoliasearch_credentials/credentials/is_instant_enabled' => '0',
+        'algoliasearch_credentials/credentials/use_adaptive_image' => '0',
 
         'algoliasearch_autocomplete/autocomplete/nb_of_products_suggestions' => '6',
         'algoliasearch_autocomplete/autocomplete/nb_of_categories_suggestions' => '2',

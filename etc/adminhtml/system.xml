@@ -120,6 +120,17 @@
                         ]]>
                     </comment>
                 </field>
+                <field id="use_adaptive_image" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Replace default image by matching variation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            E.g. When a customer searches for a "blue dress", Algolia will display the image associated with the blue variation instead of the default picture.
+                            The same happens when a customer refines products by any color.
+                            <br /><br />If a customer searches for "blue dress" and refines by "red" color, Algolia will display images for red (refined) color.
+                        ]]>
+                    </comment>
+                </field>
             </group>
         </section>
         <section id="algoliasearch_autocomplete" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

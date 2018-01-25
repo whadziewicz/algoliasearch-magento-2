@@ -938,6 +938,8 @@ class ProductHelper
             if ($attributeResource) {
                 $attributeResource = $attributeResource->setData('store_id', $product->getStoreId());
 
+                $subProductImages = [];
+
                 if ($value === null) {
                     /* Get values as array in children */
                     if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
@@ -972,11 +974,32 @@ class ProductHelper
                                 } else {
                                     $values[] = $attributeResource->getFrontend()->getValue($subProduct);
                                 }
+
+                                if (mb_strtolower($attribute['attribute'], 'utf-8') === 'color') {
+                                    $image = $this->imageHelper
+                                        ->init($subProduct, $this->configHelper->getImageType())
+                                        ->resize(
+                                            $this->configHelper->getImageWidth(),
+                                            $this->configHelper->getImageHeight()
+                                        );
+
+                                    try {
+                                        $textValueInLower = mb_strtolower($valueText, 'utf-8');
+                                        $subProductImages[$textValueInLower] = $image->getUrl();
+                                    } catch (\Exception $e) {
+                                        $this->logger->log($e->getMessage());
+                                        $this->logger->log($e->getTraceAsString());
+                                    }
+                                }
                             }
                         }
 
                         if (is_array($values) && count($values) > 0) {
                             $customData[$attribute['attribute']] = array_values(array_unique($values));
+                        }
+
+                        if (count($subProductImages) > 0) {
+                            $customData['images_data'] = $subProductImages;
                         }
 
                         if (isset($customData['in_stock']) && $customData['in_stock'] && $allProductsAreOutOfStock) {

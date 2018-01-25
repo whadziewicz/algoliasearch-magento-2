@@ -175,6 +175,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             'showSuggestionsOnNoResultsPage' => $config->showSuggestionsOnNoResultsPage(),
             'baseUrl' => $baseUrl,
             'popularQueries' => $config->getPopularQueries(),
+            'useAdaptiveImage' => $config->useAdaptiveImage(),
             'urls' => [
                 'logo' => $this->getViewFileUrl('Algolia_AlgoliaSearch::images/search-by-algolia.svg'),
             ],

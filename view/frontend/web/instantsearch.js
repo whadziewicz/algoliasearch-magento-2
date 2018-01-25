@@ -134,7 +134,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				},
 				transformData: {
 					item: function (hit) {
-						hit = transformHit(hit, algoliaConfig.priceKey);
+						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
 						
 						hit.algoliaConfig = window.algoliaConfig;

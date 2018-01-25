@@ -23,6 +23,7 @@ class ConfigHelper
     const SEARCH_ONLY_API_KEY = 'algoliasearch_credentials/credentials/search_only_api_key';
     const INDEX_PREFIX = 'algoliasearch_credentials/credentials/index_prefix';
     const IS_INSTANT_ENABLED = 'algoliasearch_credentials/credentials/is_instant_enabled';
+    const USE_ADAPTIVE_IMAGE = 'algoliasearch_credentials/credentials/use_adaptive_image';
 
     const REPLACE_CATEGORIES = 'algoliasearch_instant/instant/replace_categories';
     const INSTANT_SELECTOR = 'algoliasearch_instant/instant/instant_selector';
@@ -407,6 +408,11 @@ class ConfigHelper
         return $this->configInterface->getValue(self::IS_INSTANT_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
+    public function useAdaptiveImage($storeId = null)
+    {
+        return $this->configInterface->isSetFlag(self::USE_ADAPTIVE_IMAGE, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
     public function getInstantSelector($storeId = null)
     {
         return $this->configInterface->getValue(self::INSTANT_SELECTOR, ScopeInterface::SCOPE_STORE, $storeId);
@@ -701,6 +707,7 @@ class ConfigHelper
             'categories_without_path',
             'thumbnail_url',
             'image_url',
+            'images_data',
             'in_stock',
             'type_id',
             'value',

@@ -130,7 +130,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
 
             if ($this->config->isCustomerGroupsEnabled($this->getStore()->getStoreId())) {
                 $groupId = $this->getGroupId();
-                $this->priceKey = '.' . $currencyCode . '.group_' . $groupId;;
+                $this->priceKey = '.' . $currencyCode . '.group_' . $groupId;
             }
         }
 

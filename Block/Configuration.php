@@ -44,8 +44,6 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $baseUrl = rtrim($this->getBaseUrl(), '/');
 
-        $isCategoryPage = false;
-
         $currencyCode = $this->getCurrencyCode();
         $currencySymbol = $this->getCurrencySymbol();
 
@@ -67,6 +65,8 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         /**
          * Handle category replacement
          */
+
+        $isCategoryPage = false;
         if ($config->isInstantEnabled()
             && $config->replaceCategories()
             && $request->getControllerName() == 'category') {
@@ -97,7 +97,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
          */
         $facets = $config->getFacets();
 
-        $areCategoriesInFacets = false;
+        $areCategoriesInFacets = $this->areCategoriesInFacets($facets);
 
         if ($config->isInstantEnabled()) {
             $pageIdentifier = $request->getFullActionName();
@@ -116,13 +116,6 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                     $query = "";
                 } else {
                     $refinementKey = "";
-                }
-            }
-
-            foreach ($facets as $facet) {
-                if ($facet['attribute'] === 'categories') {
-                    $areCategoriesInFacets = true;
-                    break;
                 }
             }
         }
@@ -210,5 +203,16 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         $algoliaJsConfig = $transport->getData();
 
         return $algoliaJsConfig;
+    }
+
+    private function areCategoriesInFacets($facets)
+    {
+        foreach ($facets as $facet) {
+            if ($facet['attribute'] === 'categories') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -591,22 +591,7 @@ class Data
         }
 
         if (!empty($indexData['toRemove'])) {
-            $toRealRemove = [];
-
-            if (count($indexData['toRemove']) === 1) {
-                $toRealRemove = $indexData['toRemove'];
-            } else {
-                $indexData['toRemove'] = array_map('strval', $indexData['toRemove']);
-
-                foreach (array_chunk($indexData['toRemove'], 1000) as $chunk) {
-                    $objects = $this->algoliaHelper->getObjects($indexName, $chunk);
-                    foreach ($objects['results'] as $object) {
-                        if (isset($object['objectID'])) {
-                            $toRealRemove[] = $object['objectID'];
-                        }
-                    }
-                }
-            }
+            $toRealRemove = $this->getIdsToRealRemove($indexName, $indexData['toRemove']);
 
             if (!empty($toRealRemove)) {
                 $this->logger->start('REMOVE FROM ALGOLIA');
@@ -665,6 +650,28 @@ class Data
         }
 
         return true;
+    }
+
+    private function getIdsToRealRemove($indexName, $idsToRemove)
+    {
+        if (count($idsToRemove) === 1) {
+            return $idsToRemove;
+        }
+
+        $toRealRemove = [];
+
+        $idsToRemove = array_map('strval', $idsToRemove);
+
+        foreach (array_chunk($idsToRemove, 1000) as $chunk) {
+            $objects = $this->algoliaHelper->getObjects($indexName, $chunk);
+            foreach ($objects['results'] as $object) {
+                if (isset($object['objectID'])) {
+                    $toRealRemove[] = $object['objectID'];
+                }
+            }
+        }
+
+        return $toRealRemove;
     }
 
     private function setExtraSettings($storeId, $saveToTmpIndicesToo)
@@ -746,16 +753,16 @@ class Data
         $indexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
         $index = $this->algoliaHelper->getIndex($indexName);
 
-        $objectIds = array();
+        $objectIds = [];
         $counter = 0;
-        foreach ($index->browse('', array('attributesToRetrieve' => array('objectID'))) as $hit) {
+        foreach ($index->browse('', ['attributesToRetrieve' => ['objectID']]) as $hit) {
             $objectIds[] = $hit['objectID'];
             $counter++;
 
             if ($counter === 1000) {
                 $this->deleteInactiveIds($storeId, $objectIds, $indexName);
 
-                $objectIds = array();
+                $objectIds = [];
                 $counter = 0;
             }
         }

@@ -81,6 +81,11 @@ class ConfigHelper
     const REMOVE_BRANDING = 'algoliasearch_advanced/advanced/remove_branding';
     const AUTOCOMPLETE_SELECTOR = 'algoliasearch_advanced/advanced/autocomplete_selector';
     const IDX_PRODUCT_ON_CAT_PRODUCTS_UPD = 'algoliasearch_advanced/advanced/index_product_on_category_products_update';
+    const PREVENT_BACKEND_RENDERING = 'algoliasearch_advanced/advanced/prevent_backend_rendering';
+    const PREVENT_BACKEND_RENDERING_DISPLAY_MODE =
+        'algoliasearch_advanced/advanced/prevent_backend_rendering_display_mode';
+    const BACKEND_RENDERING_ALLOWED_USER_AGENTS =
+        'algoliasearch_advanced/advanced/backend_rendering_allowed_user_agents';
 
     const SHOW_OUT_OF_STOCK = 'cataloginventory/options/show_out_of_stock';
 
@@ -640,6 +645,53 @@ class ConfigHelper
         $value = $this->configInterface->getValue(constant('self::'.$constant), ScopeInterface::SCOPE_STORE, $storeId);
 
         return trim($value);
+    }
+
+    public function preventBackendRendering($storeId = null)
+    {
+        $preventBackendRendering = $this->configInterface->isSetFlag(
+            self::PREVENT_BACKEND_RENDERING,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        if ($preventBackendRendering === false) {
+            return false;
+        }
+
+        $userAgent = mb_strtolower($_SERVER['HTTP_USER_AGENT'], 'utf-8');
+
+        $allowedUserAgents = $this->configInterface->getValue(
+            self::BACKEND_RENDERING_ALLOWED_USER_AGENTS,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        $allowedUserAgents = trim($allowedUserAgents);
+
+        if ($allowedUserAgents === '') {
+            return true;
+        }
+
+        $allowedUserAgents = explode("\n", $allowedUserAgents);
+
+        foreach ($allowedUserAgents as $allowedUserAgent) {
+            $allowedUserAgent = mb_strtolower($allowedUserAgent, 'utf-8');
+            if (strpos($userAgent, $allowedUserAgent) !== false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function getBackendRenderingDisplayMode($storeId = null)
+    {
+        return $this->configInterface->getValue(
+            self::PREVENT_BACKEND_RENDERING_DISPLAY_MODE,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 
     public function getCurrency($storeId = null)

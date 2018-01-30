@@ -806,6 +806,32 @@
                         ]]>
                     </comment>
                 </field>
+                <field id="prevent_backend_rendering" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Prevent backend rendering?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            <span class="algolia-config-warning">&#9888;</span>
+                            By preventing your store from backend rendering you might break your SEO and accessibility of your store by search crawlers. Please, read documentation before you turn the backend rendering off:
+                            <a target="_blank" href="https://community.algolia.com/magento/doc/m2/prevent-backend-rendering/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link">Prevent Backend Rendering documentation</a>
+                        ]]>
+                    </comment>
+                </field>
+                <field id="prevent_backend_rendering_display_mode" translate="label comment" type="select" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Prevent backend rendering for:</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\BackendRenderingDisplayMode</source_model>
+                </field>
+                <field id="backend_rendering_allowed_user_agents" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow backend rendering for User Agents:</label>
+                    <comment>
+                        <![CDATA[
+                            To specify multiple User-Agents, please put one User-Agent per line.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="prevent_backend_rendering">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
         <section id="algoliasearch_extra_settings" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">

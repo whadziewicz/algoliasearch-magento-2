@@ -843,6 +843,10 @@ a.ais-current-refined-values--link:hover {
   margin-bottom: 5px;
 }
 
+.ais-infinite-hits--showmore {
+  clear: both;
+}
+
 /**
  * Facets
  */

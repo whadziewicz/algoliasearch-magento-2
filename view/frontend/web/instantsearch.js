@@ -46,7 +46,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		/**
 		 * Initialise instant search
 		 * For rendering instant search page is used Algolia's instantsearch.js library
-		 * Docs: https://community.algolia.com/instantsearch.js/documentation/
+		 * Docs: https://community.algolia.com/instantsearch.js/
 		 **/
 		
 		var instantsearchOptions = {
@@ -55,7 +55,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			indexName: algoliaConfig.indexName + '_products',
 			urlSync: {
 				useHash: true,
-				trackedParameters: ['query', 'page', 'attribute:*', 'index']
+				trackedParameters: algoliaConfig.instant.urlTrackedParameters
 			},
 			searchParameters: {
 				hitsPerPage: algoliaConfig.hitsPerPage
@@ -122,31 +122,12 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		});
 		
 		var allWidgetConfiguration = {
-			/**
-			 * Products' hits
-			 * This widget renders all products into result page
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#hits
-			 **/
-			hits: {
-				container: '#instant-search-results-container',
-				templates: {
-					item: $('#instant-hit-template').html()
-				},
-				transformData: {
-					item: function (hit) {
-						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
-						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						
-						hit.algoliaConfig = window.algoliaConfig;
-						
-						return hit;
-					}
-				}
-			},
+			infiniteHits: {},
+			hits: {},
 			custom: [
 				/**
 				 * Custom widget - this widget is used to refine results for search page or catalog page
-				 * Docs: https://community.algolia.com/instantsearch.js/documentation/#custom-widgets
+				 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
 				 **/
 				{
 					getConfiguration: function () {
@@ -187,7 +168,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				/**
 				 * Custom widget - Suggestions
 				 * This widget renders suggestion queries which might be interesting for your customer
-				 * Docs: https://community.algolia.com/instantsearch.js/documentation/#custom-widgets
+				 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
 				 **/
 				{
 					suggestions: [],
@@ -222,7 +203,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			],
 			/**
 			 * Search box
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#searchbox
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/searchBox.html
 			 **/
 			searchBox: {
 				container: instant_selector,
@@ -230,7 +211,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			},
 			/**
 			 * Stats
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#stats
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/stats.html
 			 **/
 			stats: {
 				container: '#algolia-stats',
@@ -249,7 +230,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			},
 			/**
 			 * Sorting
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#sortbyselector
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/sortBySelector.html
 			 **/
 			sortBySelector: {
 				container: '#algolia-sorts',
@@ -259,7 +240,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			/**
 			 * Widget name: Current refinements
 			 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#currentrefinedvalues
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
 			 **/
 			currentRefinedValues: {
 				container: '#current-refinements',
@@ -273,12 +254,63 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				},
 				attributes: attributes,
 				onlyListedAttributes: true
-			},
+			}
+		};
+		
+		if (algoliaConfig.instant.infiniteScrollEnabled === true) {
+			/**
+			 * Products' infinite hits
+			 * This widget renders all products into result page
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/infiniteHits.html
+			 **/
+			allWidgetConfiguration.infiniteHits = {
+				container: '#instant-search-results-container',
+				templates: {
+					item: $('#instant-hit-template').html()
+				},
+				transformData: {
+					item: function (hit) {
+						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
+						
+						hit.algoliaConfig = window.algoliaConfig;
+						
+						return hit;
+					}
+				},
+				showMoreLabel: algoliaConfig.translations.showMore,
+				escapeHits: true
+			};
+			
+			delete allWidgetConfiguration.hits;
+		} else {
+			/**
+			 * Products' hits
+			 * This widget renders all products into result page
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/hits.html
+			 **/
+			allWidgetConfiguration.hits = {
+				container: '#instant-search-results-container',
+				templates: {
+					item: $('#instant-hit-template').html()
+				},
+				transformData: {
+					item: function (hit) {
+						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
+						
+						hit.algoliaConfig = window.algoliaConfig;
+						
+						return hit;
+					}
+				}
+			};
+			
 			/**
 			 * Pagination
-			 * Docs: https://community.algolia.com/instantsearch.js/documentation/#pagination
+			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/pagination.html
 			 **/
-			pagination: {
+			allWidgetConfiguration.pagination = {
 				container: '#instant-search-pagination-container',
 				cssClass: 'algolia-pagination',
 				showFirstLast: false,
@@ -288,14 +320,16 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					next: algoliaConfig.translations.nextPage
 				},
 				scrollTo: 'body'
-			}
-		};
+			};
+			
+			delete allWidgetConfiguration.infiniteHits;
+		}
 		
 		/**
 		 * Here are specified custom attributes widgets which require special code to run properly
 		 * Custom widgets can be added to this object like [attributeName]: function(facet, templates)
 		 * Function must return instantsearch.widget object
-		 * Docs: https://community.algolia.com/instantsearch.js/documentation/#widgets
+		 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets.html
 		 **/
 		var customAttributeFacet = {
 			categories: function (facet, templates) {

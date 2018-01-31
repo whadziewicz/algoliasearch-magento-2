@@ -31,6 +31,7 @@ class ConfigHelper
     const MAX_VALUES_PER_FACET = 'algoliasearch_instant/instant/max_values_per_facet';
     const SORTING_INDICES = 'algoliasearch_instant/instant/sorts';
     const XML_ADD_TO_CART_ENABLE = 'algoliasearch_instant/instant/add_to_cart_enable';
+    const INFINITE_SCROLL_ENABLE = 'algoliasearch_instant/instant/infinite_scroll_enable';
 
     const NB_OF_PRODUCTS_SUGGESTIONS = 'algoliasearch_autocomplete/autocomplete/nb_of_products_suggestions';
     const NB_OF_CATEGORIES_SUGGESTIONS = 'algoliasearch_autocomplete/autocomplete/nb_of_categories_suggestions';
@@ -347,6 +348,12 @@ class ConfigHelper
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+    }
+
+    public function isInfiniteScrollEnabled($storeId = null)
+    {
+        return $this->isInstantEnabled($storeId)
+            && $this->configInterface->isSetFlag(self::INFINITE_SCROLL_ENABLE, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isRemoveBranding($storeId = null)

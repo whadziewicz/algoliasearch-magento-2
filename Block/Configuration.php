@@ -126,6 +126,8 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'selector' => $config->getInstantSelector(),
                 'isAddToCartEnabled' => $config->isAddToCartEnable(),
                 'addToCartParams' => $addToCartParams,
+                'infiniteScrollEnabled' => $config->isInfiniteScrollEnabled(),
+                'urlTrackedParameters' => $this->getUrlTrackedParameters(),
             ],
             'autocomplete' => [
                 'enabled' => (bool) $config->isAutoCompleteEnabled(),
@@ -195,6 +197,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'products' => __('Products'),
                 'searchBy' => __('Search by'),
                 'searchForFacetValuesPlaceholder' => __('Search for other ...'),
+                'showMore' => __('Show more products'),
             ],
         ];
 
@@ -214,5 +217,16 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         }
 
         return false;
+    }
+
+    private function getUrlTrackedParameters()
+    {
+        $urlTrackedParameters = ['query', 'attribute:*', 'index'];
+
+        if ($this->getConfigHelper()->isInfiniteScrollEnabled() === false) {
+            $urlTrackedParameters[] = 'page';
+        }
+
+        return $urlTrackedParameters;
     }
 }

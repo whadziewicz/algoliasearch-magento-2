@@ -25,7 +25,7 @@ class Queue
     /** @var Logger */
     private $logger;
 
-    protected $maxSingleJobDataSize;
+    private $maxSingleJobDataSize;
 
     private $noOfFailedJobs = 0;
 
@@ -280,7 +280,7 @@ class Queue
         return $jobs;
     }
 
-    protected function mergeJobs($oldJobs)
+    private function mergeJobs($oldJobs)
     {
         $oldJobs = $this->sortJobs($oldJobs);
 

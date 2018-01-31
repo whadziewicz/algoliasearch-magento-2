@@ -16,9 +16,6 @@ use Magento\Framework\DataObject;
 
 class CategoryHelper
 {
-    protected static $_categoryAttributes;
-    protected static $_rootCategoryId = -1;
-
     private $eventManager;
 
     private $objectManager;
@@ -32,13 +29,12 @@ class CategoryHelper
     private $configHelper;
 
     private $isCategoryVisibleInMenuCache;
-
     private $coreCategories;
-
     private $idColumn;
-
-    protected static $_activeCategories;
-    protected static $_categoryNames;
+    private $categoryAttributes;
+    private $rootCategoryId = -1;
+    private $activeCategories;
+    private $categoryNames;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -160,32 +156,34 @@ class CategoryHelper
 
     public function getAllAttributes()
     {
-        if (self::$_categoryAttributes === null) {
-            self::$_categoryAttributes = [];
-
-            $allAttributes = $this->eavConfig->getEntityAttributeCodes('catalog_category');
-
-            $categoryAttributes = array_merge($allAttributes, ['product_count']);
-
-            $excludedAttributes = [
-                'all_children', 'available_sort_by', 'children', 'children_count', 'custom_apply_to_products',
-                'custom_design', 'custom_design_from', 'custom_design_to', 'custom_layout_update',
-                'custom_use_parent_settings', 'default_sort_by', 'display_mode', 'filter_price_range',
-                'global_position', 'image', 'include_in_menu', 'is_active', 'is_always_include_in_menu', 'is_anchor',
-                'landing_page', 'level', 'lower_cms_block', 'page_layout', 'path_in_store', 'position', 'small_image',
-                'thumbnail', 'url_key', 'url_path','visible_in_menu',
-            ];
-
-            $categoryAttributes = array_diff($categoryAttributes, $excludedAttributes);
-
-            foreach ($categoryAttributes as $attributeCode) {
-                /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute */
-                $attribute = $this->eavConfig->getAttribute('catalog_category', $attributeCode);
-                self::$_categoryAttributes[$attributeCode] = $attribute->getData('frontend_label');
-            }
+        if (isset($this->categoryAttributes)) {
+            return $this->categoryAttributes;
         }
 
-        return self::$_categoryAttributes;
+        $this->categoryAttributes = [];
+
+        $allAttributes = $this->eavConfig->getEntityAttributeCodes('catalog_category');
+
+        $categoryAttributes = array_merge($allAttributes, ['product_count']);
+
+        $excludedAttributes = [
+            'all_children', 'available_sort_by', 'children', 'children_count', 'custom_apply_to_products',
+            'custom_design', 'custom_design_from', 'custom_design_to', 'custom_layout_update',
+            'custom_use_parent_settings', 'default_sort_by', 'display_mode', 'filter_price_range',
+            'global_position', 'image', 'include_in_menu', 'is_active', 'is_always_include_in_menu', 'is_anchor',
+            'landing_page', 'level', 'lower_cms_block', 'page_layout', 'path_in_store', 'position', 'small_image',
+            'thumbnail', 'url_key', 'url_path','visible_in_menu',
+        ];
+
+        $categoryAttributes = array_diff($categoryAttributes, $excludedAttributes);
+
+        foreach ($categoryAttributes as $attributeCode) {
+            /** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute */
+            $attribute = $this->eavConfig->getAttribute('catalog_category', $attributeCode);
+            $this->categoryAttributes[$attributeCode] = $attribute->getData('frontend_label');
+        }
+
+        return $this->categoryAttributes;
     }
 
     public function getObject(Category $category)
@@ -279,19 +277,21 @@ class CategoryHelper
 
     public function getRootCategoryId()
     {
-        if (-1 === self::$_rootCategoryId) {
-            /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
-            $collection = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
-            $collection->addFieldToFilter('parent_id', 0);
-            $collection->getSelect()->limit(1);
-
-            /** @var \Magento\Catalog\Model\Category $rootCategory */
-            $rootCategory = $collection->getFirstItem();
-
-            self::$_rootCategoryId = $rootCategory->getId();
+        if ($this->rootCategoryId !== -1) {
+            return $this->rootCategoryId;
         }
 
-        return self::$_rootCategoryId;
+        /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
+        $collection = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Category\Collection');
+        $collection->addFieldToFilter('parent_id', 0);
+        $collection->getSelect()->limit(1);
+
+        /** @var \Magento\Catalog\Model\Category $rootCategory */
+        $rootCategory = $collection->getFirstItem();
+
+        $this->rootCategoryId = $rootCategory->getId();
+
+        return $this->rootCategoryId;
     }
 
     private function getUrl(Category $category)
@@ -385,36 +385,38 @@ class CategoryHelper
 
     private function getCategories()
     {
-        if (self::$_activeCategories === null) {
-            self::$_activeCategories = [];
-
-            /** @var \Magento\Catalog\Model\ResourceModel\Category $resource */
-            $resource = $this->objectManager->create('\Magento\Catalog\Model\ResourceModel\Category');
-
-            if ($attribute = $resource->getAttribute('is_active')) {
-                $columnId = $this->getCorrectIdColumn();
-                $key = new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$columnId.")");
-
-                $connection = $this->resourceConnection->getConnection();
-                $select = $connection->select()
-                                     ->from(
-                                         ['backend' => $attribute->getBackendTable()],
-                                         ['key' => $key, 'category.path', 'backend.value']
-                                     )
-                                     ->join(
-                                         ['category' => $resource->getTable('catalog_category_entity')],
-                                         'backend.'.$columnId.' = category.'.$columnId,
-                                         []
-                                     )
-                                     ->where('backend.attribute_id = ?', $attribute->getAttributeId())
-                                     ->order('backend.store_id')
-                                     ->order('backend.'.$columnId);
-
-                self::$_activeCategories = $connection->fetchAssoc($select);
-            }
+        if (isset($this->activeCategories)) {
+            return $this->activeCategories;
         }
 
-        return self::$_activeCategories;
+        $this->activeCategories = [];
+
+        /** @var \Magento\Catalog\Model\ResourceModel\Category $resource */
+        $resource = $this->objectManager->create('\Magento\Catalog\Model\ResourceModel\Category');
+
+        if ($attribute = $resource->getAttribute('is_active')) {
+            $columnId = $this->getCorrectIdColumn();
+            $key = new \Zend_Db_Expr("CONCAT(backend.store_id, '-', backend.".$columnId.")");
+
+            $connection = $this->resourceConnection->getConnection();
+            $select = $connection->select()
+                                 ->from(
+                                     ['backend' => $attribute->getBackendTable()],
+                                     ['key' => $key, 'category.path', 'backend.value']
+                                 )
+                                 ->join(
+                                     ['category' => $resource->getTable('catalog_category_entity')],
+                                     'backend.'.$columnId.' = category.'.$columnId,
+                                     []
+                                 )
+                                 ->where('backend.attribute_id = ?', $attribute->getAttributeId())
+                                 ->order('backend.store_id')
+                                 ->order('backend.'.$columnId);
+
+            $this->activeCategories = $connection->fetchAssoc($select);
+        }
+
+        return $this->activeCategories;
     }
 
     public function getCategoryName($categoryId, $storeId = null)
@@ -430,8 +432,8 @@ class CategoryHelper
         $categoryId = (int) $categoryId;
         $storeId = (int) $storeId;
 
-        if (self::$_categoryNames === null) {
-            self::$_categoryNames = [];
+        if (!isset($this->categoryNames)) {
+            $this->categoryNames = [];
 
             /** @var \Magento\Catalog\Model\ResourceModel\Category $categoryModel */
             $categoryModel = $this->objectManager->create('\Magento\Catalog\Model\ResourceModel\Category');
@@ -454,7 +456,7 @@ class CategoryHelper
                                      ->where('backend.attribute_id = ?', $attribute->getAttributeId())
                                      ->where('category.level > ?', 1);
 
-                self::$_categoryNames = $connection->fetchPairs($select);
+                $this->categoryNames = $connection->fetchPairs($select);
             }
         }
 
@@ -468,14 +470,14 @@ class CategoryHelper
 
         $key = $storeId . '-' . $categoryKeyId;
 
-        if (isset(self::$_categoryNames[$key])) {
+        if (isset($this->categoryNames[$key])) {
             // Check whether the category name is present for the specified store
-            $categoryName = (string) self::$_categoryNames[$key];
+            $categoryName = (string) $this->categoryNames[$key];
         } elseif ($storeId != 0) {
             // Check whether the category name is present for the default store
             $key = '0-' . $categoryKeyId;
-            if (isset(self::$_categoryNames[$key])) {
-                $categoryName = (string) self::$_categoryNames[$key];
+            if (isset($this->categoryNames[$key])) {
+                $categoryName = (string) $this->categoryNames[$key];
             }
         }
 

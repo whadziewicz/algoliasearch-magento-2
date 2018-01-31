@@ -14,7 +14,7 @@ use Magento\Framework\ObjectManagerInterface;
 class CategoryUrlPlugin
 {
     const FRONTEND_URL = 'Magento\Framework\Url';
-    protected $objectManager;
+    private $objectManager;
 
     public function __construct(
         ObjectManagerInterface $objectManager

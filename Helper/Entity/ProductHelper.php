@@ -36,15 +36,11 @@ class ProductHelper
     private $currencyManager;
     private $categoryHelper;
     private $priceManager;
-
-    /** @var Image $imageHelper */
     private $imageHelper;
 
-    protected static $_productAttributes;
-    protected static $_currencies;
-    protected static $debug = 0;
+    private $productAttributes;
 
-    protected static $_predefinedProductAttributes = [
+    private $predefinedProductAttributes = [
         'name',
         'url_key',
         'image',
@@ -53,7 +49,7 @@ class ProductHelper
         'msrp_enabled', // Needed to handle MSRP behavior
     ];
 
-    protected static $createdAttributes = [
+    private $createdAttributes = [
         'path',
         'categories',
         'categories_without_path',
@@ -111,8 +107,8 @@ class ProductHelper
 
     public function getAllAttributes($addEmptyRow = false)
     {
-        if (self::$_productAttributes === null) {
-            self::$_productAttributes = [];
+        if (!isset($this->productAttributes)) {
+            $this->productAttributes = [];
 
             $allAttributes = $this->eavConfig->getEntityAttributeCodes('catalog_product');
 
@@ -142,13 +138,13 @@ class ProductHelper
             $productAttributes = array_diff($productAttributes, $excludedAttributes);
 
             foreach ($productAttributes as $attributeCode) {
-                self::$_productAttributes[$attributeCode] = $this->eavConfig
+                $this->productAttributes[$attributeCode] = $this->eavConfig
                     ->getAttribute('catalog_product', $attributeCode)
                     ->getFrontendLabel();
             }
         }
 
-        $attributes = self::$_productAttributes;
+        $attributes = $this->productAttributes;
 
         if ($addEmptyRow === true) {
             $attributes[''] = '';
@@ -210,8 +206,8 @@ class ProductHelper
             $attr = $attr['attribute'];
         }
 
-        $attrs = array_merge(static::$_predefinedProductAttributes, $additionalAttr);
-        $attrs = array_diff($attrs, static::$createdAttributes);
+        $attrs = array_merge($this->predefinedProductAttributes, $additionalAttr);
+        $attrs = array_diff($attrs, $this->createdAttributes);
 
         $products = $products->addAttributeToSelect(array_values($attrs));
 
@@ -559,7 +555,7 @@ class ProductHelper
         return $hierachivalCategories;
     }
 
-    protected function addImageData(array $customData, Product $product, $additionalAttributes)
+    private function addImageData(array $customData, Product $product, $additionalAttributes)
     {
         if (false === isset($customData['thumbnail_url'])) {
             $customData['thumbnail_url'] = $this->imageHelper

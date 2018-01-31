@@ -13,22 +13,22 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class AlgoliaHelper extends AbstractHelper
 {
     /** @var Client */
-    protected $client;
+    private $client;
 
     /** @var ConfigHelper */
-    protected $config;
+    private $config;
 
     /** @var ManagerInterface */
-    protected $messageManager;
+    private $messageManager;
 
     /** @var ConsoleOutput */
-    protected $consoleOutput;
+    private $consoleOutput;
 
     /** @var int */
-    protected $maxRecordSize = 20000;
+    private $maxRecordSize = 20000;
 
     /** @var array */
-    protected $potentiallyLongAttributes = ['description', 'short_description', 'meta_description', 'content'];
+    private $potentiallyLongAttributes = ['description', 'short_description', 'meta_description', 'content'];
 
     /** @var string */
     private static $lastUsedIndexName;

@@ -9,8 +9,8 @@ use Magento\Framework\View\ConfigInterface;
 
 class Image extends \Magento\Catalog\Helper\Image
 {
-    protected $logger;
-    protected $options;
+    private $logger;
+    private $options;
 
     /**
      * Image constructor.

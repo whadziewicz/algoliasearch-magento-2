@@ -9,9 +9,9 @@ use Magento\Customer\Model\Context as CustomerContext;
 
 class Hit extends Template
 {
-    protected $config;
-    protected $priceKey;
-    protected $httpContext;
+    private $config;
+    private $priceKey;
+    private $httpContext;
 
     public function __construct(
         Template\Context $context,

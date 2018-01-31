@@ -24,21 +24,21 @@ class Data
 {
     const COLLECTION_PAGE_SIZE = 100;
 
-    protected $algoliaHelper;
+    private $algoliaHelper;
 
-    protected $pageHelper;
-    protected $categoryHelper;
-    protected $productHelper;
-    protected $suggestionHelper;
-    protected $additionalSectionHelper;
-    protected $stockRegistry;
+    private $pageHelper;
+    private $categoryHelper;
+    private $productHelper;
+    private $suggestionHelper;
+    private $additionalSectionHelper;
+    private $stockRegistry;
 
-    protected $logger;
-    protected $configHelper;
-    protected $emulation;
-    protected $resource;
-    protected $eventManager;
-    protected $storeManager;
+    private $logger;
+    private $configHelper;
+    private $emulation;
+    private $resource;
+    private $eventManager;
+    private $storeManager;
 
     private $emulationRuns = false;
 
@@ -448,7 +448,7 @@ class Data
         unset($collection);
     }
 
-    protected function getProductsRecords($storeId, $collection, $potentiallyDeletedProductsIds = null)
+    private function getProductsRecords($storeId, $collection, $potentiallyDeletedProductsIds = null)
     {
         $productsToIndex = [];
         $productsToRemove = [];

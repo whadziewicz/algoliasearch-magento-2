@@ -20,21 +20,21 @@ use Magento\Customer\Model\Context as CustomerContext;
 
 class Algolia extends Template implements CollectionDataSourceInterface
 {
-    protected $config;
-    protected $catalogSearchHelper;
-    protected $storeManager;
-    protected $objectManager;
-    protected $registry;
-    protected $productHelper;
-    protected $currency;
-    protected $algoliaHelper;
-    protected $urlHelper;
-    protected $formKey;
-    protected $httpContext;
-    protected $coreHelper;
-    protected $categoryHelper;
+    private $config;
+    private $catalogSearchHelper;
+    private $storeManager;
+    private $objectManager;
+    private $registry;
+    private $productHelper;
+    private $currency;
+    private $algoliaHelper;
+    private $urlHelper;
+    private $formKey;
+    private $httpContext;
+    private $coreHelper;
+    private $categoryHelper;
 
-    protected $priceKey;
+    private $priceKey;
 
     public function __construct(
         Template\Context $context,

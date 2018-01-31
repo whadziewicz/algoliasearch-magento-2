@@ -24,7 +24,7 @@ class Url extends ProductUrl
     const FRONTEND_URL = 'Magento\Framework\Url';
     const BACKEND_URL = 'Magento\Backend\Model\Url';
 
-    protected $objectManager;
+    private $objectManager;
 
     public function __construct(
         UrlFactory $urlFactory,

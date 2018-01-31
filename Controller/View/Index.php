@@ -9,7 +9,7 @@ use Magento\Framework\View\Result\PageFactory;
 class Index extends Action
 {
     /** @var \Magento\Framework\View\Result\PageFactory */
-    protected $resultPageFactory;
+    private $resultPageFactory;
 
     public function __construct(
         Context $context,

@@ -7,12 +7,12 @@ use Psr\Log\LoggerInterface;
 
 class Logger
 {
-    protected $enabled;
-    protected $config;
-    protected $logger;
+    private $enabled;
+    private $config;
+    private $logger;
 
-    protected $timers = [];
-    protected $stores = [];
+    private $timers = [];
+    private $stores = [];
 
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -74,7 +74,7 @@ class Logger
         }
     }
 
-    protected function formatTime($begin, $end)
+    private function formatTime($begin, $end)
     {
         return ($end - $begin) . 'sec';
     }

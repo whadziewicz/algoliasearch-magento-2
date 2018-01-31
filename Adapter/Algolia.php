@@ -23,10 +23,10 @@ use Magento\Store\Model\StoreManagerInterface;
 class Algolia implements AdapterInterface
 {
     /** @var Mapper */
-    protected $mapper;
+    private $mapper;
 
     /** @var ResponseFactory */
-    protected $responseFactory;
+    private $responseFactory;
 
     /** @var ResourceConnection */
     private $resource;
@@ -38,22 +38,22 @@ class Algolia implements AdapterInterface
     private $temporaryStorageFactory;
 
     /** @var ConfigHelper */
-    protected $config;
+    private $config;
 
     /** @var Data */
-    protected $catalogSearchHelper;
+    private $catalogSearchHelper;
 
     /** @var StoreManagerInterface */
-    protected $storeManager;
+    private $storeManager;
 
     /** @var AlgoliaHelper */
-    protected $algoliaHelper;
+    private $algoliaHelper;
 
     /** @var Http */
-    protected $request;
+    private $request;
 
     /** @var DocumentFactory */
-    protected $documentFactory;
+    private $documentFactory;
 
     /**
      * @param Mapper $mapper

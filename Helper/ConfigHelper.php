@@ -99,8 +99,6 @@ class ConfigHelper
     const EXTRA_SETTINGS_ADDITIONAL_SECTIONS =
         'algoliasearch_extra_settings/extra_settings/additional_sections_extra_settings';
 
-    protected $_productTypeMap = [];
-
     private $configInterface;
     private $objectManager;
     private $currency;

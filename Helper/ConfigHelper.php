@@ -503,6 +503,7 @@ class ConfigHelper
                     'typo',
                     'geo',
                     'words',
+                    'filters',
                     'proximity',
                     'attribute',
                     'exact',

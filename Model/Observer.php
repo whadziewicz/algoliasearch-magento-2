@@ -5,6 +5,7 @@ namespace Algolia\AlgoliaSearch\Model;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Registry;
+use Magento\Framework\View\Layout;
 
 /**
  * Algolia search observer model
@@ -25,7 +26,7 @@ class Observer implements ObserverInterface
         if ($this->config->isEnabledFrontEnd()) {
             if ($this->config->getApplicationID() && $this->config->getAPIKey()) {
                 if ($this->config->isPopupEnabled() || $this->config->isInstantEnabled()) {
-                    /** @var \Magento\Framework\View\Layout $layout */
+                    /** @var Layout $layout */
                     $layout = $observer->getData('layout');
 
                     $layout->getUpdate()->addHandle('algolia_search_handle');
@@ -36,16 +37,25 @@ class Observer implements ObserverInterface
                         $layout->getUpdate()->addHandle('algolia_search_handle_no_topsearch');
                     }
 
-                    if ($this->config->preventBackendRendering() === true) {
-                        /** @var \Magento\Catalog\Model\Category $category */
-                        $category = $this->registry->registry('current_category');
-                        $displayMode = $this->config->getBackendRenderingDisplayMode();
-                        if ($category && ($displayMode === 'all' || ($displayMode === 'only_products' && $category->getDisplayMode() !== 'PAGE'))) {
-                            $layout->getUpdate()->addHandle('algolia_search_handle_prevent_backend_rendering');
-                        }
-                    }
+                    $this->loadPreventBackendRenderingHandle($layout);
                 }
             }
         }
+    }
+
+    private function loadPreventBackendRenderingHandle(Layout $layout)
+    {
+        if ($this->config->preventBackendRendering() === false) {
+            return;
+        }
+
+        /** @var \Magento\Catalog\Model\Category $category */
+        $category = $this->registry->registry('current_category');
+        $displayMode = $this->config->getBackendRenderingDisplayMode();
+        if ($category && $displayMode === 'only_products' && $category->getDisplayMode() === 'PAGE') {
+            return;
+        }
+
+        $layout->getUpdate()->addHandle('algolia_search_handle_prevent_backend_rendering');
     }
 }

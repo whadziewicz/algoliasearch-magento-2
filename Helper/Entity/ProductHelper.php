@@ -274,18 +274,24 @@ class ProductHelper
         $isInstantSearchEnabled = (bool) $this->configHelper->isInstantEnabled($storeId);
         $sortingIndices = $this->configHelper->getSortingIndices($indexName, $storeId);
 
-        if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
-            $replicas = array_values(array_map(function ($sortingIndex) {
-                return $sortingIndex['name'];
-            }, $sortingIndices));
+        $replicas = array_values(array_map(function ($sortingIndex) {
+            return $sortingIndex['name'];
+        }, $sortingIndices));
 
+        if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
             $this->algoliaHelper->setSettings($indexName, ['replicas' => $replicas]);
+            $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
 
             foreach ($sortingIndices as $values) {
                 $indexSettings['ranking'] = $values['ranking'];
                 $this->algoliaHelper->setSettings($values['name'], $indexSettings, false, true);
             }
+        } else {
+            $this->algoliaHelper->setSettings($indexName, ['replicas' => []]);
+            $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
         }
+
+        $this->deleteUnusedReplicas($indexName, $replicas, $setReplicasTaskId);
 
         if ($this->configHelper->isEnabledSynonyms($storeId) === true) {
             if ($synonymsFile = $this->configHelper->getSynonymsFile($storeId)) {
@@ -847,6 +853,30 @@ class ProductHelper
         }
 
         return $attributesForFaceting;
+    }
+
+    private function deleteUnusedReplicas($indexName, $replicas, $setReplicasTaskId)
+    {
+        $indicesToDelete = [];
+
+        $allIndices = $this->algoliaHelper->listIndexes();
+        foreach ($allIndices['items'] as $indexInfo) {
+            if (strpos($indexInfo['name'], $indexName) !== 0 || $indexInfo['name'] === $indexName) {
+                continue;
+            }
+
+            if (in_array($indexInfo['name'], $replicas) === false) {
+                $indicesToDelete[] = $indexInfo['name'];
+            }
+        }
+
+        if (count($indicesToDelete) > 0) {
+            $this->algoliaHelper->waitLastTask($indexName, $setReplicasTaskId);
+
+            foreach ($indicesToDelete as $indexToDelete) {
+                $this->algoliaHelper->deleteIndex($indexToDelete);
+            }
+        }
     }
 
     private function explodeSynonyms($synonyms)

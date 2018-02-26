@@ -156,7 +156,8 @@
                     <label>Number of products</label>
                     <comment>
                         <![CDATA[
-                            The number of products (>=1) suggested in the autocomplete dropdown. Default value is 6
+                            The number of products suggested in the autocomplete dropdown. Default value is 6.<br>
+                            Set 0 to disable the products section.
                         ]]>
                     </comment>
                 </field>
@@ -165,7 +166,8 @@
                     <label>Number of categories</label>
                     <comment>
                         <![CDATA[
-                            The number of categories (>=1) suggested in the autocomplete dropdown. Default value is 2
+                            The number of categories suggested in the autocomplete dropdown. Default value is 2.<br>
+                            Set 0 to disable the categories section.
                         ]]>
                     </comment>
                 </field>
@@ -174,7 +176,8 @@
                     <label>Number of queries</label>
                     <comment>
                         <![CDATA[
-                            The number of queries suggestions (0 to disabled it) suggested in the autocomplete dropdown. Default value is 0
+                            The number of queries suggestions suggested in the autocomplete dropdown. Default value is 0.<br>
+                            Set 0 to disable the query suggestion section.
                         ]]>
                     </comment>
                 </field>

@@ -321,14 +321,21 @@ class AlgoliaHelper extends AbstractHelper
         self::$lastTaskId = $res['taskID'];
     }
 
-    public function waitLastTask()
+    public function waitLastTask($lastUsedIndexName = null, $lastTaskId = null)
     {
-        if (!isset(self::$lastUsedIndexName) || !isset(self::$lastTaskId)) {
+        if ($lastUsedIndexName === null && isset(self::$lastUsedIndexName)) {
+            $lastUsedIndexName = self::$lastUsedIndexName;
+        }
+
+        if ($lastTaskId === null && isset(self::$lastTaskId)) {
+            $lastTaskId = self::$lastTaskId;
+        }
+        if (!$lastUsedIndexName || !$lastTaskId) {
             return;
         }
 
         $this->checkClient(__FUNCTION__);
-        $this->client->initIndex(self::$lastUsedIndexName)->waitTask(self::$lastTaskId);
+        $this->client->initIndex($lastUsedIndexName)->waitTask($lastTaskId);
     }
 
     private function prepareRecords(&$objects, $indexName)
@@ -460,5 +467,15 @@ class AlgoliaHelper extends AbstractHelper
         }
 
         return $value;
+    }
+
+    public function getLastIndexName()
+    {
+        return self::$lastUsedIndexName;
+    }
+
+    public function getLastTaskId()
+    {
+        return self::$lastTaskId;
     }
 }

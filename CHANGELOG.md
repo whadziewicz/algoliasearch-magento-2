@@ -1,5 +1,30 @@
 # CHANGE LOG
 
+## 1.6.0
+
+### FEATURES
+- New indexer which deletes all products which shouldn't be indexed in Algolia (#405)
+- Facets now support [**search for facet values**](https://www.algolia.com/doc/api-reference/api-methods/search-for-facet-values/) feature (#408)
+- The extension now displays the right image for a color variant depending on search query or selected color filter (#409)
+- Experimental feature to prevent backend rendering of category and search results pages (#413)
+    - Use very carefully and read [documentation](https://community.algolia.com/magento/doc/m2/prevent-backend-rendering/) before enabling it
+- Infinite scrolling on instant search pages (#414)
+- Replica indices are automatically deleted when removing sorting options in configuration (#430)
+
+### UPDATES
+- Code is now more readable - **BC Break**
+    - shorter lines (#402)
+    - lower cyclomatic complexity (#410)
+- Price calculation was moved to separate class (#411) - **BC Break**
+- Most of `protected` class members were changed to `private` ones (#415) - **BC Break**
+- Ranking formula of replicas now contain `filters` rule (#419)
+- It's now possible to remove autocomplete menu sections by specifying 0 results in configuration (#429)
+
+### FIXES
+- Fixed buggy behavior on iOS when scrolling in autocomplete was not possible (#401)
+- Fixed magnifying glass icon next to query suggestions (#403)
+- Fixed URL of image placeholders (#428)
+
 ## 1.5.0
 
 ### FEATURES

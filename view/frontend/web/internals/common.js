@@ -1,3 +1,49 @@
+var algolia = {
+	allowedHooks: [
+		'beforeAutocompleteSources',
+		'beforeAutocompleteOptions',
+		'beforeInstantsearchInit',
+		'beforeWidgetInitialization',
+		'beforeInstantsearchStart',
+		'afterInstantsearchStart'
+	],
+	registeredHooks: [],
+	registerHook: function (hookName, callback) {
+		if (this.allowedHooks.indexOf(hookName) === -1) {
+			throw 'Hook "' + hookName + '" cannot be defined. Please use one of ' + this.allowedHooks.join(', ');
+		}
+		
+		if (!this.registeredHooks[hookName]) {
+			this.registeredHooks[hookName] = [callback];
+		} else {
+			this.registeredHooks[hookName].push(callback);
+		}
+	},
+	getRegisteredHooks: function(hookName) {
+		if (this.allowedHooks.indexOf(hookName) === -1) {
+			throw 'Hook "' + hookName + '" cannot be defined. Please use one of ' + this.allowedHooks.join(', ');
+		}
+		
+		if (!this.registeredHooks[hookName]) {
+			return [];
+		}
+		
+		return this.registeredHooks[hookName];
+	},
+	triggerHooks: function () {
+		var hookName = arguments[0],
+			originalData = arguments[1],
+			hookArguments = Array.prototype.slice.call(arguments, 2);
+		
+		var data = this.getRegisteredHooks(hookName).reduce(function(currentData, hook) {
+			var allParameters = [].concat(currentData).concat(hookArguments);
+			return hook.apply(null, allParameters);
+		}, originalData);
+		
+		return data;
+	}
+};
+
 requirejs(['algoliaBundle'], function(algoliaBundle) {
 	algoliaBundle.$(function ($) {
 		window.isMobile = function() {
@@ -113,7 +159,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			
 			var options = {
 				hitsPerPage: section.hitsPerPage,
-				analyticsTags: 'autocomplete'
+				analyticsTags: 'autocomplete',
+				clickAnalytics: true
 			};
 			
 			var source;
@@ -148,9 +195,14 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 							
 							return template;
 						},
-						suggestion: function (hit) {
-							hit = transformHit(hit, algoliaConfig.priceKey)
+						suggestion: function (hit, payload) {
+							hit = transformHit(hit, algoliaConfig.priceKey);
+							
 							hit.displayKey = hit.displayKey || hit.name;
+							
+							hit.__queryID = payload.queryID;
+							hit.__position = payload.hits.indexOf(hit) + 1;
+							
 							return algoliaConfig.autocomplete.templates[section.name].render(hit);
 						}
 					}
@@ -167,7 +219,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					name: i,
 					templates: {
 						empty: '<div class="aa-no-results">' + algoliaConfig.translations.noResults + '</div>',
-						suggestion: function (hit) {
+						suggestion: function (hit, payload) {
 							if (section.name === 'categories') {
 								hit.displayKey = hit.path;
 							}
@@ -189,6 +241,10 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 							}
 							
 							hit.displayKey = hit.displayKey || hit.name;
+							
+							hit.__queryID = payload.queryID;
+							hit.__position = payload.hits.indexOf(hit) + 1;
+							
 							return algoliaConfig.autocomplete.templates[section.name].render(hit);
 						}
 					}
@@ -201,9 +257,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				var products_index = algolia_client.initIndex(algoliaConfig.indexName + "_products");
 				
 				source = {
-					source: $.fn.autocomplete.sources.popularIn(suggestions_index, {
-						hitsPerPage: section.hitsPerPage
-					}, {
+					source: $.fn.autocomplete.sources.popularIn(suggestions_index, options, {
 						source: 'query',
 						index: products_index,
 						facets: ['categories.level0'],
@@ -218,7 +272,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					displayKey: 'query',
 					name: section.name,
 					templates: {
-						suggestion: function (hit) {
+						suggestion: function (hit, payload) {
 							if (hit.facet) {
 								hit.category = hit.facet.value;
 							}
@@ -232,6 +286,9 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 							var toEscape = hit._highlightResult.query.value;
 							hit._highlightResult.query.value = algoliaBundle.autocomplete.escapeHighlightedString(toEscape);
 							
+							hit.__queryID = payload.queryID;
+							hit.__position = payload.hits.indexOf(hit) + 1;
+							
 							return algoliaConfig.autocomplete.templates.suggestions.render(hit);
 						}
 					}
@@ -241,15 +298,16 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				var index = algolia_client.initIndex(algoliaConfig.indexName + "_section_" + section.name);
 				
 				source = {
-					source: $.fn.autocomplete.sources.hits(index, {
-						hitsPerPage: section.hitsPerPage,
-						analyticsTags: 'autocomplete'
-					}),
+					source: $.fn.autocomplete.sources.hits(index, options),
 					displayKey: 'value',
 					name: i,
 					templates: {
-						suggestion: function (hit) {
+						suggestion: function (hit, payload) {
 							hit.url = algoliaConfig.baseUrl + '/catalogsearch/result/?q=' + hit.value + '&refinement_key=' + section.name;
+							
+							hit.__queryID = payload.queryID;
+							hit.__position = payload.hits.indexOf(hit) + 1;
+							
 							return algoliaConfig.autocomplete.templates.additionalSection.render(hit);
 						}
 					}

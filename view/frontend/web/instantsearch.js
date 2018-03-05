@@ -20,6 +20,12 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			$(algoliaConfig.instant.selector).find('#algolia-autocomplete-container').remove();
 		}
 		
+		/** BC of old hooks **/
+		registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
+		registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
+		registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
+		registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
+		
 		/**
 		 * Setup wrapper
 		 *
@@ -88,9 +94,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 		}
 		
-		if (typeof algoliaHookBeforeInstantsearchInit === 'function') {
-			instantsearchOptions = algoliaHookBeforeInstantsearchInit(instantsearchOptions);
-		}
+		instantsearchOptions = algolia.triggerHooks('beforeInstantsearchInit', instantsearchOptions);
 		
 		var search = algoliaBundle.instantsearch(instantsearchOptions);
 		
@@ -275,6 +279,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 						
 						hit.algoliaConfig = window.algoliaConfig;
 						
+						hit.__position = hit.__hitIndex + 1;
+						
 						return hit;
 					}
 				},
@@ -300,6 +306,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
 						
 						hit.algoliaConfig = window.algoliaConfig;
+						
+						hit.__position = hit.__hitIndex + 1;
 						
 						return hit;
 					}
@@ -465,31 +473,29 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				allWidgetConfiguration[widgetType].push(widgetConfig);
 			}
 		});
+    
+    if (algoliaConfig.analytics.enabled) {
+			if (typeof algoliaAnalyticsPushFunction != 'function') {
+				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
+					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
 
-        if (algoliaConfig.analytics.enabled) {
-            if (typeof algoliaAnalyticsPushFunction != 'function') {
-                var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
-                    var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
+					// Universal Analytics
+					if (typeof window.ga != 'undefined') {
+						window.ga('set', 'page', trackedUrl);
+						window.ga('send', 'pageView');
+					}
+				};
+			}
 
-                    // Universal Analytics
-                    if (typeof window.ga != 'undefined') {
-                        window.ga('set', 'page', trackedUrl);
-                        window.ga('send', 'pageView');
-                    }
-                };
-            }
-
-            allWidgetConfiguration['analytics'] = {
-                pushFunction: algoliaAnalyticsPushFunction,
-                delay: algoliaConfig.analytics.delay,
-                triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
-                pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
-            };
-        }
-		
-		if (typeof algoliaHookBeforeWidgetInitialization === 'function') {
-			allWidgetConfiguration = algoliaHookBeforeWidgetInitialization(allWidgetConfiguration);
+			allWidgetConfiguration['analytics'] = {
+				pushFunction: algoliaAnalyticsPushFunction,
+				delay: algoliaConfig.analytics.delay,
+				triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
+				pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
+			};
 		}
+		
+		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration);
 		
 		$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
 			if (Array.isArray(widgetConfig) === true) {
@@ -507,15 +513,11 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				return;
 			}
 			
-			if (typeof algoliaHookBeforeInstantsearchStart === 'function') {
-				search = algoliaHookBeforeInstantsearchStart(search);
-			}
+			search = algolia.triggerHooks('beforeInstantsearchStart', search);
 			
 			search.start();
 			
-			if (typeof algoliaHookAfterInstantsearchStart === 'function') {
-				search = algoliaHookAfterInstantsearchStart(search);
-			}
+			search = algolia.triggerHooks('afterInstantsearchStart', search);
 			
 			var instant_search_bar = $(instant_selector);
 			if (instant_search_bar.is(":focus") === false) {

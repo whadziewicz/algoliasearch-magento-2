@@ -21,10 +21,21 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		}
 		
 		/** BC of old hooks **/
-		registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
-		registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
-		registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
-		registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
+		if (typeof algoliaHookBeforeInstantsearchInit === 'function') {
+			algolia.registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
+		}
+		
+		if (typeof algoliaHookBeforeWidgetInitialization === 'function') {
+			algolia.registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
+		}
+		
+		if (typeof algoliaHookBeforeInstantsearchStart === 'function') {
+			algolia.registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
+		}
+		
+		if (typeof algoliaHookAfterInstantsearchStart === 'function') {
+			algolia.registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
+		}
 		
 		/**
 		 * Setup wrapper

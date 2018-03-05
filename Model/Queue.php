@@ -102,7 +102,7 @@ class Queue
 
         if ($nbJobs === null) {
             $nbJobs = $this->configHelper->getNumberOfJobToRun();
-            if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') == '1') {
+            if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') === '1') {
                 $nbJobs = -1;
 
                 $this->logRecord['with_empty_queue'] = 1;
@@ -122,7 +122,7 @@ class Queue
 
         $jobs = $this->getJobs($maxJobs, $pid);
 
-        if (empty($jobs)) {
+        if ($jobs === []) {
             return;
         }
 
@@ -216,7 +216,7 @@ class Queue
                 }
 
                 // If $jobs is empty, it's the first run
-                if (empty($jobs)) {
+                if ($jobs === []) {
                     $firstJobId = $rawJobs[0]['job_id'];
                 }
 
@@ -233,7 +233,7 @@ class Queue
                 // Without resetting not-merged jobs would be stacked
                 $jobs = [];
 
-                if (count($rawJobs) == $maxJobs) {
+                if (count($rawJobs) === $maxJobs) {
                     $jobs = $rawJobs;
                     break;
                 }
@@ -241,7 +241,7 @@ class Queue
                 foreach ($rawJobs as $job) {
                     $jobSize = (int) $job['data_size'];
 
-                    if ($actualBatchSize + $jobSize <= $maxBatchSize || empty($jobs)) {
+                    if ($actualBatchSize + $jobSize <= $maxBatchSize || !$jobs) {
                         $jobs[] = $job;
                         $actualBatchSize += $jobSize;
                     } else {
@@ -366,7 +366,7 @@ class Queue
 
     private function stackSortedJobs($sortedJobs, $tempSortableJobs, $job = null)
     {
-        if (!empty($tempSortableJobs)) {
+        if ($tempSortableJobs && $tempSortableJobs !== []) {
             $tempSortableJobs = $this->arrayMultisort(
                 $tempSortableJobs,
                 'class',
@@ -459,7 +459,7 @@ class Queue
 
         foreach ($array as $arr) {
             foreach ($arr as $key => $value) {
-                if ($key == $keyToSearch && ($value >= $currentMax)) {
+                if ($key === $keyToSearch && ($value >= $currentMax)) {
                     $currentMax = $value;
                 }
             }

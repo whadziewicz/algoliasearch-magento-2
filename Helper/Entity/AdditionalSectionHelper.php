@@ -65,11 +65,11 @@ class AdditionalSectionHelper
             implode(',', $usedAttributeValues)
         );
 
-        if (!$values || count($values) == 0) {
+        if (!$values || count($values) === 0) {
             $values = array_unique($products->getColumnValues($attributeCode));
         }
 
-        if ($values && is_array($values) == false) {
+        if ($values && is_array($values) === false) {
             $values = [$values];
         }
 

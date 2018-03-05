@@ -225,7 +225,7 @@ class AlgoliaHelper extends AbstractHelper
             $page++;
         } while (($page * $hitsPerPage) < $complexSynonyms['nbHits']);
 
-        if (empty($synonyms)) {
+        if (!$synonyms) {
             $res = $index->clearSynonyms(true);
         } else {
             $res = $index->batchSynonyms($synonyms, true, true);
@@ -255,7 +255,7 @@ class AlgoliaHelper extends AbstractHelper
             $page++;
         } while (($page * $hitsPerPage) < $fetchedSynonyms['nbHits']);
 
-        if (empty($synonymsToSet)) {
+        if (!$synonymsToSet) {
             $res = $toIndex->clearSynonyms(true);
         } else {
             $res = $toIndex->batchSynonyms($synonymsToSet, true, true);
@@ -289,7 +289,7 @@ class AlgoliaHelper extends AbstractHelper
             $page++;
         } while (($page * $hitsPerPage) < $fetchedQueryRules['nbHits']);
 
-        if (empty($queryRulesToSet)) {
+        if (!$queryRulesToSet) {
             $res = $toIndex->clearRules(true);
         } else {
             $res = $toIndex->batchRules($queryRulesToSet, true, true);
@@ -364,7 +364,7 @@ class AlgoliaHelper extends AbstractHelper
             $object = $this->castRecord($object);
         }
 
-        if (!empty($modifiedIds)) {
+        if ($modifiedIds && $modifiedIds !== []) {
             $separator = php_sapi_name() === 'cli' ? "\n" : '<br>';
 
             $errorMessage = 'Algolia reindexing: 
@@ -435,7 +435,7 @@ class AlgoliaHelper extends AbstractHelper
             if (is_array($data) === false) {
                 $data = explode('|', $data);
 
-                if (count($data) == 1) {
+                if (count($data) === 1) {
                     $data = $data[0];
                     $data = $this->castAttribute($data);
                 } else {
@@ -458,7 +458,7 @@ class AlgoliaHelper extends AbstractHelper
 
     private function castAttribute($value)
     {
-        if (is_numeric($value) && floatval($value) == floatval((int) $value)) {
+        if (is_numeric($value) && floatval($value) === floatval((int) $value)) {
             return (int) $value;
         }
 

@@ -210,7 +210,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}
 			else if (section.name === "categories" || section.name === "pages")
 			{
-				if (section.name === "categories" && algoliaConfig.show_cats_not_included_in_navigation == false) {
+				if (section.name === "categories" && algoliaConfig.showCatsNotIncludedInNavigation === false) {
 					options.numericFilters = 'include_in_menu=1';
 				}
 				
@@ -410,7 +410,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			$(this).closest('form').submit(function (e) {
 				var query = $(this).find(algoliaConfig.autocomplete.selector).val();
 				
-				if (algoliaConfig.instant.enabled && query == '')
+				if (algoliaConfig.instant.enabled && query === '')
 					query = '__empty__';
 				
 				window.location = $(this).attr('action') + '?q=' + query;
@@ -540,10 +540,10 @@ var AlgoliaBase64 = {
 			
 			output = output + String.fromCharCode(chr1);
 			
-			if (enc3 != 64) {
+			if (enc3 !== 64) {
 				output = output + String.fromCharCode(chr2);
 			}
-			if (enc4 != 64) {
+			if (enc4 !== 64) {
 				output = output + String.fromCharCode(chr3);
 			}
 		}

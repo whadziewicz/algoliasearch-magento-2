@@ -271,7 +271,7 @@ class ProductHelper
         /*
          * Handle replicas
          */
-        $isInstantSearchEnabled = (bool) $this->configHelper->isInstantEnabled($storeId);
+        $isInstantSearchEnabled = $this->configHelper->isInstantEnabled($storeId);
         $sortingIndices = $this->configHelper->getSortingIndices($indexName, $storeId);
 
         $replicas = array_values(array_map(function ($sortingIndex) {
@@ -426,8 +426,8 @@ class ProductHelper
         $ids = null;
 
         $type = $product->getTypeId();
-        if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
-            if ($type == 'bundle') {
+        if ($type === 'configurable' || $type === 'grouped' || $type === 'bundle') {
+            if ($type === 'bundle') {
                 $ids = [];
 
                 /** @var \Magento\Bundle\Model\Product\Type $typeInstance */
@@ -439,7 +439,7 @@ class ProductHelper
                 }
             }
 
-            if ($type == 'configurable' || $type == 'grouped') {
+            if ($type === 'configurable' || $type === 'grouped') {
                 $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
                 $ids = call_user_func_array('array_merge', $ids);
             }
@@ -483,7 +483,7 @@ class ProductHelper
                 // in the path of the current store.
                 $path = $category->getPath();
                 $pathParts = explode('/', $path);
-                if (isset($pathParts[1]) && $pathParts[1] != $rootCat) {
+                if (isset($pathParts[1]) && $pathParts[1] !== $rootCat) {
                     continue;
                 }
 
@@ -649,7 +649,7 @@ class ProductHelper
             }
 
             $type = $product->getTypeId();
-            if ($type != 'configurable' && $type != 'grouped' && $type != 'bundle') {
+            if ($type !== 'configurable' && $type !== 'grouped' && $type !== 'bundle') {
                 continue;
             }
 
@@ -667,9 +667,9 @@ class ProductHelper
 
         /** @var Product $subProduct */
         foreach ($subProducts as $subProduct) {
-            $isInStock = (int) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
+            $isInStock = (bool) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
 
-            if ($isInStock == false && $this->configHelper->indexOutOfStockOptions($storeId) == false) {
+            if ($isInStock === false && $this->configHelper->indexOutOfStockOptions($storeId) === false) {
                 continue;
             }
 
@@ -769,16 +769,16 @@ class ProductHelper
         $searchableAttributes = [];
 
         foreach ($this->getAdditionalAttributes() as $attribute) {
-            if ($attribute['searchable'] == '1') {
-                if (!isset($attribute['order']) || $attribute['order'] == 'ordered') {
+            if ($attribute['searchable'] === '1') {
+                if (!isset($attribute['order']) || $attribute['order'] === 'ordered') {
                     $searchableAttributes[] = $attribute['attribute'];
                 } else {
                     $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
                 }
             }
 
-            if ($attribute['attribute'] == 'categories') {
-                $searchableAttributes[] = (isset($attribute['order']) && $attribute['order'] == 'ordered') ?
+            if ($attribute['attribute'] === 'categories') {
+                $searchableAttributes[] = (isset($attribute['order']) && $attribute['order'] === 'ordered') ?
                     'categories_without_path' : 'unordered(categories_without_path)';
             }
         }
@@ -805,7 +805,7 @@ class ProductHelper
         $unretrievableAttributes = [];
 
         foreach ($this->getAdditionalAttributes() as $attribute) {
-            if ($attribute['retrievable'] != '1') {
+            if ($attribute['retrievable'] !== '1') {
                 $unretrievableAttributes[] = $attribute['attribute'];
             }
         }

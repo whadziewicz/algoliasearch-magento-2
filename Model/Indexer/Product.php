@@ -89,7 +89,7 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
             $collection = $this->productHelper->getProductCollectionQuery($storeId, $productIds, $useTmpIndex);
             $size = $collection->getSize();
 
-            if (!empty($productIds)) {
+            if ($productIds && $productIds !== []) {
                 $size = max(count($productIds), $size);
             }
 

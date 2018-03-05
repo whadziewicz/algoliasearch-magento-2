@@ -140,7 +140,7 @@ class ConfigHelper
 
     public function indexOutOfStockOptions($storeId = null)
     {
-        return $this->configInterface->getValue(
+        return $this->configInterface->isSetFlag(
             self::INDEX_OUT_OF_STOCK_OPTIONS,
             ScopeInterface::SCOPE_STORE,
             $storeId
@@ -149,7 +149,7 @@ class ConfigHelper
 
     public function showCatsNotIncludedInNavigation($storeId = null)
     {
-        return $this->configInterface->getValue(
+        return $this->configInterface->isSetFlag(
             self::SHOW_CATS_NOT_INCLUDED_IN_NAV,
             ScopeInterface::SCOPE_STORE,
             $storeId
@@ -250,7 +250,7 @@ class ConfigHelper
 
     public function isLoggingEnabled($storeId = null)
     {
-        return $this->configInterface->getValue(self::LOGGING_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->configInterface->isSetFlag(self::LOGGING_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function getShowOutOfStock($storeId = null)
@@ -275,7 +275,7 @@ class ConfigHelper
             $storeId
         );
 
-        if (empty($imageWidth)) {
+        if (!$imageWidth) {
             return 265;
         }
 
@@ -290,7 +290,7 @@ class ConfigHelper
             $storeId
         );
 
-        if (empty($imageHeight)) {
+        if (!$imageHeight) {
             return 265;
         }
 
@@ -408,7 +408,7 @@ class ConfigHelper
 
     public function replaceCategories($storeId = null)
     {
-        return $this->configInterface->getValue(self::REPLACE_CATEGORIES, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->configInterface->isSetFlag(self::REPLACE_CATEGORIES, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isAutoCompleteEnabled($storeId = null)
@@ -418,7 +418,7 @@ class ConfigHelper
 
     public function isInstantEnabled($storeId = null)
     {
-        return $this->configInterface->getValue(self::IS_INSTANT_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->configInterface->isSetFlag(self::IS_INSTANT_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function useAdaptiveImage($storeId = null)
@@ -585,7 +585,7 @@ class ConfigHelper
             $storeId
         ));
         $customRankings = array_filter($customRankings, function ($customRanking) {
-            return $customRanking['attribute'] != 'custom_attribute';
+            return $customRanking['attribute'] !== 'custom_attribute';
         });
         $attributes = $this->addIndexableAttributes($attributes, $customRankings, '0', '0');
 
@@ -605,7 +605,7 @@ class ConfigHelper
         ));
 
         foreach ($attrs as &$attr) {
-            if ($attr['type'] == 'other') {
+            if ($attr['type'] === 'other') {
                 $attr['type'] = $attr['other_type'];
             }
         }
@@ -887,7 +887,7 @@ class ConfigHelper
     ) {
         foreach ((array) $addedAttributes as $addedAttribute) {
             foreach ((array) $attributes as $attribute) {
-                if ($addedAttribute['attribute'] == $attribute['attribute']) {
+                if ($addedAttribute['attribute'] === $attribute['attribute']) {
                     continue 2;
                 }
             }

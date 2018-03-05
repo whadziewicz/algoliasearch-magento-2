@@ -114,7 +114,7 @@ class PriceManager
                     $store
                 );
 
-                if ($type == 'configurable' || $type == 'grouped' || $type == 'bundle') {
+                if ($type === 'configurable' || $type === 'grouped' || $type === 'bundle') {
                     list($min, $max) = $this->getMinMaxPrices(
                         $product,
                         $withTax,
@@ -126,7 +126,7 @@ class PriceManager
 
                     $dashedFormat = $this->getDashedPriceFormat($min, $max, $store, $currencyCode);
 
-                    if ($min != $max) {
+                    if ($min !== $max) {
                         $customData = $this->handleNonEqualMinMaxPrices(
                             $customData,
                             $field,
@@ -139,7 +139,7 @@ class PriceManager
                         );
                     }
 
-                    if ($customData[$field][$currencyCode]['default'] == 0) {
+                    if ($customData[$field][$currencyCode]['default'] === 0) {
                         $customData = $this->handleZeroDefaultPrice(
                             $customData,
                             $field,
@@ -211,7 +211,7 @@ class PriceManager
             });
 
             $specialPrice[$groupId] = false;
-            if (!empty($specialPrices[$groupId])) {
+            if ($specialPrices[$groupId] && $specialPrices[$groupId] !== []) {
                 $specialPrice[$groupId] = min($specialPrices[$groupId]);
             }
 
@@ -374,13 +374,13 @@ class PriceManager
         $min = PHP_INT_MAX;
         $max = 0;
 
-        if ($type == 'bundle') {
+        if ($type === 'bundle') {
             /** @var \Magento\Bundle\Model\Product\Price $priceModel */
             $priceModel = $product->getPriceModel();
             list($min, $max) = $priceModel->getTotalPrices($product, null, $withTax, true);
         }
 
-        if ($type == 'grouped' || $type == 'configurable') {
+        if ($type === 'grouped' || $type === 'configurable') {
             if (count($subProducts) > 0) {
                 /** @var Product $subProduct */
                 foreach ($subProducts as $subProduct) {
@@ -406,7 +406,7 @@ class PriceManager
         if ($currencyCode !== $baseCurrencyCode) {
             $min = $this->priceCurrency->convert($min, $store, $currencyCode);
 
-            if ($min != $max) {
+            if ($min !== $max) {
                 $max = $this->priceCurrency->convert($max, $store, $currencyCode);
             }
         }
@@ -416,7 +416,7 @@ class PriceManager
 
     private function getDashedPriceFormat($min, $max, Store $store, $currencyCode)
     {
-        if ($min == $max) {
+        if ($min === $max) {
             return '';
         }
 
@@ -466,7 +466,7 @@ class PriceManager
             foreach ($groups as $group) {
                 $groupId = (int) $group->getData('customer_group_id');
 
-                if ($min != $max && $min <= $customData[$field][$currencyCode]['group_' . $groupId]) {
+                if ($min !== $max && $min <= $customData[$field][$currencyCode]['group_' . $groupId]) {
                     $customData[$field][$currencyCode]['group_'.$groupId] = 0;
                     $customData[$field][$currencyCode]['group_'.$groupId.'_formated'] = $dashedFormat;
                 }
@@ -515,7 +515,7 @@ class PriceManager
         foreach ($groups as $group) {
             $groupId = (int) $group->getData('customer_group_id');
 
-            if ($customData[$field][$currencyCode]['group_' . $groupId] == 0) {
+            if ($customData[$field][$currencyCode]['group_' . $groupId] === 0) {
                 $customData[$field][$currencyCode]['group_' . $groupId] = $min;
 
                 if ($min === $max) {

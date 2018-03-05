@@ -17,7 +17,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 return true;
             }
 
-            if ($this->getConfigHelper()->replaceCategories() && $request->getControllerName() == 'category') {
+            if ($this->getConfigHelper()->replaceCategories() && $request->getControllerName() === 'category') {
                 $category = $this->getCurrentCategory();
                 if ($category && $category->getDisplayMode() !== 'PAGE') {
                     return true;
@@ -69,7 +69,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         $isCategoryPage = false;
         if ($config->isInstantEnabled()
             && $config->replaceCategories()
-            && $request->getControllerName() == 'category') {
+            && $request->getControllerName() === 'category') {
             $category = $this->getCurrentCategory();
 
             if ($category && $category->getDisplayMode() !== 'PAGE') {
@@ -77,7 +77,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
                 $level = -1;
                 foreach ($category->getPathIds() as $treeCategoryId) {
-                    if ($path != '') {
+                    if ($path !== '') {
                         $path .= ' /// ';
                     }
 
@@ -105,7 +105,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             if ($pageIdentifier === 'catalogsearch_result_index') {
                 $query = $this->getRequest()->getParam($catalogSearchHelper->getQueryParamName());
 
-                if ($query == '__empty__') {
+                if ($query === '__empty__') {
                     $query = '';
                 }
 
@@ -122,7 +122,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $algoliaJsConfig = [
             'instant' => [
-                'enabled' => (bool) $config->isInstantEnabled(),
+                'enabled' => $config->isInstantEnabled(),
                 'selector' => $config->getInstantSelector(),
                 'isAddToCartEnabled' => $config->isAddToCartEnable(),
                 'addToCartParams' => $addToCartParams,

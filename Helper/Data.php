@@ -325,7 +325,7 @@ class Data
             $collection = $this->productHelper->getProductCollectionQuery($storeId, $productIds);
             $size = $collection->getSize();
 
-            if (!empty($productIds)) {
+            if ($productIds && $productIds !== []) {
                 $size = max(count($productIds), $size);
             }
 
@@ -485,7 +485,7 @@ class Data
             }
 
             if ($product->isDeleted() === true
-                || $product->getStatus() == Status::STATUS_DISABLED
+                || $product->getStatus() === Status::STATUS_DISABLED
                 || !in_array($product->getVisibility(), [
                     Visibility::VISIBILITY_BOTH,
                     Visibility::VISIBILITY_IN_SEARCH,
@@ -582,7 +582,7 @@ class Data
 
         $indexData = $this->getProductsRecords($storeId, $collection, $productIds);
 
-        if (!empty($indexData['toIndex'])) {
+        if ($indexData['toIndex'] && $indexData['toIndex'] !== []) {
             $this->logger->start('ADD/UPDATE TO ALGOLIA');
 
             $this->algoliaHelper->addObjects($indexData['toIndex'], $indexName);
@@ -591,10 +591,10 @@ class Data
             $this->logger->stop('ADD/UPDATE TO ALGOLIA');
         }
 
-        if (!empty($indexData['toRemove'])) {
+        if ($indexData['toRemove'] && $indexData['toRemove'] !== []) {
             $toRealRemove = $this->getIdsToRealRemove($indexName, $indexData['toRemove']);
 
-            if (!empty($toRealRemove)) {
+            if ($toRealRemove && $toRealRemove !== []) {
                 $this->logger->start('REMOVE FROM ALGOLIA');
 
                 $this->algoliaHelper->deleteObjects($toRealRemove, $indexName);
@@ -714,7 +714,7 @@ class Data
             }
         }
 
-        if (!empty($error)) {
+        if ($error) {
             throw new AlgoliaException('<br>'.implode('<br> ', $error));
         }
     }
@@ -768,7 +768,7 @@ class Data
             }
         }
 
-        if (!empty($objectIds)) {
+        if ($objectIds && $objectIds !== []) {
             $this->deleteInactiveIds($storeId, $objectIds, $indexName);
         }
     }

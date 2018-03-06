@@ -24,7 +24,7 @@ class CategoryUrlPlugin
 
     public function aroundGetUrlInstance(Category $category, \Closure $proceed)
     {
-        if ($category->getStoreId() == 0) {
+        if ($category->getStoreId() === 0) {
             return $proceed();
         } else {
             return $this->objectManager->create(self::FRONTEND_URL)->setStoreId($category->getStoreId());

@@ -486,12 +486,12 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		});
     
     if (algoliaConfig.analytics.enabled) {
-			if (typeof algoliaAnalyticsPushFunction != 'function') {
+			if (typeof algoliaAnalyticsPushFunction !== 'function') {
 				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
 					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
 
 					// Universal Analytics
-					if (typeof window.ga != 'undefined') {
+					if (typeof window.ga !== 'undefined') {
 						window.ga('set', 'page', trackedUrl);
 						window.ga('send', 'pageView');
 					}

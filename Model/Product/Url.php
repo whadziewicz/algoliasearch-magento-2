@@ -61,7 +61,7 @@ class Url extends ProductUrl
             $routeParams['_scope'] = $urlDataObject->getStoreId();
         } else {
             $requestPath = $product->getRequestPath();
-            if (empty($requestPath) && $requestPath != false) {
+            if ($requestPath === '') {
                 $filterData = [
                     UrlRewrite::ENTITY_ID   => $product->getId(),
                     UrlRewrite::ENTITY_TYPE => ProductUrlRewriteGenerator::ENTITY_TYPE,
@@ -84,11 +84,11 @@ class Url extends ProductUrl
             $storeId = $this->storeManager->getStore($routeParams['_scope'])->getId();
         }
 
-        if ($storeId != $this->storeManager->getStore()->getId()) {
+        if ($storeId !== $this->storeManager->getStore()->getId()) {
             $routeParams['_scope_to_url'] = true;
         }
 
-        if (!empty($requestPath)) {
+        if ($requestPath) {
             $routeParams['_direct'] = $requestPath;
         } else {
             $routePath = 'catalog/product/view';
@@ -123,7 +123,7 @@ class Url extends ProductUrl
      */
     public function getStoreScopeUrlInstance($storeId)
     {
-        if ($storeId == 0) {
+        if (!$storeId) {
             return $this->objectManager->create(self::BACKEND_URL);
         } else {
             return $this->objectManager->create(self::FRONTEND_URL);

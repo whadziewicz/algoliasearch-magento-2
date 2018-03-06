@@ -63,15 +63,15 @@ class CategoryHelper
         $unretrievableAttributes = [];
 
         foreach ($this->configHelper->getCategoryAdditionalAttributes($storeId) as $attribute) {
-            if ($attribute['searchable'] == '1') {
-                if ($attribute['order'] == 'ordered') {
+            if ($attribute['searchable'] === '1') {
+                if ($attribute['order'] === 'ordered') {
                     $searchableAttributes[] = $attribute['attribute'];
                 } else {
                     $searchableAttributes[] = 'unordered(' . $attribute['attribute'] . ')';
                 }
             }
 
-            if ($attribute['retrievable'] != '1') {
+            if ($attribute['retrievable'] !== '1') {
                 $unretrievableAttributes[] = $attribute['attribute'];
             }
         }
@@ -209,7 +209,7 @@ class CategoryHelper
 
         $path = '';
         foreach ($category->getPathIds() as $categoryId) {
-            if ($path != '') {
+            if ($path !== '') {
                 $path .= ' / ';
             }
             $path .= $this->getCategoryName($categoryId, $storeId);
@@ -233,7 +233,7 @@ class CategoryHelper
             'product_count' => $category->getProductCount(),
         ];
 
-        if (!empty($imageUrl)) {
+        if ($imageUrl) {
             /** @var Image $imageHelper */
             $imageHelper = $this->objectManager->create('Algolia\AlgoliaSearch\Helper\Image');
 
@@ -369,14 +369,13 @@ class CategoryHelper
         }
 
         $key = $storeId . '-' . $categoryKeyId;
-
         if (isset($categories[$key])) {
-            $path = ($categories[$key]['value'] == 1) ? (string) $categories[$key]['path'] : null;
+            $path = ($categories[$key]['value'] === '1') ? (string) $categories[$key]['path'] : null;
         } elseif ($storeId !== 0) {
             $key = '0-' . $categoryKeyId;
 
             if (isset($categories[$key])) {
-                $path = ($categories[$key]['value'] == 1) ? (string) $categories[$key]['path'] : null;
+                $path = ($categories[$key]['value'] === '1') ? (string) $categories[$key]['path'] : null;
             }
         }
 
@@ -473,7 +472,7 @@ class CategoryHelper
         if (isset($this->categoryNames[$key])) {
             // Check whether the category name is present for the specified store
             $categoryName = (string) $this->categoryNames[$key];
-        } elseif ($storeId != 0) {
+        } elseif ($storeId !== 0) {
             // Check whether the category name is present for the default store
             $key = '0-' . $categoryKeyId;
             if (isset($this->categoryNames[$key])) {

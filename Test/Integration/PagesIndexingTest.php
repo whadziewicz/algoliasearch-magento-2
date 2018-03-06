@@ -92,13 +92,13 @@ class PagesIndexingTest extends IndexingTestCase
                              ->setContent('Hello Im a test CMS page with script tags and style tags. <script>alert("Foo");</script> <style>.bar { font-weight: bold; }</style>')
                              ->save();
 
-        $testPageId = $testPage->getId();
+        $testPageId = (string) $testPage->getId();
 
         /** @var PageHelper $pagesHelper */
         $pagesHelper = $this->getObjectManager()->create('Algolia\AlgoliaSearch\Helper\Entity\PageHelper');
         $pages = $pagesHelper->getPages(1);
         foreach ($pages as $page) {
-            if ($page['objectID'] == $testPageId) {
+            if ($page['objectID'] === $testPageId) {
                 $content = $page['content'];
                 $this->assertNotContains('<script>', $content);
                 $this->assertNotContains('alert("Foo");', $content);
@@ -125,13 +125,13 @@ class PagesIndexingTest extends IndexingTestCase
                              ->setContent($utf8Content)
                              ->save();
 
-        $testPageId = $testPage->getId();
+        $testPageId = (string) $testPage->getId();
 
         /** @var PageHelper $pagesHelper */
         $pagesHelper = $this->getObjectManager()->create('Algolia\AlgoliaSearch\Helper\Entity\PageHelper');
         $pages = $pagesHelper->getPages(1);
         foreach ($pages as $page) {
-            if ($page['objectID'] == $testPageId) {
+            if ($page['objectID'] === $testPageId) {
                 $this->assertSame($utf8Content, $page['content']);
             }
         }

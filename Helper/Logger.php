@@ -44,7 +44,7 @@ class Logger
 
     public function start($action)
     {
-        if ($this->enabled == false) {
+        if ($this->enabled === false) {
             return;
         }
 
@@ -56,7 +56,7 @@ class Logger
 
     public function stop($action)
     {
-        if ($this->enabled == false) {
+        if ($this->enabled === false) {
             return;
         }
 
@@ -69,7 +69,7 @@ class Logger
 
     public function log($message)
     {
-        if ($this->config->isLoggingEnabled()) {
+        if ($this->enabled) {
             $this->logger->info($message);
         }
     }

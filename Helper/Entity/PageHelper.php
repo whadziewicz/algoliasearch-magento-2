@@ -128,7 +128,7 @@ class PageHelper
 
     private function getStoreUrl($storeId)
     {
-        if ($this->storeUrls == null) {
+        if ($this->storeUrls === null) {
             $this->storeUrls = [];
             $storeIds = $this->getStores(null);
 
@@ -154,7 +154,7 @@ class PageHelper
     {
         $storeIds = [];
 
-        if ($storeId == null) {
+        if ($storeId === null) {
             /** @var \Magento\Store\Model\Store $store */
             foreach ($this->storeManager->getStores() as $store) {
                 if ($this->configHelper->isEnabledBackEnd($store->getId()) === false) {
@@ -174,7 +174,7 @@ class PageHelper
 
     private function strip($s, $completeRemoveTags = [])
     {
-        if (!empty($completeRemoveTags) && $s) {
+        if ($completeRemoveTags && $completeRemoveTags !== [] && $s) {
             $dom = new \DOMDocument();
             if (@$dom->loadHTML(mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8'))) {
                 $toRemove = [];

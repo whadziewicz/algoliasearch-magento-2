@@ -170,7 +170,7 @@ class Algolia implements AdapterInterface
     /** @return boolean */
     private function isSearch()
     {
-        return ($this->request->getFullActionName() == 'catalogsearch_result_index');
+        return ($this->request->getFullActionName() === 'catalogsearch_result_index');
     }
 
     /**
@@ -183,9 +183,9 @@ class Algolia implements AdapterInterface
     private function isReplaceCategory($storeId)
     {
         return (
-            $this->request->getControllerName() == 'category'
-            && $this->config->replaceCategories($storeId) == true
-            && $this->config->isInstantEnabled($storeId) == true
+            $this->request->getControllerName() === 'category'
+            && $this->config->replaceCategories($storeId) === true
+            && $this->config->isInstantEnabled($storeId) === true
         );
     }
 
@@ -199,8 +199,8 @@ class Algolia implements AdapterInterface
     private function isReplaceAdvancedSearch($storeId)
     {
         return (
-            $this->request->getFullActionName() == 'catalogsearch_advanced_result'
-            && $this->config->isInstantEnabled($storeId) == true
+            $this->request->getFullActionName() === 'catalogsearch_advanced_result'
+            && $this->config->isInstantEnabled($storeId) === true
         );
     }
 

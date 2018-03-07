@@ -2,7 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
-use Algolia\AlgoliaSearch\Helper\Image;
+use AlgoliaSearch\Index;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Directory\Model\Currency;
@@ -266,6 +266,11 @@ class ProductHelper
         $this->algoliaHelper->setSettings($indexName, $indexSettings, false, true);
         if ($saveToTmpIndicesToo === true) {
             $this->algoliaHelper->setSettings($indexNameTmp, $indexSettings, false, true);
+        }
+
+        $this->setFacetsQueryRules($indexName);
+        if ($saveToTmpIndicesToo === true) {
+            $this->setFacetsQueryRules($indexNameTmp);
         }
 
         /*
@@ -877,6 +882,64 @@ class ProductHelper
                 $this->algoliaHelper->deleteIndex($indexToDelete);
             }
         }
+    }
+
+    private function setFacetsQueryRules($indexName)
+    {
+        $index = $this->algoliaHelper->getIndex($indexName);
+
+        $this->clearFacetsQueryRules($index);
+
+        $rules = [];
+        $facets = $this->configHelper->getFacets();
+        foreach ($facets as $facet) {
+            if (!array_key_exists('create_rule', $facet) || $facet['create_rule'] !== '1') {
+                continue;
+            }
+
+            $attribute = $facet['attribute'];
+
+            $rules[] = [
+                'objectID' => 'filter_'.$attribute,
+                'description' => 'Filter facet "'.$attribute.'"',
+                'condition' => [
+                    'anchoring' => 'contains',
+                    'pattern' => '{facet:'.$attribute.'}',
+                    'context' => 'magento_filters',
+                ],
+                'consequence' => [
+                    'params' => [
+                        'automaticFacetFilters' => [$attribute],
+                        'query' => [
+                            'remove' => ['{facet:'.$attribute.'}']
+                        ]
+                    ],
+                ]
+            ];
+        }
+
+        if ($rules) {
+            $index->batchRules($rules, true);
+        }
+    }
+
+    private function clearFacetsQueryRules(Index $index)
+    {
+        $hitsPerPage = 100;
+        $page = 0;
+        do {
+            $fetchedQueryRules = $index->searchRules([
+                'context' => 'magento_filters',
+                'page' => $page,
+                'hitsPerPage' => $hitsPerPage,
+            ]);
+
+            foreach ($fetchedQueryRules['hits'] as $hit) {
+                $index->deleteRule($hit['objectID'], true);
+            }
+
+            $page++;
+        } while (($page * $hitsPerPage) < $fetchedQueryRules['nbHits']);
     }
 
     private function explodeSynonyms($synonyms)

@@ -75,7 +75,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				trackedParameters: algoliaConfig.instant.urlTrackedParameters
 			},
 			searchParameters: {
-				hitsPerPage: algoliaConfig.hitsPerPage
+				hitsPerPage: algoliaConfig.hitsPerPage,
+				ruleContexts: ['magento_filters', ''] // Empty context to keep BC for already create rules in dashboard
 			},
 			searchFunction: function(helper) {
 				if (helper.state.query === '' && !algoliaConfig.isSearchPage) {

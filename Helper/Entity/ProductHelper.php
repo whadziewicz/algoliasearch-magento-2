@@ -570,8 +570,7 @@ class ProductHelper
     {
         if (false === isset($customData['thumbnail_url'])) {
             $customData['thumbnail_url'] = $this->imageHelper
-                ->init($product, 'thumbnail')
-                ->resize(75, 75)
+                ->init($product, 'product_thumbnail_image')
                 ->getUrl();
         }
 

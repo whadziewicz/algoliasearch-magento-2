@@ -357,6 +357,7 @@ class AlgoliaHelper extends AbstractHelper
                     - ID '.$previousObject['objectID'].' - skipped - longest attribute: '.$longestAttribute;
 
                 unset($objects[$key]);
+                continue;
             } elseif ($previousObject !== $object) {
                 $modifiedIds[] = $indexName.' - ID '.$previousObject['objectID'].' - truncated';
             }

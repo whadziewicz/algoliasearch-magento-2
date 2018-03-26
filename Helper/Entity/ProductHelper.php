@@ -179,10 +179,9 @@ class ProductHelper
             ->distinct(true);
 
         if ($onlyVisible) {
-            $products = $products->addAttributeToFilter(
-                'visibility',
-                ['in' => $this->visibility->getVisibleInSiteIds()]
-            );
+            $products = $products
+                ->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSiteIds()])
+                ->addAttributeToFilter('status', ['=' => \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED]);
         }
 
         if ($onlyVisible && $this->configHelper->getShowOutOfStock($storeId) === false) {
@@ -195,10 +194,7 @@ class ProductHelper
             ->addAttributeToSelect('special_from_date')
             ->addAttributeToSelect('special_to_date')
             ->addAttributeToSelect('visibility')
-            ->addAttributeToFilter(
-                'status',
-                ['=' => \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED]
-            );
+            ->addAttributeToSelect('status');
 
         $additionalAttr = $this->getAdditionalAttributes($storeId);
 

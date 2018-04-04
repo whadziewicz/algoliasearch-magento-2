@@ -4,6 +4,7 @@ namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use AlgoliaSearch\Index;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\DataObject;
@@ -181,7 +182,7 @@ class ProductHelper
         if ($onlyVisible) {
             $products = $products
                 ->addAttributeToFilter('visibility', ['in' => $this->visibility->getVisibleInSiteIds()])
-                ->addAttributeToFilter('status', ['=' => \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED]);
+                ->addAttributeToFilter('status', ['=' => Status::STATUS_ENABLED]);
         }
 
         if ($onlyVisible && $this->configHelper->getShowOutOfStock($storeId) === false) {
@@ -446,7 +447,12 @@ class ProductHelper
             }
 
             if (count($ids)) {
-                $subProducts = $this->getProductCollectionQuery($product->getStoreId(), $ids, false)->load();
+                $onlyVisible = false;
+                if ($this->configHelper->indexOutOfStockOptions($product->getStoreId()) === false) {
+                    $onlyVisible = true;
+                }
+
+                $subProducts = $this->getProductCollectionQuery($product->getStoreId(), $ids, $onlyVisible)->load();
             }
         }
 
@@ -653,32 +659,25 @@ class ProductHelper
                 continue;
             }
 
-            $storeId = $product->getStoreId();
-            $customData = $this->addNullValue($customData, $subProducts, $storeId, $attribute, $attributeResource);
+            $customData = $this->addNullValue($customData, $subProducts, $attribute, $attributeResource);
         }
 
         return $customData;
     }
 
-    private function addNullValue($customData, $subProducts, $storeId, $attribute, AttributeResource $attributeResource)
+    private function addNullValue($customData, $subProducts, $attribute, AttributeResource $attributeResource)
     {
         $values = [];
         $subProductImages = [];
 
         /** @var Product $subProduct */
         foreach ($subProducts as $subProduct) {
-            $isInStock = (bool) $this->stockRegistry->getStockItem($subProduct->getId())->getIsInStock();
-
-            if ($isInStock === false && $this->configHelper->indexOutOfStockOptions($storeId) === false) {
-                continue;
-            }
-
             $value = $subProduct->getData($attribute['attribute']);
             if ($value) {
                 /** @var string|array $valueText */
                 $valueText = $subProduct->getAttributeText($attribute['attribute']);
 
-                $values = $this->getValues($valueText, $subProduct, $attributeResource);
+                $values = array_merge($values, $this->getValues($valueText, $subProduct, $attributeResource));
                 $subProductImages = $this->addSubProductImage($subProductImages, $attribute, $subProduct, $valueText);
             }
         }

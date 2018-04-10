@@ -494,7 +494,7 @@ class ProductHelper
                     continue;
                 }
 
-                $categoryName = $category->getName();
+                $categoryName = $this->categoryHelper->getCategoryName($category->getId(), $storeId);
 
                 if ($categoryName) {
                     $categories[] = $categoryName;

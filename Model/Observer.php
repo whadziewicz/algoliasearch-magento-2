@@ -53,8 +53,12 @@ class Observer implements ObserverInterface
 
         /** @var \Magento\Catalog\Model\Category $category */
         $category = $this->registry->registry('current_category');
+        if (!$category) {
+            return;
+        }
+
         $displayMode = $this->config->getBackendRenderingDisplayMode();
-        if ($category && $displayMode === 'only_products' && $category->getDisplayMode() === 'PAGE') {
+        if ($displayMode === 'only_products' && $category->getDisplayMode() === 'PAGE') {
             return;
         }
 

@@ -66,7 +66,7 @@ class Page implements Magento\Framework\Indexer\ActionInterface, Magento\Framewo
             return;
         }
 
-        $storeIds = array_keys($this->storeManager->getStores());
+        $storeIds = $this->pageHelper->getStores();
 
         foreach ($storeIds as $storeId) {
             if ($this->fullAction->isIndexingEnabled($storeId) === false) {

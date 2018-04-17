@@ -130,7 +130,7 @@ class PageHelper
     {
         if ($this->storeUrls === null) {
             $this->storeUrls = [];
-            $storeIds = $this->getStores(null);
+            $storeIds = $this->getStores();
 
             foreach ($storeIds as $storeId) {
                 // ObjectManager used instead of UrlFactory because UrlFactory will return UrlInterface which
@@ -150,7 +150,7 @@ class PageHelper
         return null;
     }
 
-    private function getStores($storeId)
+    public function getStores($storeId = null)
     {
         $storeIds = [];
 

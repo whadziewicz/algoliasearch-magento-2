@@ -1,5 +1,4 @@
 preset: PSR2
-linting: true
 finder:
   path:
       - "code"

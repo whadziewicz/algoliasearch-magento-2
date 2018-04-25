@@ -682,7 +682,8 @@ class ConfigHelper
             return true;
         }
 
-        $allowedUserAgents = explode("\n", $allowedUserAgents);
+        $allowedUserAgents = preg_split('/\n|\r\n?/', $allowedUserAgents);
+        $allowedUserAgents = array_filter($allowedUserAgents);
 
         foreach ($allowedUserAgents as $allowedUserAgent) {
             $allowedUserAgent = mb_strtolower($allowedUserAgent, 'utf-8');

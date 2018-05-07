@@ -30,6 +30,9 @@ class AlgoliaHelper extends AbstractHelper
     /** @var array */
     private $potentiallyLongAttributes = ['description', 'short_description', 'meta_description', 'content'];
 
+    /** @var array */
+    private $nonCastableAttributes = ['sku', 'name', 'description'];
+
     /** @var string */
     private static $lastUsedIndexName;
 
@@ -424,10 +427,8 @@ class AlgoliaHelper extends AbstractHelper
 
     public function castProductObject(&$productData)
     {
-        $nonCastableAttributes = ['sku', 'name', 'description'];
-
         foreach ($productData as $key => &$data) {
-            if (in_array($key, $nonCastableAttributes, true) === true) {
+            if (in_array($key, $this->nonCastableAttributes, true) === true) {
                 continue;
             }
 
@@ -450,7 +451,11 @@ class AlgoliaHelper extends AbstractHelper
 
     private function castRecord($object)
     {
-        foreach ($object as &$value) {
+        foreach ($object as $key => &$value) {
+            if (in_array($key, $this->nonCastableAttributes, true) === true) {
+                continue;
+            }
+
             $value = $this->castAttribute($value);
         }
 

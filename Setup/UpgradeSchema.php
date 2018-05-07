@@ -29,9 +29,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         'algoliasearch_autocomplete/autocomplete/nb_of_products_suggestions' => '6',
         'algoliasearch_autocomplete/autocomplete/nb_of_categories_suggestions' => '2',
-        'algoliasearch_autocomplete/autocomplete/nb_of_queries_suggestions' => '1000',
+        'algoliasearch_autocomplete/autocomplete/nb_of_queries_suggestions' => '0',
         'algoliasearch_autocomplete/autocomplete/min_popularity' => '2',
-        'algoliasearch_autocomplete/autocomplete/min_number_of_results' => '0',
+        'algoliasearch_autocomplete/autocomplete/min_number_of_results' => '1000',
         'algoliasearch_autocomplete/autocomplete/render_template_directives' => '1',
         'algoliasearch_autocomplete/autocomplete/debug' => '0',
 

@@ -339,6 +339,7 @@ class AlgoliaHelper extends AbstractHelper
         if ($lastTaskId === null && isset(self::$lastTaskId)) {
             $lastTaskId = self::$lastTaskId;
         }
+
         if (!$lastUsedIndexName || !$lastTaskId) {
             return;
         }

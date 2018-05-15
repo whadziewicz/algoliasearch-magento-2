@@ -796,12 +796,12 @@ class QueueTest extends TestCase
         $indexer->execute(range(1, 512));
 
         $dbJobs = $this->connection->query('SELECT * FROM algoliasearch_queue')->fetchAll();
-        $this->assertSame(6, count($dbJobs));
+        $this->assertSame(10, count($dbJobs));
 
         $firstJob = reset($dbJobs);
         $lastJob = end($dbJobs);
 
         $this->assertEquals(100, $firstJob['data_size']);
-        $this->assertEquals(12, $lastJob['data_size']);
+        $this->assertEquals(49, $lastJob['data_size']);
     }
 }

@@ -56,7 +56,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         'algoliasearch_queue/queue/number_of_retries' => '3',
 
         'algoliasearch_cc_analytics/cc_analytics_group/enable' => '0',
-        'algoliasearch_cc_analytics/cc_analytics_group/is_selector' => '.ais-hits--item a.result',
+        'algoliasearch_cc_analytics/cc_analytics_group/is_selector' => '.ais-hits--item a.result, .ais-infinite-hits--item a.result',
+        'algoliasearch_cc_analytics/cc_analytics_group/enable_conversion_analytics' => 'disabled',
+        'algoliasearch_cc_analytics/cc_analytics_group/add_to_cart_selector' => '.action.primary.tocart',
 
         'algoliasearch_analytics/analytics_group/enable' => '0',
         'algoliasearch_analytics/analytics_group/delay' => '3000',

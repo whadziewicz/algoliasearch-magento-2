@@ -319,7 +319,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 						
 						hit.algoliaConfig = window.algoliaConfig;
 						
-						hit.__position = hit.__hitIndex + 1;
+						var state = search.helper.state;
+						hit.__position = (state.page * state.hitsPerPage) + hit.__hitIndex + 1;
 						
 						return hit;
 					}

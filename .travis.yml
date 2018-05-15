@@ -19,6 +19,7 @@ cache:
     - $HOME/.composer/cache
 
 before_install:
+  - phpenv config-add travis.php.ini
   - mysql -e 'CREATE DATABASE magento20;'
   - composer global require phpstan/phpstan
 

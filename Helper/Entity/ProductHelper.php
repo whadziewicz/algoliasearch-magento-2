@@ -914,7 +914,7 @@ class ProductHelper
                 continue;
             }
 
-            if (in_array($indexInfo['name'], $replicas) === false) {
+            if (strpos($indexInfo['name'], '_tmp') === false && in_array($indexInfo['name'], $replicas) === false) {
                 $indicesToDelete[] = $indexInfo['name'];
             }
         }

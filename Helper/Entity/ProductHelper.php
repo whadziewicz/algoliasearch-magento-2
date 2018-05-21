@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper\Entity;
 
+use AlgoliaSearch\AlgoliaException;
 use AlgoliaSearch\Index;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
@@ -287,14 +288,25 @@ class ProductHelper
         /*
          * Handle replicas
          */
-        $isInstantSearchEnabled = $this->configHelper->isInstantEnabled($storeId);
         $sortingIndices = $this->configHelper->getSortingIndices($indexName, $storeId);
 
         $replicas = array_values(array_map(function ($sortingIndex) {
             return $sortingIndex['name'];
         }, $sortingIndices));
 
-        if ($isInstantSearchEnabled === true && count($sortingIndices) > 0) {
+        // Merge current replicas with sorting replicas to not delete A/B testing replica indices
+        try {
+            $currentSettings = $this->algoliaHelper->getSettings($indexName);
+            if (array_key_exists('replicas', $currentSettings)) {
+                $replicas = array_values(array_unique(array_merge($replicas, $currentSettings['replicas'])));
+            }
+        } catch (AlgoliaException $e) {
+            if ($e->getMessage() !== 'Index does not exist') {
+                throw $e;
+            }
+        }
+
+        if (count($replicas) > 0) {
             $this->algoliaHelper->setSettings($indexName, ['replicas' => $replicas]);
             $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
 
@@ -307,7 +319,8 @@ class ProductHelper
             $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
         }
 
-        $this->deleteUnusedReplicas($indexName, $replicas, $setReplicasTaskId);
+        // Commented out as it doesn't delete anything now because of merging replica indices earlier
+        // $this->deleteUnusedReplicas($indexName, $replicas, $setReplicasTaskId);
 
         if ($this->configHelper->isEnabledSynonyms($storeId) === true) {
             if ($synonymsFile = $this->configHelper->getSynonymsFile($storeId)) {

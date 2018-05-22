@@ -102,7 +102,7 @@ class Queue
 
         if ($nbJobs === null) {
             $nbJobs = $this->configHelper->getNumberOfJobToRun();
-            if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') === '1') {
+            if ($this->shouldEmptyQueue() === true) {
                 $nbJobs = -1;
 
                 $this->logRecord['with_empty_queue'] = 1;
@@ -479,5 +479,18 @@ class Queue
         if ($idsToDelete) {
             $this->db->query("DELETE FROM {$this->logTable} WHERE id IN (" . implode(", ", $idsToDelete) . ")");
         }
+    }
+
+	private function shouldEmptyQueue()
+	{
+		if (getenv('PROCESS_FULL_QUEUE') && getenv('PROCESS_FULL_QUEUE') === '1') {
+			return true;
+		}
+
+		if (getenv('EMPTY_QUEUE') && getenv('EMPTY_QUEUE') === '1') {
+			return true;
+		}
+
+		return false;
     }
 }

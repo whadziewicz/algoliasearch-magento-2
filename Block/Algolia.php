@@ -13,6 +13,7 @@ use Magento\Framework\Data\CollectionDataSourceInterface;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Locale\Currency;
 use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\Url\Helper\Data;
 use Magento\Framework\View\Element\Template;
 use Magento\Search\Helper\Data as CatalogSearchHelper;
@@ -33,6 +34,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
     private $coreHelper;
     private $categoryHelper;
     private $checkoutSession;
+    private $date;
 
     private $priceKey;
 
@@ -50,6 +52,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
         CoreHelper $coreHelper,
         CategoryHelper $categoryHelper,
         CheckoutSession $checkoutSession,
+        DateTime $date,
         array $data = []
     ) {
         $this->config = $config;
@@ -64,6 +67,7 @@ class Algolia extends Template implements CollectionDataSourceInterface
         $this->coreHelper = $coreHelper;
         $this->categoryHelper = $categoryHelper;
         $this->checkoutSession = $checkoutSession;
+        $this->date = $date;
 
         parent::__construct($context, $data);
     }
@@ -169,6 +173,11 @@ class Algolia extends Template implements CollectionDataSourceInterface
             'action' => $url,
             'formKey' => $this->formKey->getFormKey(),
         ];
+    }
+
+    public function getTimestamp()
+    {
+        return $this->date->gmtTimestamp();
     }
 
     private function getAddToCartUrl($additional = [])

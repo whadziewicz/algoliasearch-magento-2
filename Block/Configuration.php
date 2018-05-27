@@ -189,6 +189,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'orderedProductIds' => $this->getOrderedProductIds($config, $request),
             ],
             'analytics' => $config->getAnalyticsConfig(),
+            'now' => $this->getTimestamp(),
             'translations' => [
                 'to' => __('to'),
                 'or' => __('or'),

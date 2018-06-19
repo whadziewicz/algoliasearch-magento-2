@@ -45,6 +45,8 @@ class Url extends ProductUrl
      * @param Product $product
      * @param array $params
      * @return string
+     *
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getUrl(Product $product, $params = [])
     {
@@ -82,10 +84,6 @@ class Url extends ProductUrl
 
         if (isset($routeParams['_scope'])) {
             $storeId = $this->storeManager->getStore($routeParams['_scope'])->getId();
-        }
-
-        if ($storeId !== $this->storeManager->getStore()->getId()) {
-            $routeParams['_scope_to_url'] = true;
         }
 
         if ($requestPath) {

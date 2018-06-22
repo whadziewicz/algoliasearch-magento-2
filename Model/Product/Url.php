@@ -86,6 +86,11 @@ class Url extends ProductUrl
             $storeId = $this->storeManager->getStore($routeParams['_scope'])->getId();
         }
 
+        // Loose (==) comparison on purpose
+        if ($storeId != $this->storeManager->getStore()->getId()) {
+            $routeParams['_scope_to_url'] = true;
+        }
+
         if ($requestPath) {
             $routeParams['_direct'] = $requestPath;
         } else {

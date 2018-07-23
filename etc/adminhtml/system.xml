@@ -173,7 +173,7 @@
                     <label>Minimal query popularity</label>
                     <comment>
                         <![CDATA[
-                            The minimum number of times a query has been performed in order to be suggested in the autocomplete menu. Default value is 1000.
+                            The minimal number of times a query has been performed in order to be suggested in the autocomplete menu. Default value is 1000.
                         ]]>
                     </comment>
                     <depends>

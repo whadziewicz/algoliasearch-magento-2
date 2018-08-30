@@ -251,14 +251,14 @@ class CategoryHelper
         }
 
         $data = [
-            'objectID'      => $category->getId(),
-            'name'          => $category->getName(),
-            'path'          => $path,
-            'level'         => $category->getLevel(),
-            'url'           => $this->getUrl($category),
+            'objectID' => $category->getId(),
+            'name' => $category->getName(),
+            'path' => $path,
+            'level' => $category->getLevel(),
+            'url' => $this->getUrl($category),
             'include_in_menu' => $category->getIncludeInMenu(),
-            '_tags'         => ['category'],
-            'popularity'    => 1,
+            '_tags' => ['category'],
+            'popularity' => 1,
             'product_count' => $category->getProductCount(),
         ];
 

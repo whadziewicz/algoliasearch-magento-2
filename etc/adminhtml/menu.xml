@@ -37,6 +37,15 @@
             resource="Algolia_AlgoliaSearch::manage"
         />
         <add
+            id="Algolia_AlgoliaSearch::queue"
+            title="Indexing Queue"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="50"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/queue/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
             id="Algolia_AlgoliaSearch::reindex"
             title="Reindex SKU(s)"
             module="Algolia_AlgoliaSearch"

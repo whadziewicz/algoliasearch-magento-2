@@ -19,13 +19,15 @@ $configHelper = $block->getConfigHelper();
 
 
 
-<?php if (!$configHelper->isInstantEnabled() || !$configHelper->replaceCategories()): ?>
+<?php if (!$configHelper->isInstantEnabled() || !$configHelper->replaceCategories()):
+    $instantSearchLink = $this->getUrl('adminhtml/system_config/edit/section/algoliasearch_instant');
+?>
 
 <div class="messages">
     <div class="message message-info info">
         To merchandise products using Algolia
         you need to enable <b>Instant search</b> with <b>Replace category pages</b> feature.
-        You can do it in Algolia's <a href="" target="_blank">Instant Search configuration</a>.
+        You can do it in Algolia's <a href="<?php echo $instantSearchLink; ?>" target="_blank">Instant Search configuration</a>.
         <br><br>
         <b>Instant search</b> with enabled <b>Replace category pages</b> feature gives your customers a great experience
         while browsing your catalog. It enables your customers to search and filter for products at real time resulting
@@ -609,7 +611,7 @@ $isConfig = [
                     }];
 
 	            $('#algolia_merchandising_autocomplete')
-                    .autocomplete({ debug: true, hint: false }, sources)
+                    .autocomplete({ debug: false, hint: false }, sources)
 		            .on('autocomplete:selected', function (e, suggestion) {
 		            	var $existingRow = $('.algolia_merchandising_items_table tbody tr[data-objectid="' + suggestion.objectID + '"]');
 

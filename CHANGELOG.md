@@ -1,5 +1,11 @@
 # CHANGE LOG
 
+## 1.8.1
+
+* Fixed PHP 5.5 support (#562)
+* Fixed `archive` table creation (#566)
+* Fixed PHP notice on not recognised product type (#566)
+
 ## 1.8.0
 
 ### FEATURES

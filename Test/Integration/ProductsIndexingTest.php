@@ -16,7 +16,7 @@ class ProductsIndexingTest extends IndexingTestCase
         /** @var Product $indexer */
         $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
 
-        $this->processTest($indexer, 'products', ($this->assertValues)::PRODUCTS_ON_STOCK_COUNT);
+        $this->processTest($indexer, 'products', $this->assertValues->productsOnStockCount);
     }
 
     public function testIncludingOutOfStock()
@@ -28,7 +28,7 @@ class ProductsIndexingTest extends IndexingTestCase
         /** @var Product $indexer */
         $indexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
 
-        $this->processTest($indexer, 'products', ($this->assertValues)::PRODUCTS_OUT_OF_STOCK_COUNT);
+        $this->processTest($indexer, 'products', $this->assertValues->productsOutOfStockCount);
     }
 
     public function testDefaultIndexableAttributes()

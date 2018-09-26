@@ -27,8 +27,6 @@ abstract class ProductWithChildren extends ProductWithoutChildren
 
     protected function getMinMaxPrices(Product $product, $withTax, $subProducts, $currencyCode)
     {
-        $type = $product->getTypeId();
-
         $min = PHP_INT_MAX;
         $max = 0;
 
@@ -95,10 +93,6 @@ abstract class ProductWithChildren extends ProductWithoutChildren
 
         if ($min !== $max) {
             return;
-        }
-
-        if ($currencyCode !== $this->baseCurrencyCode) {
-            $min = $this->convertPrice($min, $currencyCode);
         }
 
         $this->customData[$field][$currencyCode]['default'] = $min;

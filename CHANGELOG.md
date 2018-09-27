@@ -1,5 +1,13 @@
 # CHANGE LOG
 
+## 1.8.2
+
+* Fixed error which showed Instant search components on checkout page (#572)
+* Fixed administration categories and category merchandising on Magento 2.1 (#573)
+* Fixed indexing queue page on Magento 2.1 (#575)
+* Fixed configurable products' price calculation when parent product has zero price (#580)
+* Fixed processed jobs removal from indexing queue (#582)
+
 ## 1.8.1
 
 * Fixed PHP 5.5 support (#562)
@@ -12,7 +20,7 @@
 - Possibility to [reindex specific SKUs](https://community.algolia.com/doc/m2/sku-reindexing-form/) (#536)
     - the form will give an option to reindex specific SKU(s)
     - if the product shouldn't be reindexed, the form shows the exact reason why the product is not indexed 
-- Category visual merchandiser (#510)
+- Category visual merchandiser - Magento 2.1 and higher (#510)
     - the tool gives possibility to visually merchandise products on category pages powered by Algolia
     - it's placed in category detail in tab "Algolia Merchandising"
 - Indexing queue page (#537)

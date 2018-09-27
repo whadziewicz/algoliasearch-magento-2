@@ -181,7 +181,7 @@ class Queue
                 call_user_func_array([$model, $method], $data);
 
                 // Delete one by one
-                $where = $this->db->quoteInto('pid = ?', $pid);
+                $where = $this->db->quoteInto('job_id IN (?)', $job['merged_ids']);
                 $this->db->delete($this->table, $where);
 
                 $this->logRecord['processed_jobs'] += count($job['merged_ids']);

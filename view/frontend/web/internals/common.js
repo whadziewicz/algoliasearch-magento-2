@@ -155,7 +155,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 				&& hit['price'][algoliaConfig.currencyCode]['special_to_date']) {
 				var priceExpiration = hit['price'][algoliaConfig.currencyCode]['special_to_date'];
 				
-				if (algoliaConfig.now > priceExpiration) {
+				if (algoliaConfig.now > priceExpiration + 1) {
 					hit['price'][algoliaConfig.currencyCode]['default_formated'] = hit['price'][algoliaConfig.currencyCode]['default_original_formated'];
 					hit['price'][algoliaConfig.currencyCode]['default_original_formated'] = false;
 				}

@@ -63,7 +63,6 @@ $tierFormatedVar = 'price' . $priceKey . '_tier_formated'
                         <div class="result-description text-ellipsis">{{{ _highlightResult.description.value }}}</div>
 
                         {{#isAddToCartEnabled}}
-                        {{#in_stock}}
                         <form data-role="tocart-form" action="{{ addToCart.action }}" method="post">
                             <input type="hidden" name="product" value="{{objectID}}">
                             <input type="hidden" name="uenc" value="{{ addToCart.uenc }}">
@@ -72,7 +71,6 @@ $tierFormatedVar = 'price' . $priceKey . '_tier_formated'
                                 <span>Add to Cart</span>
                             </button>
                         </form>
-                        {{/in_stock}}
                         {{/isAddToCartEnabled}}
                     </div>
                 </div>

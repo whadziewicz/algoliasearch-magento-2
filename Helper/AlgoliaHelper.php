@@ -473,7 +473,7 @@ class AlgoliaHelper extends AbstractHelper
                     }
 
                     array_pop($object['sku']);
-                    
+
                     $size = $this->calculateObjectSize($object);
                     if ($size < $this->maxRecordSize) {
                         return $object;
@@ -571,6 +571,7 @@ class AlgoliaHelper extends AbstractHelper
 
     /**
      * @param $object
+     *
      * @return int
      */
     private function calculateObjectSize($object)

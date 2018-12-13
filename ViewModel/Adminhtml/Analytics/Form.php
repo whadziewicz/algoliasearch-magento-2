@@ -14,7 +14,9 @@ class Form extends Index
 
     /**
      * Set Default Date Range if Form Value for dates are not set
+     *
      * @param $key
+     *
      * @return string
      */
     public function getFormValue($key)

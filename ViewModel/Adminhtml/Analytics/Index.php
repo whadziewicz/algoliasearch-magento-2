@@ -3,9 +3,9 @@
 namespace Algolia\AlgoliaSearch\ViewModel\Adminhtml\Analytics;
 
 use Algolia\AlgoliaSearch\DataProvider\Analytics\PopularResultsDataProvider;
-use Algolia\AlgoliaSearch\ViewModel\Adminhtml\BackendView;
 use Algolia\AlgoliaSearch\Helper\AnalyticsHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\AggregatorHelper;
+use Algolia\AlgoliaSearch\ViewModel\Adminhtml\BackendView;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 
 class Index implements ArgumentInterface
@@ -33,6 +33,7 @@ class Index implements ArgumentInterface
 
     /**
      * Index constructor.
+     *
      * @param BackendView $backendView
      * @param AnalyticsHelper $analyticsHelper
      * @param AggregatorHelper $entityHelper
@@ -62,6 +63,7 @@ class Index implements ArgumentInterface
 
     /**
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
      * @return mixed
      */
     public function getIndexName()
@@ -73,7 +75,9 @@ class Index implements ArgumentInterface
 
     /**
      * @param array $additional
+     *
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
      * @return array
      */
     public function getAnalyticsParams($additional = [])
@@ -129,7 +133,9 @@ class Index implements ArgumentInterface
 
     /**
      * Click Analytics
+     *
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
      * @return mixed
      */
     public function getClickThroughRate()
@@ -164,6 +170,7 @@ class Index implements ArgumentInterface
 
     /**
      * Get aggregated Daily data from separate calls
+     *
      * @return array
      */
     public function getDailySearchData()
@@ -199,6 +206,7 @@ class Index implements ArgumentInterface
      * @param $array
      * @param $date
      * @param $valueKey
+     *
      * @return string
      */
     private function getDateValue($array, $date, $valueKey)
@@ -225,6 +233,7 @@ class Index implements ArgumentInterface
 
     /**
      * @throws \Magento\Framework\Exception\LocalizedException
+     *
      * @return array
      */
     public function getPopularResults()
@@ -276,6 +285,7 @@ class Index implements ArgumentInterface
 
     /**
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
      * @return array
      */
     public function getNoResultSearches()
@@ -336,6 +346,7 @@ class Index implements ArgumentInterface
 
     /**
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
      * @return array
      */
     public function getSections()
@@ -345,6 +356,7 @@ class Index implements ArgumentInterface
 
     /**
      * @param $search
+     *
      * @return array
      */
     public function getTypeEditUrl($search)
@@ -395,6 +407,7 @@ class Index implements ArgumentInterface
 
     /**
      * @param $message
+     *
      * @return string
      */
     public function getTooltipHtml($message)
@@ -407,8 +420,9 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @return \Magento\Store\Api\Data\StoreInterface|null|string
      * @throws \Magento\Framework\Exception\NoSuchEntityException
+     *
+     * @return \Magento\Store\Api\Data\StoreInterface|null|string
      */
     public function getStore()
     {
@@ -437,6 +451,7 @@ class Index implements ArgumentInterface
 
     /**
      * Messages rendered HTML getter.
+     *
      * @return string
      */
     public function getMessagesHtml()

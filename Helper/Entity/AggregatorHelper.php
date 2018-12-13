@@ -4,8 +4,8 @@ namespace Algolia\AlgoliaSearch\Helper\Entity;
 
 use Algolia\AlgoliaSearch\Helper\Data;
 
-class AggregatorHelper {
-
+class AggregatorHelper
+{
     /** @var Data */
     private $dataHelper;
 
@@ -28,6 +28,7 @@ class AggregatorHelper {
 
     /**
      * EntityHelper constructor.
+     *
      * @param Data $dataHelper
      * @param ProductHelper $productHelper
      * @param CategoryHelper $categoryHelper
@@ -53,6 +54,7 @@ class AggregatorHelper {
 
     /**
      * @param $storeId
+     *
      * @return array
      */
     public function getEntityIndexes($storeId)
@@ -75,6 +77,7 @@ class AggregatorHelper {
     /**
      * @param $entity
      * @param $storeId
+     *
      * @return mixed
      */
     public function getIndexNameByEntity($entity, $storeId)
@@ -83,5 +86,4 @@ class AggregatorHelper {
 
         return $indexes[$entity];
     }
-
 }

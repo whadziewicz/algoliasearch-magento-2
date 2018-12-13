@@ -2,12 +2,12 @@
 
 namespace Algolia\AlgoliaSearch\ViewModel\Adminhtml;
 
+use Magento\Backend\Model\Session;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use Magento\Backend\Model\Session;
-use Magento\Framework\UrlInterface;
 
 class BackendView implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
@@ -92,5 +92,4 @@ class BackendView implements \Magento\Framework\View\Element\Block\ArgumentInter
     {
         return $this->url;
     }
-
 }

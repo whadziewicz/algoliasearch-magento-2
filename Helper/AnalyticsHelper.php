@@ -2,8 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use AlgoliaSearch\Analytics;
 use Algolia\AlgoliaSearch\Helper\Entity\AggregatorHelper;
+use AlgoliaSearch\Analytics;
 
 class AnalyticsHelper extends Analytics
 {
@@ -42,6 +42,7 @@ class AnalyticsHelper extends Analytics
 
     /**
      * AnalyticsHelper constructor.
+     *
      * @param AlgoliaHelper $algoliaHelper
      * @param ConfigHelper $configHelper
      * @param AggregatorHelper $entityHelper
@@ -65,6 +66,7 @@ class AnalyticsHelper extends Analytics
 
     /**
      * @param $storeId
+     *
      * @return array
      */
     public function getAnalyticsIndices($storeId)
@@ -78,7 +80,9 @@ class AnalyticsHelper extends Analytics
 
     /**
      * Search Analytics
+     *
      * @param array $params
+     *
      * @return mixed
      */
     public function getTopSearches(array $params)
@@ -139,7 +143,9 @@ class AnalyticsHelper extends Analytics
 
     /**
      * Hits Analytics
+     *
      * @param array $params
+     *
      * @return mixed
      */
     public function getTopHits(array $params)
@@ -154,7 +160,9 @@ class AnalyticsHelper extends Analytics
 
     /**
      * Get Count of Users
+     *
      * @param array $params
+     *
      * @return mixed
      */
     public function getUsers(array $params)
@@ -182,7 +190,9 @@ class AnalyticsHelper extends Analytics
 
     /**
      * Filter Analytics
+     *
      * @param array $params
+     *
      * @return mixed
      */
     public function getTopFilterAttributes(array $params)
@@ -215,6 +225,7 @@ class AnalyticsHelper extends Analytics
      * Click Analytics
      *
      * @param array $params
+     *
      * @return mixed
      */
     public function getAverageClickPosition(array $params)
@@ -267,6 +278,7 @@ class AnalyticsHelper extends Analytics
 
     /**
      * Client Data Check
+     *
      * @return mixed
      */
     public function getClientData()
@@ -282,9 +294,8 @@ class AnalyticsHelper extends Analytics
     {
         $clientData = $this->getClientData();
 
-        return (bool)$clientData && isset($clientData['analytics_api']) ? $clientData['analytics_api'] : 0;
+        return (bool) $clientData && isset($clientData['analytics_api']) ? $clientData['analytics_api'] : 0;
     }
-
 
     public function isClickAnalyticsEnabled()
     {
@@ -294,13 +305,15 @@ class AnalyticsHelper extends Analytics
 
         $clientData = $this->getClientData();
 
-        return (bool)$clientData && isset($clientData['click_analytics']) ? $clientData['click_analytics'] : 0;
+        return (bool) $clientData && isset($clientData['click_analytics']) ? $clientData['click_analytics'] : 0;
     }
 
     /**
      * Pass through method for handling API Versions
+     *
      * @param string $path
      * @param array $params
+     *
      * @return mixed
      */
     private function fetch($path, array $params)
@@ -318,7 +331,6 @@ class AnalyticsHelper extends Analytics
             }
 
             $response = $this->request('GET', $path, $params);
-
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             $this->logger->log($e->getMessage());
@@ -346,7 +358,7 @@ class AnalyticsHelper extends Analytics
         $params = [
             'appId' => $appId,
             'token' => $token,
-            'type' => 'analytics'
+            'type' => 'analytics',
         ];
 
         $ch = curl_init();

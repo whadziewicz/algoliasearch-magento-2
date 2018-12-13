@@ -20,6 +20,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
 
     /**
      * AbstractAction constructor.
+     *
      * @param Context $context
      * @param ResultFactory $resultFactory
      * @param JsonFactory $resultJsonFactory

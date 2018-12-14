@@ -1,7 +1,7 @@
-<script type="text/template" id="facet-template">
-    <div class="sub_facet {{#isRefined}}checked{{/isRefined}}">
-        <input class="facet_value" {{#isRefined}}checked{{/isRefined}} type="checkbox">
+<script type="text/template" id="refinements-lists-item-template">
+    <div class="{{cssClasses.label}} {{#isRefined}}checked{{/isRefined}}">
+        <input class="{{cssClasses.checkbox}}" {{#isRefined}}checked{{/isRefined}} type="checkbox">
         {{value}}
-        <span class="count">{{count}}</span>
+        <span class="{{cssClasses.count}}">{{count}}</span>
     </div>
 </script>

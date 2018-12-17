@@ -5,9 +5,8 @@ namespace Algolia\AlgoliaSearch\ViewModel\Adminhtml\Support;
 use Algolia\AlgoliaSearch\Helper\SupportHelper;
 use Algolia\AlgoliaSearch\ViewModel\Adminhtml\BackendView;
 use Magento\Backend\Block\Template;
-use Magento\Framework\View\Element\Block\ArgumentInterface;
 
-class Index implements ArgumentInterface
+class Overview
 {
     /** @var BackendView */
     private $backendView;

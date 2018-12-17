@@ -10,7 +10,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-class BackendView implements \Magento\Framework\View\Element\Block\ArgumentInterface
+class BackendView
 {
     /** @var RequestInterface */
     private $request;

@@ -1,5 +1,26 @@
 # CHANGE LOG
 
+## 1.9.0
+
+### FEATURES
+- Added new "Support page" to find and seek help with the extension (#606)
+- Added new "Analytics overview" page to track business performance of the search (#620)
+- SEO improvements: (#616)
+    - Back-end of the extension now renders the same content as the front-end does on replaced category pages
+    - Instant search pages URLs are SEO-friendly
+
+### UPDATES
+- The extension no longer supports Magento 2.0 (#588, #594) - **BC Break**
+- No query rules are created by default configuration (#599)
+- Prevented spoiling of attribute source model by checking if a product attribute uses source (#545)
+- When a record is too big t be indexed in Algolia, SKUs of child attributes are truncated (#617)
+- Removed "in_stock" condition to display "Add to cart" button on instant search page (#631)
+
+### FIXES
+- The Instant Search page and Autocomplete menu configurations are not wiped out when the feature is disabled (#593)
+- Fixed price sorting on the front-end with customers group enabled (#625)
+- Fixed HTML ID of facet template which was never used (#636)
+
 ## 1.8.4
 
 - **Added compatibility with Magento 2.3** (#624)

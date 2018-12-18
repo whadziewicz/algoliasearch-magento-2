@@ -6,21 +6,27 @@ use Algolia\AlgoliaSearch\Helper\SupportHelper;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Result\Page;
 
 class Contact extends AbstractAction
 {
     private $supportHelper;
 
-    public function __construct(Context $context, ResultFactory $resultFactory, SupportHelper $supportHelper)
+    /**
+     * @param Context $context
+     * @param SupportHelper $supportHelper
+     */
+    public function __construct(Context $context, SupportHelper $supportHelper)
     {
-        parent::__construct($context, $resultFactory);
+        parent::__construct($context);
 
         $this->supportHelper = $supportHelper;
     }
 
     /**
      * @throws \Zend_Db_Statement_Exception
+     * @throws LocalizedException
      *
      * @return Redirect | Page
      */

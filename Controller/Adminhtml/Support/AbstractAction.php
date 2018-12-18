@@ -12,15 +12,12 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
 
     /**
      * @param Context $context
-     * @param ResultFactory $resultFactory
      */
-    public function __construct(
-        Context $context,
-        ResultFactory $resultFactory
-    ) {
+    public function __construct(Context $context)
+    {
         parent::__construct($context);
 
-        $this->resultFactory = $resultFactory;
+        $this->resultFactory = $context->getResultFactory();
     }
 
     /** @return bool */

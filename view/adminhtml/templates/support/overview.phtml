@@ -1,9 +1,9 @@
 <?php
 
-/** @var $this \Magento\Backend\Block\Template */
+/** @var $this \Algolia\AlgoliaSearch\Block\Adminhtml\BaseAdminTemplate */
 
-/** @var \Algolia\AlgoliaSearch\ViewModel\Adminhtml\Support\Index $view */
-$view = $block->getViewModel();
+/** @var \Algolia\AlgoliaSearch\ViewModel\Adminhtml\Support\Overview $view */
+$view = $this->getViewModel();
 
 $docIllustration = $this->getViewFileUrl('Algolia_AlgoliaSearch::images/support-documentation.svg');
 $comIllustration = $this->getViewFileUrl('Algolia_AlgoliaSearch::images/support-community.svg');

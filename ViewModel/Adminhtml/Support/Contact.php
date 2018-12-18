@@ -7,10 +7,9 @@ use Algolia\AlgoliaSearch\ViewModel\Adminhtml\BackendView;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Framework\Module\ModuleListInterface;
-use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\User\Model\User;
 
-class Contact implements ArgumentInterface
+class Contact
 {
     /** @var BackendView */
     private $backendView;

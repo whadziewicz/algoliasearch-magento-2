@@ -5,9 +5,11 @@ namespace Algolia\AlgoliaSearch\ViewModel\Adminhtml\Analytics;
 use Algolia\AlgoliaSearch\DataProvider\Analytics\IndexEntityDataProvider;
 use Algolia\AlgoliaSearch\Helper\AnalyticsHelper;
 use Algolia\AlgoliaSearch\ViewModel\Adminhtml\BackendView;
-use Magento\Framework\View\Element\Block\ArgumentInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Api\Data\StoreInterface;
 
-class Index implements ArgumentInterface
+class Overview
 {
     const LIMIT_RESULTS = 5;
 
@@ -55,7 +57,7 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
      * @return mixed
      */
@@ -69,7 +71,7 @@ class Index implements ArgumentInterface
     /**
      * @param array $additional
      *
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
      * @return array
      */
@@ -127,7 +129,7 @@ class Index implements ArgumentInterface
     /**
      * Click Analytics
      *
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
      * @return mixed
      */
@@ -225,7 +227,7 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      *
      * @return array
      */
@@ -277,7 +279,7 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
      * @return array
      */
@@ -338,7 +340,7 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
      * @return array
      */
@@ -409,9 +411,9 @@ class Index implements ArgumentInterface
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      *
-     * @return \Magento\Store\Api\Data\StoreInterface|null|string
+     * @return StoreInterface|null|string
      */
     public function getStore()
     {

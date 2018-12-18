@@ -859,7 +859,7 @@ class ProductHelper
     ) {
         $valueText = null;
 
-        if (!is_array($value)) {
+        if (!is_array($value) && $attributeResource->usesSource()) {
             $valueText = $product->getAttributeText($attribute['attribute']);
         }
 

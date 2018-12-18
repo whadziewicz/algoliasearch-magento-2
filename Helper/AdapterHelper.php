@@ -3,7 +3,7 @@
 namespace Algolia\AlgoliaSearch\Helper;
 
 use Algolia\AlgoliaSearch\Helper\Adapter\FiltersHelper;
-use Algolia\AlgoliaSearch\Helper\Data as AlgoliaHelper;
+use Algolia\AlgoliaSearch\Helper\Data as AlgoliaDataHelper;
 use Magento\CatalogSearch\Helper\Data;
 
 class AdapterHelper
@@ -11,7 +11,7 @@ class AdapterHelper
     /** @var Data */
     private $catalogSearchHelper;
 
-    /** @var AlgoliaHelper */
+    /** @var AlgoliaDataHelper */
     private $algoliaHelper;
 
     /** @var FiltersHelper */
@@ -22,13 +22,13 @@ class AdapterHelper
 
     /**
      * @param Data $catalogSearchHelper
-     * @param AlgoliaHelper $algoliaHelper
+     * @param AlgoliaDataHelper $algoliaHelper
      * @param FiltersHelper $filtersHelper
      * @param ConfigHelper $configHelper
      */
     public function __construct(
         Data $catalogSearchHelper,
-        AlgoliaHelper $algoliaHelper,
+        AlgoliaDataHelper $algoliaHelper,
         FiltersHelper $filtersHelper,
         ConfigHelper $configHelper
     ) {

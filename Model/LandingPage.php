@@ -135,7 +135,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     /**
      * @inheritdoc
      */
-    public function setSpaceshipId($value)
+    public function setLandingPageId($value)
     {
         return $this->setId((int) $value);
     }

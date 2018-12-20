@@ -127,7 +127,7 @@ interface LandingPageInterface
      *
      * @return LandingPageInterface
      */
-    public function setSpaceshipId($value);
+    public function setLandingPageId($value);
 
     /**
      * Set field: store_id

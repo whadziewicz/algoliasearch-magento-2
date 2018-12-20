@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">algolia_algoliasearch_landingpage_form.landingpage_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Main Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="Algolia\AlgoliaSearch\Block\Adminhtml\LandingPage\Edit\SaveButton"/>
+            <button name="back" class="Algolia\AlgoliaSearch\Block\Adminhtml\LandingPage\Edit\BackButton"/>
+        </buttons>
+        <namespace>algolia_algoliasearch_landingpage_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>algolia_algoliasearch_landingpage_form.landingpage_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="landingpage_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="algolia_algoliasearch/landingpage/save"/>
+        </settings>
+        <dataProvider class="Algolia\AlgoliaSearch\DataProvider\LandingPage\LandingPageDataProvider" name="landingpage_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>landing_page_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="main_information">
+        <settings>
+            <label translate="true">Main Information</label>
+        </settings>
+        <field name="landing_page_id" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>landing_page_id</dataScope>
+            </settings>
+        </field>
+        <field name="title" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>title</dataScope>
+            </settings>
+        </field>
+        <field name="store_id" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Store ID</label>
+                <dataScope>store_id</dataScope>
+            </settings>
+        </field>
+        <field name="url_key" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">URL</label>
+                <dataScope>url_key</dataScope>
+            </settings>
+        </field>
+
+        <field name="is_active" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Is active</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+        </field>
+        <field name="date_from" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Date From</label>
+                <dataScope>date_from</dataScope>
+            </settings>
+        </field>
+        <field name="date_to" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Date To</label>
+                <dataScope>date_to</dataScope>
+            </settings>
+        </field>
+        <field name="content" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Content</label>
+                <dataScope>content</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="meta_data">
+        <settings>
+            <label translate="true">Meta Data</label>
+        </settings>
+        <field name="meta_title" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Meta Title</label>
+                <dataScope>meta_title</dataScope>
+            </settings>
+        </field>
+        <field name="meta_description" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Meta Description</label>
+                <dataScope>meta_description</dataScope>
+            </settings>
+        </field>
+        <field name="meta_keywords" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Meta Keywords</label>
+                <dataScope>meta_keywords</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="search_configuration">
+        <settings>
+            <label translate="true">Search Configuration</label>
+        </settings>
+        <field name="query" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Query</label>
+                <dataScope>query</dataScope>
+            </settings>
+        </field>
+        <field name="configuration" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Configuration</label>
+                <dataScope>configuration</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

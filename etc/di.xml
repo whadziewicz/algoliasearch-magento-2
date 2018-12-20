@@ -31,6 +31,7 @@
         <arguments>
             <argument name="collections" xsi:type="array">
                 <item name="algolia_algoliasearch_job_listing_data_source" xsi:type="string">Algolia\AlgoliaSearch\Model\ResourceModel\Job\Grid\Collection</item>
+                <item name="algolia_algoliasearch_landingpage_listing_data_source" xsi:type="string">Algolia\AlgoliaSearch\Model\ResourceModel\LandingPage\Grid\Collection</item>
             </argument>
         </arguments>
     </type>
@@ -40,6 +41,32 @@
             <argument name="eventPrefix" xsi:type="string">algoliasearch_queue_grid_collection</argument>
             <argument name="eventObject" xsi:type="string">algoliasearch_queue_grid_collection</argument>
             <argument name="resourceModel" xsi:type="string">Algolia\AlgoliaSearch\Model\ResourceModel\Job</argument>
+        </arguments>
+    </type>
+    <type name="Algolia\AlgoliaSearch\Model\ResourceModel\LandingPage\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">algoliasearch_landing_page</argument>
+            <argument name="eventPrefix" xsi:type="string">algoliasearch_landing_page_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">algoliasearch_landing_page_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Algolia\AlgoliaSearch\Model\ResourceModel\LandingPage</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\EntityManager\MetadataPool">
+        <arguments>
+            <argument name="metadata" xsi:type="array">
+                <item name="Algolia\AlgoliaSearch\Api\Data\LandingPageInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">algoliasearch_landing_page</item>
+                    <item name="identifierField" xsi:type="string">landing_page_id</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\HydratorPool">
+        <arguments>
+            <argument name="hydrators" xsi:type="array">
+                <item name="Algolia\AlgoliaSearch\Api\Data\LandingPageInterface" xsi:type="string">Magento\Framework\EntityManager\AbstractModelHydrator</item>
+            </argument>
         </arguments>
     </type>
 </config>

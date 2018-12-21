@@ -2,49 +2,36 @@
 
 namespace Algolia\AlgoliaSearch\Controller;
 
+use Algolia\AlgoliaSearch\Model\LandingPageFactory;
+use Magento\Framework\App\ActionFactory;
+use Magento\Store\Model\StoreManagerInterface;
+
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Router implements \Magento\Framework\App\RouterInterface
 {
-    /**
-     * @var \Magento\Framework\App\ActionFactory
-     */
+    /** @var ActionFactory */
     protected $actionFactory;
 
-    /**
-     * Store manager
-     *
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
+    /** @var StoreManagerInterface */
     protected $storeManager;
 
-    /**
-     * Page factory
-     *
-     * @var \Magento\Cms\Model\PageFactory
-     */
-    protected $pageFactory;
+    /**  @var LandingPageFactory */
+    protected $landingPageFactory;
 
     /**
-     * Config primary
-     *
-     * @var \Magento\Framework\App\State
-     */
-    protected $appState;
-
-    /**
-     * @param \Magento\Framework\App\ActionFactory $actionFactory
-     * @param \Magento\Cms\Model\PageFactory $pageFactory
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param ActionFactory $actionFactory
+     * @param LandingPageFactory $landingPageFactory
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        \Magento\Framework\App\ActionFactory $actionFactory,
-        \Magento\Cms\Model\PageFactory $pageFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        ActionFactory $actionFactory,
+        LandingPageFactory $landingPageFactory,
+        StoreManagerInterface $storeManager
     ) {
         $this->actionFactory = $actionFactory;
-        $this->pageFactory = $pageFactory;
+        $this->landingPageFactory = $landingPageFactory;
         $this->storeManager = $storeManager;
     }
 
@@ -58,20 +45,20 @@ class Router implements \Magento\Framework\App\RouterInterface
     {
         $identifier = trim($request->getPathInfo(), '/');
 
-        if ($identifier == 'my-landing-page') {
-            die('LANDING PAGE');
-        }
-
-        /** @var \Magento\Cms\Model\Page $page */
-        $page = $this->pageFactory->create();
-        $pageId = $page->checkIdentifier($identifier, $this->storeManager->getStore()->getId());
+        /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
+        $landingPage = $this->landingPageFactory->create();
+        $pageId = $landingPage->checkIdentifier($identifier, $this->storeManager->getStore()->getId());
         if (!$pageId) {
             return null;
         }
 
-        $request->setModuleName('cms')->setControllerName('page')->setActionName('view')->setParam('page_id', $pageId);
-        $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);
+        $request
+            ->setModuleName('algolia')
+            ->setControllerName('landingpage')
+            ->setActionName('view')
+            ->setParam('landing_page_id', $pageId);
 
+        $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);
         return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
     }
 }

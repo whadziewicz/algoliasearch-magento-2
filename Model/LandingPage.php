@@ -235,4 +235,18 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     {
         return $this->setData(self::FIELD_CONFIGURATION, (string) $value);
     }
+
+    /**
+     * Check if landing page url key exists for specific store
+     * return page id if landing page exists
+     *
+     * @param string $identifier
+     * @param int $storeId
+     *
+     * @return int
+     */
+    public function checkIdentifier($identifier, $storeId)
+    {
+        return $this->_getResource()->checkIdentifier($identifier, $storeId);
+    }
 }

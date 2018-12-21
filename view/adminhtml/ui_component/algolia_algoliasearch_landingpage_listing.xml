@@ -72,17 +72,16 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
-                    <item name="sorting" xsi:type="string">asc</item>
-                    <item name="resizeDefaultWidth" xsi:type="string">55</item>
                     <item name="label" xsi:type="string" translate="true">Landing Page Id</item>
                 </item>
             </argument>
         </column>
-        <column name="store_id">
+        <column name="store_id" class="Magento\Search\Ui\Component\Listing\Column\StoreView">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
-                    <item name="label" xsi:type="string" translate="true">Store Id</item>
+                    <item name="label" xsi:type="string" translate="true">Store View</item>
+                    <item name="bodyTmpl" xsi:type="string" translate="true">ui/grid/cells/html</item>
                 </item>
             </argument>
         </column>
@@ -108,14 +107,15 @@
                 </item>
             </argument>
         </column>
-        <column name="is_active" >
+        <column name="is_active">
             <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Algolia\AlgoliaSearch\Model\Source\LandingPageStatuses</item>
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="editor" xsi:type="array">
-                        <item name="editorType" xsi:type="string">text</item>
-                    </item>
-                    <item name="label" xsi:type="string" translate="true">Active</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="editor" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Status</item>
                 </item>
             </argument>
         </column>

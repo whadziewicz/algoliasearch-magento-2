@@ -35,9 +35,11 @@
         </dataProvider>
     </dataSource>
     <fieldset name="main_information">
-        <settings>
-            <label translate="true">Main Information</label>
-        </settings>
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Main Information</item>
+            </item>
+        </argument>
         <field name="landing_page_id" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -49,6 +51,30 @@
                 <visible>false</visible>
                 <dataScope>landing_page_id</dataScope>
             </settings>
+        </field>
+        <field name="is_active" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">ß</item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Enable Landing Page</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
         </field>
         <field name="title" formElement="input">
             <argument name="data" xsi:type="array">
@@ -65,20 +91,28 @@
                 <dataScope>title</dataScope>
             </settings>
         </field>
-        <field name="store_id" formElement="input">
+        <field name="store_id" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">landing_page</item>
+                    <item name="default" xsi:type="number">0</item>
                 </item>
             </argument>
             <settings>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
-                <dataType>text</dataType>
-                <label translate="true">Store ID</label>
+                <dataType>int</dataType>
+                <label translate="true">Store View</label>
                 <dataScope>store_id</dataScope>
             </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Cms\Ui\Component\Listing\Column\Cms\Options"/>
+                    </settings>
+                </select>
+            </formElements>
         </field>
         <field name="url_key" formElement="input">
             <argument name="data" xsi:type="array">
@@ -95,8 +129,7 @@
                 <dataScope>url_key</dataScope>
             </settings>
         </field>
-
-        <field name="is_active" formElement="input">
+        <field name="date_from" formElement="date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">landing_page</item>
@@ -104,29 +137,14 @@
             </argument>
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Is active</label>
-                <dataScope>is_active</dataScope>
-            </settings>
-        </field>
-        <field name="date_from" formElement="input">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                </item>
-            </argument>
-            <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">false</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Date From</label>
+                <label translate="true">From</label>
                 <dataScope>date_from</dataScope>
             </settings>
         </field>
-        <field name="date_to" formElement="input">
+        <field name="date_to" formElement="date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">landing_page</item>
@@ -134,33 +152,41 @@
             </argument>
             <settings>
                 <validation>
-                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
                 </validation>
                 <dataType>text</dataType>
-                <label translate="true">Date To</label>
+                <label translate="true">To</label>
                 <dataScope>date_to</dataScope>
             </settings>
         </field>
-        <field name="content" formElement="input">
+    </fieldset>
+    <fieldset name="content">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string" translate="true">Content</item>
+            </item>
+        </argument>
+        <field name="content">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string"/>
+                    <item name="formElement" xsi:type="string">wysiwyg</item>
                     <item name="source" xsi:type="string">landing_page</item>
+                    <item name="wysiwyg" xsi:type="boolean">true</item>
+                    <item name="dataScope" xsi:type="string">content</item>
+                    <item name="additionalClasses" xsi:type="string">admin__field-wide</item>
                 </item>
             </argument>
-            <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">false</rule>
-                </validation>
-                <dataType>text</dataType>
-                <label translate="true">Content</label>
-                <dataScope>content</dataScope>
-            </settings>
         </field>
     </fieldset>
     <fieldset name="meta_data">
-        <settings>
-            <label translate="true">Meta Data</label>
-        </settings>
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string" translate="true">Meta Data</item>
+            </item>
+        </argument>
         <field name="meta_title" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -208,9 +234,12 @@
         </field>
     </fieldset>
     <fieldset name="search_configuration">
-        <settings>
-            <label translate="true">Search Configuration</label>
-        </settings>
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string" translate="true">Search Configuration</item>
+            </item>
+        </argument>
         <field name="query" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

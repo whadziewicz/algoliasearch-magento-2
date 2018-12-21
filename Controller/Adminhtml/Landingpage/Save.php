@@ -74,7 +74,7 @@ class Save extends AbstractAction
                 $this->dataPersistor->clear('algolia_algoliasearch_landing_page');
 
                 if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('*/*/edit', ['landing_page_id' => $landingPage->getId()]);
+                    return $resultRedirect->setPath('*/*/edit', ['id' => $landingPage->getId()]);
                 }
 
                 return $resultRedirect->setPath('*/*/');
@@ -89,7 +89,7 @@ class Save extends AbstractAction
 
             $this->dataPersistor->set('landing_page', $data);
 
-            return $resultRedirect->setPath('*/*/edit', ['landing_page_id' => $landingPageId]);
+            return $resultRedirect->setPath('*/*/edit', ['id' => $landingPageId]);
         }
         return $resultRedirect->setPath('*/*/');
     }

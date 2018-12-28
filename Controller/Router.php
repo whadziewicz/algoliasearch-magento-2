@@ -5,6 +5,8 @@ namespace Algolia\AlgoliaSearch\Controller;
 use Algolia\AlgoliaSearch\Model\LandingPageFactory;
 use Magento\Framework\App\ActionFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Stdlib\DateTime;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -17,21 +19,33 @@ class Router implements \Magento\Framework\App\RouterInterface
     /** @var StoreManagerInterface */
     protected $storeManager;
 
+    /** @var TimezoneInterface */
+    protected $localeDate;
+
+    /** @var DateTime */
+    protected $dateTime;
+
     /**  @var LandingPageFactory */
     protected $landingPageFactory;
 
     /**
      * @param ActionFactory $actionFactory
      * @param LandingPageFactory $landingPageFactory
+     * @param TimezoneInterface $localeDate
+     * @param DateTime $dateTime
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         ActionFactory $actionFactory,
         LandingPageFactory $landingPageFactory,
+        TimezoneInterface $localeDate,
+        DateTime $dateTime,
         StoreManagerInterface $storeManager
     ) {
         $this->actionFactory = $actionFactory;
         $this->landingPageFactory = $landingPageFactory;
+        $this->localeDate = $localeDate;
+        $this->dateTime = $dateTime;
         $this->storeManager = $storeManager;
     }
 
@@ -47,7 +61,10 @@ class Router implements \Magento\Framework\App\RouterInterface
 
         /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
         $landingPage = $this->landingPageFactory->create();
-        $pageId = $landingPage->checkIdentifier($identifier, $this->storeManager->getStore()->getId());
+        $storeId = $this->storeManager->getStore()->getId();
+        $date = $this->dateTime->formatDate($this->localeDate->scopeTimeStamp($storeId), false);
+        $pageId = $landingPage->checkIdentifier($identifier, $storeId, $date);
+
         if (!$pageId) {
             return null;
         }

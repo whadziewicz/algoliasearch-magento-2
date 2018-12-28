@@ -242,11 +242,12 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
      *
      * @param string $identifier
      * @param int $storeId
+     * @param string $date
      *
      * @return int
      */
-    public function checkIdentifier($identifier, $storeId)
+    public function checkIdentifier($identifier, $storeId, $date)
     {
-        return $this->_getResource()->checkIdentifier($identifier, $storeId);
+        return $this->_getResource()->checkIdentifier($identifier, $storeId, $date);
     }
 }

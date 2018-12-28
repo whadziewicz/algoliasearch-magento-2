@@ -20,9 +20,10 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      *
      * @param string $identifier
      * @param int $storeId
+     * @param string $date
      * @return int
      */
-    public function checkIdentifier($identifier, $storeId)
+    public function checkIdentifier($identifier, $storeId, $date)
     {
         $select = $this->getConnection()
             ->select()
@@ -30,6 +31,8 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             ->where('url_key = ?', $identifier)
             ->where('is_active = ?', 1)
             ->where('store_id IN (?)', [Store::DEFAULT_STORE_ID, $storeId])
+            ->where('date_from IS NULL OR date_from <= ?', $date)
+            ->where('date_to IS NULL OR date_to >= ?', $date)
             ->order('store_id DESC')
             ->limit(1);
 

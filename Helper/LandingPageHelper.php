@@ -51,6 +51,18 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
     }
 
+    public function getLandingPage($pageId)
+    {
+        if ($pageId !== null && $pageId !== $this->landingPage->getId()) {
+            $this->landingPage->setStoreId($this->storeManager->getStore()->getId());
+            if (!$this->landingPage->load($pageId)) {
+                return false;
+            }
+        }
+
+        return $this->landingPage;
+    }
+
     /**
      * Return result Landing page
      *
@@ -61,14 +73,9 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function prepareResultPage(Action $action, $pageId = null)
     {
-        if ($pageId !== null && $pageId !== $this->landingPage->getId()) {
-            $this->landingPage->setStoreId($this->storeManager->getStore()->getId());
-            if (!$this->landingPage->load($pageId)) {
-                return false;
-            }
-        }
+        $page = $this->getLandingPage($pageId);
 
-        if (!$this->landingPage->getId()) {
+        if (!$page->getId()) {
             return false;
         }
 
@@ -76,7 +83,7 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addHandle('algolia_algoliasearch_landingpage_view');
         $resultPage->addPageLayoutHandles(
-            ['id' => str_replace('/', '_', $this->landingPage->getUrlKey())]
+            ['id' => str_replace('/', '_', $page->getUrlKey())]
         );
 
         $this->_eventManager->dispatch(
@@ -95,15 +102,10 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPageUrl($pageId = null)
     {
-        /** @var LandingPage $page */
-        $page = $this->landingPageFactory->create();
-        if ($pageId !== null && $pageId !== $page->getId()) {
-            $page->setStoreId($this->storeManager->getStore()->getId());
-            $page->load($pageId);
-        }
+        $page = $this->getLandingPage($pageId);
 
         if (!$page->getId()) {
-            return null;
+            return false;
         }
 
         return $this->_urlBuilder->getUrl(null, ['_direct' => $page->getUrlKey()]);

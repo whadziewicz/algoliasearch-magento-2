@@ -4,59 +4,63 @@ namespace Algolia\AlgoliaSearch\Block;
 
 use Algolia\AlgoliaSearch\Model\LandingPage as LandingPageModel;
 use Algolia\AlgoliaSearch\Model\LandingPageFactory;
+use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
+use Magento\CatalogSearch\Helper\Data;
+use Magento\CatalogSearch\Block\Result;
+use Magento\Cms\Model\Template\FilterProvider;
+use Magento\Search\Model\QueryFactory;
 use Magento\Store\Model\ScopeInterface;
 
-class LandingPage extends \Magento\Framework\View\Element\AbstractBlock implements
-    \Magento\Framework\DataObject\IdentityInterface
+class LandingPage extends Result
 {
-    /** @var \Magento\Cms\Model\Template\FilterProvider */
-    protected $_filterProvider;
+    /** @var FilterProvider */
+    protected $filterProvider;
 
     /** @var LandingPageModel */
     protected $landingPage;
 
-    /** @var \Magento\Store\Model\StoreManagerInterface */
-    protected $_storeManager;
-
     /** @var LandingPageFactory */
     protected $landingPageFactory;
-
-    /** @var \Magento\Framework\View\Page\Config */
-    protected $pageConfig;
 
     /**
      * Construct
      *
-     * @param \Magento\Framework\View\Element\Context $context
+     * @param Magento\Framework\View\Element\Template\Context $context
+     * @param LayerResolver $layerResolver
+     * @param Data $catalogSearchData
+     * @param QueryFactory $queryFactory
+     * @param FilterProvider $filterProvider
      * @param LandingPageModel $landingPage
-     * @param \Magento\Cms\Model\Template\FilterProvider $filterProvider
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param LandingPageFactory $landingPageFactory
-     * @param \Magento\Framework\View\Page\Config $pageConfig
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\Context $context,
+        \Magento\Framework\View\Element\Template\Context $context,
+        LayerResolver $layerResolver,
+        Data $catalogSearchData,
+        QueryFactory $queryFactory,
+        FilterProvider $filterProvider,
         LandingPageModel $landingPage,
-        \Magento\Cms\Model\Template\FilterProvider $filterProvider,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
         LandingPageFactory $landingPageFactory,
-        \Magento\Framework\View\Page\Config $pageConfig,
         array $data = []
     ) {
-        parent::__construct($context, $data);
+        parent::__construct(
+            $context,
+            $layerResolver,
+            $catalogSearchData,
+            $queryFactory,
+            $data
+        );
 
+        $this->filterProvider = $filterProvider;
         $this->landingPage = $landingPage;
-        $this->_filterProvider = $filterProvider;
-        $this->_storeManager = $storeManager;
         $this->landingPageFactory = $landingPageFactory;
-        $this->pageConfig = $pageConfig;
     }
 
     /**
      * Retrieve Page instance
      *
-     * @return \Magento\Cms\Model\Page
+     * @return LandingPageModel
      */
     public function getPage()
     {
@@ -87,18 +91,15 @@ class LandingPage extends \Magento\Framework\View\Element\AbstractBlock implemen
         $this->pageConfig->setKeywords($page->getMetaKeywords());
         $this->pageConfig->setDescription($page->getMetaDescription());
 
-        return parent::_prepareLayout();
+        $this->getLayout()->getBlock('landing_page_content')->setText($this->getLandingPageContent());
+
+        return $this;
     }
 
-    /**
-     * Prepare HTML content
-     *
-     * @return string
-     */
-    protected function _toHtml()
+
+    protected function getLandingPageContent()
     {
-        $html = $this->_filterProvider->getPageFilter()->filter($this->getPage()->getContent());
-        return $html;
+        return $this->filterProvider->getPageFilter()->filter($this->getPage()->getContent());
     }
 
     /**

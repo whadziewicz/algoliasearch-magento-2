@@ -122,6 +122,16 @@ class AdapterHelper
         return $this->filtersHelper->getRequest()->getFullActionName() === 'catalogsearch_result_index';
     }
 
+    /** @return bool */
+    public function isLandingPage()
+    {
+        $storeId = $this->getStoreId();
+
+        return
+            $this->filtersHelper->getRequest()->getFullActionName() === 'algolia_landingpage_view'
+            && $this->configHelper->isInstantEnabled($storeId) === true;
+    }
+
     /**
      * Checks if Algolia should replace category results
      *

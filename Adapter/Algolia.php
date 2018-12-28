@@ -75,7 +75,9 @@ class Algolia implements AdapterInterface
         if (!$this->adapterHelper->isAllowed()
             || !($this->adapterHelper->isSearch() ||
                 $this->adapterHelper->isReplaceCategory() ||
-                $this->adapterHelper->isReplaceAdvancedSearch())
+                $this->adapterHelper->isReplaceAdvancedSearch() ||
+                $this->adapterHelper->isLandingPage()
+            )
         ) {
             return $this->nativeQuery($request);
         }

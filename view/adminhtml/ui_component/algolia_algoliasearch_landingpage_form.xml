@@ -233,5 +233,10 @@
                 </item>
             </argument>
         </field>
+        <container name="algolia_merchandising_container" >
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">Algolia\AlgoliaSearch\Block\Adminhtml\LandingPage\SearchConfiguration</argument>
+            </htmlContent>
+        </container>
     </fieldset>
 </form>

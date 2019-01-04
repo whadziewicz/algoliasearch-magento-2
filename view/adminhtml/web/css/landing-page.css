@@ -26,9 +26,24 @@
     float: left;
 }
 
-.algolia_merchandising_items_table {
+.algolia_merchandising_items_right_container {
     width: 75%;
     float: right;
+}
+
+.algolia_merchandising_items_right_container .ais-search-box {
+    margin-top : 20px;
+}
+
+.algolia_merchandising_items_right_container .ais-search-box--input {
+    width: 100%;
+    border: 1px solid #adadad;
+    height: auto;
+    line-height: 1.36;
+}
+
+.algolia_merchandising_items_table {
+    width: 100%;
 }
 
 .algolia_merchandising_items_table td {
@@ -171,6 +186,18 @@
     text-align: center;
 }
 
+/** SEARCH BOX */
+
+.ais-search-box--powered-by {
+    font-size: .8em;
+    text-align: right;
+    margin-top: 2px;
+}
+
+input::-ms-clear {
+    display: none;
+}
+
 /* AUTOCOMPLETE HIT */
 .aa-dropdown-menu {
     position: absolute;
@@ -304,6 +331,14 @@
     padding : 0 10px;
 }
 
+#current-refinements {
+    padding : 0 10px;
+}
+
+#current-refinements .ais-current-refined-values--clear-all {
+    color : white;
+}
+
 /** REFINEMENT LIST */
 
 .ais-menu--link,
@@ -380,7 +415,7 @@
     border-radius: 2px;
     border: solid 1px #DDDDDD;
     background-color: #f4f4f4;
-    display: inline-block;
+    display: inline-block !important;
     max-width: 100%;
     white-space: nowrap;
     padding: 0 8px 0 0;
@@ -437,7 +472,7 @@ a.ais-current-refined-values--link:hover {
 
 .ais-current-refined-values--item .current-refinement-wrapper {
     float: left;
-    width: calc(100% - 26px);
+    width: calc(100% - 34px);
     height: 26px;
     padding-left: 8px;
     overflow: hidden;
@@ -733,19 +768,6 @@ a.ais-current-refined-values--link:hover {
 
 /** INSTANT SEARCH BAR **/
 
-#algolia_instant_selector #instant-search-bar-container {
-    padding-top: 0;
-    margin-bottom: 15px;
-    width: 100%;
-    position: relative;
-}
-
-#algolia_instant_selector #instant-search-bar-container:after {
-    clear: both;
-    content: "";
-    display: block;
-}
-
 #algolia_instant_selector .as-search-box--input {
     width: 100%;
     height: 40px;
@@ -893,4 +915,76 @@ a.ais-current-refined-values--link:hover {
 
 #algolia-static-content {
     margin-bottom: 20px;
+}
+
+/** Search Box */
+
+#algolia-searchbox {
+    position: relative;
+}
+
+#algolia-searchbox .clear-cross, #algolia_instant_selector .clear-cross {
+    position: absolute;
+    display: none;
+    background: url("data:image/svg+xml;utf8,<svg width=\'12\' height=\'12\' viewBox=\'0 0 12 12\' xmlns=\'http://www.w3.org/2000/svg\' opacity=\'0.6\'><path d=\'M.566 1.698L0 1.13 1.132 0l.565.566L6 4.868 10.302.566 10.868 0 12 1.132l-.566.565L7.132 6l4.302 4.3.566.568L10.868 12l-.565-.566L6 7.132l-4.3 4.302L1.13 12 0 10.868l.566-.565L4.868 6 .566 1.698z\'></path></svg>") no-repeat center center / contain;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+#algolia-searchbox .clear-query-autocomplete {
+    bottom: 22px;
+    right: 9px;
+}
+
+#algolia_instant_selector .cross-wrapper .clear-refinement {
+    display: block;
+    position: relative;
+    top: 5px;
+    left: 5px;
+}
+
+#algolia-searchbox .magnifying-glass {
+    position: absolute;
+    bottom: 21px;
+    right: 7px;
+    width: 20px;
+    height: 20px;
+    display: block;
+    background: url("data:image/svg+xml;utf8,<svg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'  fill=\'%23A6A6A6\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M15.553 31.107c8.59 0 15.554-6.964 15.554-15.554S24.143 0 15.553 0 0 6.964 0 15.553c0 8.59 6.964 15.554 15.553 15.554zm0-3.888c6.443 0 11.666-5.225 11.666-11.668 0-6.442-5.225-11.665-11.668-11.665-6.442 0-11.665 5.223-11.665 11.665 0 6.443 5.223 11.666 11.665 11.666zm12.21 3.84a2.005 2.005 0 0 1 .002-2.833l.463-.463a2.008 2.008 0 0 1 2.833-.003l8.17 8.168c.78.78.78 2.05-.004 2.833l-.462.463a2.008 2.008 0 0 1-2.834.004l-8.168-8.17z\' fill-rule=\'evenodd\'/></svg>") no-repeat center right / 20px;
+}
+
+@media (min-width: 768px) {
+    #algolia-searchbox .magnifying-glass {
+        bottom: 6px;
+    }
+}
+
+@media (min-width: 768px) {
+    #algolia-searchbox .clear-query-autocomplete {
+        bottom: 8px;
+    }
+}
+
+
+#algolia-searchbox .algolia-search-input:focus:not([value=""]) {
+    background: transparent;
+}
+
+#algolia-searchbox .algolia-search-input {
+    position: static !important;
+}
+
+#algolia-searchbox .algolia-search-input:focus {
+    outline: 0;
+    box-shadow: none;
+    border: solid 1px #54A5CD;
+}
+
+#algolia_instant_selector .ais-current-refined-values.facet .ais-current-refined-values--body {
+    padding-left: 8px;
+}
+
+#algolia_instant_selector .ais-header.ais-current-refined-values--header {
+    margin-bottom: 13px;
 }

@@ -2,10 +2,12 @@
 
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\LandingPage;
 
+use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
 use Algolia\AlgoliaSearch\Model\LandingPageFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Save extends AbstractAction
 {
@@ -15,12 +17,24 @@ class Save extends AbstractAction
     protected $dataPersistor;
 
     /**
+     * @var MerchandisingHelper
+     */
+    protected $merchandisingHelper;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * PHP Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param LandingPageFactory $landingPageFactory
      * @param DataPersistorInterface $dataPersistor
+     * @param MerchandisingHelper $merchandisingHelper
+     * @param StoreManagerInterface $storeManager
      *
      * @return Save
      */
@@ -28,9 +42,13 @@ class Save extends AbstractAction
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
         LandingPageFactory $landingPageFactory,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        MerchandisingHelper $merchandisingHelper,
+        StoreManagerInterface $storeManager
     ) {
         $this->dataPersistor = $dataPersistor;
+        $this->merchandisingHelper = $merchandisingHelper;
+        $this->storeManager = $storeManager;
 
         parent::__construct($context, $coreRegistry, $landingPageFactory);
     }
@@ -65,10 +83,50 @@ class Save extends AbstractAction
                 }
             }
 
+            if (isset($data['algolia_query']) && $data['algolia_query'] != $data['query']) {
+                $data['query'] = $data['algolia_query'];
+            }
+
+            if (isset($data['algolia_configuration']) && $data['algolia_configuration'] != $data['configuration']) {
+                $data['configuration'] = $data['algolia_configuration'];
+            }
+
             $landingPage->setData($data);
 
             try {
                 $landingPage->getResource()->save($landingPage);
+
+                if (isset($data['algolia_merchandising_positions']) && $data['algolia_merchandising_positions'] != '') {
+                    $positions = json_decode($data['algolia_merchandising_positions'], true);
+                    $stores = [];
+                    if ($data['store_id'] == 0) {
+                        foreach ($this->storeManager->getStores() as $store) {
+                            if ($store->getIsActive()) {
+                                $stores[] = $store->getId();
+                            }
+                        }
+                    } else {
+                        $stores[] = $data['store_id'];
+                    }
+
+                    foreach ($stores as $storeId) {
+                        if (!$positions) {
+                            $this->merchandisingHelper->deleteQueryRule(
+                                $storeId,
+                                $landingPageId,
+                                'landingpage'
+                            );
+                        } else {
+                            $this->merchandisingHelper->saveQueryRule(
+                                $storeId,
+                                $landingPageId,
+                                $positions,
+                                'landingpage',
+                                $data['query']
+                            );
+                        }
+                    }
+                }
 
                 $this->messageManager->addSuccessMessage(__('The landing page has been saved.'));
                 $this->dataPersistor->clear('algolia_algoliasearch_landing_page');

@@ -182,6 +182,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'refinementKey' => $refinementKey,
                 'refinementValue' => $refinementValue,
                 'categoryId' => $categoryId,
+                'landingPageId' => $this->getLandingPageId(),
                 'path' => $path,
                 'level' => $level,
             ],
@@ -282,6 +283,15 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
     private function isLandingPage()
     {
         return $this->getRequest()->getFullActionName() === 'algolia_landingpage_view';
+    }
+
+    private function getLandingPageId()
+    {
+        if (!$this->isLandingPage()) {
+            return '';
+        }
+
+        return $this->getCurrentLandingPage()->getId();
     }
 
     private function getLandingPageQuery()

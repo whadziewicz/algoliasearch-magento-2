@@ -25,7 +25,7 @@ class MerchandisingHelper
         $this->algoliaHelper = $algoliaHelper;
     }
 
-    public function saveQueryRule($storeId, $categoryId, $rawPositions)
+    public function saveQueryRule($storeId, $entityId, $rawPositions, $entityType, $query = null)
     {
         if ($this->coreHelper->isIndexingEnabled($storeId) === false) {
             return;
@@ -36,31 +36,35 @@ class MerchandisingHelper
         $positions = $this->transformPositions($rawPositions);
 
         $rule = [
-            'objectID' => $this->getQueryRuleId($categoryId),
+            'objectID' => $this->getQueryRuleId($entityId, $entityType),
             'description' => 'MagentoGeneratedQueryRule',
             'condition' => [
                 'pattern' => '',
                 'anchoring' => 'is',
-                'context' => 'magento-category-' . $categoryId,
+                'context' => 'magento-' . $entityType . '-' . $entityId,
             ],
             'consequence' => [
                 'promote' => $positions,
             ],
         ];
 
+        if (!is_null($query) && $query != '') {
+            $rule['condition']['pattern'] = $query;
+        }
+
         // Not catching AlgoliaSearchException for disabled query rules on purpose
         // It displays correct error message and navigates user to pricing page
         $this->algoliaHelper->saveRule($rule, $productsIndexName);
     }
 
-    public function deleteQueryRule($storeId, $categoryId)
+    public function deleteQueryRule($storeId, $entityId, $entityType)
     {
         if ($this->coreHelper->isIndexingEnabled($storeId) === false) {
             return;
         }
 
         $productsIndexName = $this->coreHelper->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
-        $ruleId = $this->getQueryRuleId($categoryId);
+        $ruleId = $this->getQueryRuleId($entityId, $entityType);
 
         // Not catching AlgoliaSearchException for disabled query rules on purpose
         // It displays correct error message and navigates user to pricing page
@@ -81,8 +85,8 @@ class MerchandisingHelper
         return $transformedPositions;
     }
 
-    private function getQueryRuleId($categoryId)
+    private function getQueryRuleId($entityId, $entityType)
     {
-        return 'magento-category-' . $categoryId;
+        return 'magento-' . $entityType . '-' . $entityId;
     }
 }

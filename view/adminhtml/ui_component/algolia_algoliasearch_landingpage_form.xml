@@ -219,6 +219,7 @@
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Query</item>
                     <item name="dataScope" xsi:type="string">query</item>
+                    <item name="visible" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </field>
@@ -230,6 +231,7 @@
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Configuration</item>
                     <item name="dataScope" xsi:type="string">configuration</item>
+                    <item name="visible" xsi:type="boolean">false</item>
                 </item>
             </argument>
         </field>

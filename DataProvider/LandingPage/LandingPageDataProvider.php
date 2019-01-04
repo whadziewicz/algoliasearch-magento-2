@@ -30,7 +30,6 @@ class LandingPageDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
      * @param DataPersistorInterface $dataPersistor
      * @param array $meta
      * @param array $data
-     * @param PoolInterface|null $pool
      */
     public function __construct(
         $name,
@@ -39,12 +38,11 @@ class LandingPageDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
         array $meta = [],
-        array $data = [],
-        PoolInterface $pool = null
+        array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
-        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data, $pool);
+        parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
     /**

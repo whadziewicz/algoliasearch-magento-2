@@ -293,40 +293,57 @@ $isConfig = [
         var disjunctiveRefinements = state.disjunctiveFacetsRefinements;
         var hierarchicalRefinements = state.hierarchicalFacetsRefinements;
         var refinements = state.facetsRefinements;
+        var numericRefinements = state.numericRefinements;
+        var rawConfig = Object.assign(disjunctiveRefinements, hierarchicalRefinements, refinements);
 
-        var config = Object.assign(disjunctiveRefinements, hierarchicalRefinements, refinements);
         var formattedConfig = {};
-
-        for (var attribute in config) {
-          if (config.hasOwnProperty(attribute)) {
-            formattedConfig[attribute] = config[attribute].join("~");
+        for (var attribute in rawConfig) {
+          if (rawConfig.hasOwnProperty(attribute) || typeof rawConfig[attribute] != "undefined") {
+            formattedConfig[attribute] = rawConfig[attribute].join("~");
           }
+        }
+
+        var priceFacet = 'price' + config.priceKey;
+        if (typeof numericRefinements[priceFacet] !== "undefined") {
+          formattedConfig[priceFacet] =  numericRefinements[priceFacet];
         }
 
         $('input[name="configuration"]').val(JSON.stringify(formattedConfig)).change();
         $('input[name="algolia_configuration"]').val(JSON.stringify(formattedConfig)).change();
       }
 
+      var customAttributeFacet = {
+        categories: function (facet, templates) {
+          var hierarchical_levels = [];
+          for (var l = 0; l < 10; l++)
+            hierarchical_levels.push('categories.level' + l.toString());
+
+          var hierarchicalMenuParams = {
+            container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+            attributes: hierarchical_levels,
+            separator: ' /// ',
+            alwaysGetRootLevel: true,
+            limit: config.maxValuesPerFacet,
+            templates: templates,
+            sortBy: ['name:asc'],
+            cssClasses: {
+              list: 'hierarchical',
+              root: 'facet hierarchical'
+            }
+          };
+
+          hierarchicalMenuParams.templates.item = '' +
+            '<div class="ais-hierearchical-link-wrapper">' +
+            '<a class="{{cssClasses.link}}" href="{{url}}">{{label}}' +
+            '{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
+            '<span class="{{cssClasses.count}}">{{count}}</span></a>' +
+            '</div>';
+
+          return ['hierarchicalMenu', hierarchicalMenuParams];
+        }
+      };
 
       window.getFacetWidget = function (facet, templates) {
-
-        // if (facet.type === 'priceRanges') {
-        //   delete templates.item;
-        //
-        //   return ['priceRanges', {
-        //     container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-        //     attributeName: facet.attribute,
-        //     labels: {
-        //       currency: algoliaConfig.currencySymbol,
-        //       separator: algoliaConfig.translations.to,
-        //       button: algoliaConfig.translations.go
-        //     },
-        //     templates: templates,
-        //     cssClasses: {
-        //       root: 'facet conjunctive'
-        //     }
-        //   }];
-        // }
 
         if (facet.type === 'conjunctive') {
           var refinementListOptions = {
@@ -391,7 +408,6 @@ $isConfig = [
         return options;
       }
 
-
       $.each(config.facets, function (i, facet) {
 
         if (facet.attribute.indexOf("price") !== -1)
@@ -404,7 +420,10 @@ $isConfig = [
           item: $('#refinements-lists-item-template').html()
         };
 
-        var widgetInfo = getFacetWidget(facet, templates);
+        var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
+          customAttributeFacet[facet.attribute](facet, templates) :
+          getFacetWidget(facet, templates);
+
 
         var widgetType = widgetInfo[0],
           widgetConfig = widgetInfo[1];
@@ -421,9 +440,16 @@ $isConfig = [
 
             for (var attribute in config.landingPageConfig) {
               if (config.landingPageConfig.hasOwnProperty(attribute)) {
-                var values = config.landingPageConfig[attribute].split("~");
-                for(var i=0; i<values.length; i++) {
-                  data.helper.toggleRefine(attribute, values[i]);
+                if (attribute.match(/price/) !== null) {
+                  var values = config.landingPageConfig[attribute];
+                  for (var key in values) {
+                    data.helper.addNumericRefinement(attribute, key, values[key][0]);
+                  }
+                } else {
+                  var values = config.landingPageConfig[attribute].split("~");
+                  for(var i=0; i<values.length; i++) {
+                    data.helper.toggleRefine(attribute, values[i]);
+                  }
                 }
               }
             }

@@ -493,6 +493,7 @@ a.ais-current-refined-values--link:hover {
 .ais-menu--count, .ais-hierarchical-menu--count, .ais-refinement-list--count {
     float: right;
     color: #666;
+    margin-right: 35px;
 }
 
 #algolia_instant_selector .ais-refinement-list--list .sbx-sffv__wrapper {

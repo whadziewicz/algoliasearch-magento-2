@@ -19,7 +19,7 @@ $isConfig = [
     'landingPageConfig' => json_decode($landingPage->getConfiguration()),
     'searchParameters' => [
         'query' => $landingPage->getQuery(),
-        'hitsPerPage' => 20,
+        'hitsPerPage' => 10,
         'getRankingInfo' => true,
         'ruleContexts' => [
             '',
@@ -50,18 +50,29 @@ $isConfig = [
         </p>
     </div>
     <br>
-    <label for="algolia_merchandising_autocomplete">
-        <input type="text" id="algolia_merchandising_autocomplete" placeholder="Add another item to promote ..." />
-    </label>
 
     <div class="algolia_merchandising_items_left_container" id="algolia_merchandising_items_left_container">
+        <div id="search-box">
+            <div class="ais-root ais-current-refined-values facet">
+                <div class="ais-current-refined-values--header ais-header">
+                    <div class="name">Search query</div>
+                </div>
+                <div id="algolia_merchandising_search_box" class="ais-body"></div>
+            </div>
+        </div>
         <div id="current-refinements"></div>
         <div id="algolia_merchandising_facet_wrapper"></div>
     </div>
     <div class="algolia_merchandising_items_right_container" id="algolia_merchandising_items_right_container">
-        <div id="algolia_merchandising_search_box"></div>
+        <h2>Products shown on landing page</h2>
+        <div id="algolia-stats"></div>
+        <label for="algolia_merchandising_autocomplete">
+            <input type="text" id="algolia_merchandising_autocomplete" placeholder="Quickly find an item to promote..." />
+        </label>
         <div id="algolia_sortby"></div>
+        <div id="algolia_hit_per_page"></div>
         <div id="algolia_merchandising_hits"></div>
+        <div id="instant-search-pagination-container"></div>
     </div>
 </div>
 
@@ -198,6 +209,16 @@ $isConfig = [
     </div>
 </script>
 
+<script type="text/template" id="instant-stats-template">
+    {{#hasOneResult}}
+        <strong>1</strong> product matches this query / filter
+    {{/hasOneResult}}
+
+    {{#hasManyResults}}
+        <strong><span itemprop="numberOfItems">{{nbHits}}</span></strong> products match this query / filter
+    {{/hasManyResults}}
+</script>
+
 <script>
   requirejs(['algoliaAdminBundle'], function (algoliaAdminBundle) {
     algoliaAdminBundle.$(function ($) {
@@ -259,6 +280,38 @@ $isConfig = [
           indices: sortingIndices
         })
       );
+
+      search.addWidget(
+        algoliaAdminBundle.instantsearch.widgets.pagination({
+          container: '#instant-search-pagination-container',
+          cssClass: 'algolia-pagination',
+          maxPages: 1000,
+          scrollTo: false,
+          showFirstLast: false,
+        })
+      );
+
+      search.addWidget(
+        algoliaAdminBundle.instantsearch.widgets.hitsPerPageSelector({
+          container: '#algolia_hit_per_page',
+          items: [
+            {value: 10, label: 'Show 10 per page', default: true},
+            {value: 20, label: 'Show 20 per page'},
+            {value: 50, label: 'Show 50 per page'},
+          ]
+        })
+      );
+
+      search.addWidget(
+        algoliaAdminBundle.instantsearch.widgets.stats({
+          container: '#algolia-stats',
+          templates: {
+            body: $('#instant-stats-template').html()
+          }
+        })
+      );
+
+
 
       // initialize Current refined values
       search.addWidget(

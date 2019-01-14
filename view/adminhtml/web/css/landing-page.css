@@ -1,10 +1,10 @@
 #algolia_merchandising_autocomplete {
-    width: 630px;
-    height: 56px;
+    width: 500px;
+    height: 50px;
     border-radius: 3px;
-    background: #f6f6f6 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.778" opacity=".4" transform="translate(1 1)"><circle cx="7.111" cy="7.111" r="7.111"/><path d="M16 16l-3.867-3.867"/></g></svg>') no-repeat 24px;
+    background: #ffffff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.778" opacity=".4" transform="translate(1 1)"><circle cx="7.111" cy="7.111" r="7.111"/><path d="M16 16l-3.867-3.867"/></g></svg>') no-repeat 24px;
     padding-left: 64px;
-    border: solid 1px rgba(204, 204, 204, 0.5);
+    border: solid 1px adadad;
 }
 
 #algolia_merchandising_hits p {
@@ -31,19 +31,32 @@
     float: right;
 }
 
-.algolia_merchandising_items_right_container .ais-search-box {
-    margin-top : 20px;
+.algolia_merchandising_items_right_container h2 {
+    color: #303030;
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: .025em;
+    margin-bottom : 5px;
 }
 
-.algolia_merchandising_items_right_container .ais-search-box--input {
+.algolia_merchandising_items_left_container .ais-search-box {
+    margin : 20px 8px;
+}
+
+.algolia_merchandising_items_left_container .ais-search-box--input {
     width: 100%;
     border: 1px solid #adadad;
     height: auto;
     line-height: 1.36;
 }
 
+#algolia-stats {
+    margin-bottom : 15px;
+}
+
 .algolia_merchandising_items_table {
     width: 100%;
+    margin-bottom : 10px;
 }
 
 .algolia_merchandising_items_table td {
@@ -339,6 +352,10 @@ input::-ms-clear {
     color : white;
 }
 
+#search-box {
+    padding : 0 10px;
+}
+
 /** REFINEMENT LIST */
 
 .ais-menu--link,
@@ -557,9 +574,9 @@ a.ais-current-refined-values--link:hover {
 }
 
 .ais-range-slider .rheostat-horizontal .rheostat-progress {
-    background-color: #b5b6b9;
+    background-color: #514943;
     position: absolute;
-    height: 4px;
+    height: 6px;
     top: 1px;
 }
 
@@ -967,6 +984,46 @@ a.ais-current-refined-values--link:hover {
     }
 }
 
+/** PAGINATION */
+
+#instant-search-pagination-container {
+    width: 100%;
+    padding : 10px;
+    background-color : #f5f5f5;
+}
+.ais-pagination {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 10px auto;
+}
+.ais-pagination li {
+    display: inline-block;
+}
+.ais-pagination--item a {
+    padding: 5px 10px;
+    margin: 0 5px;
+    line-height: 25px;
+    color: #007bdb;
+}
+
+.ais-pagination li.ais-pagination--item__disabled {
+    display: none;
+}
+
+.ais-pagination--item__active a {
+    font-weight: bolder;
+    color: #606060;
+    text-decoration: underline;
+    background-color : #e5e5e5;
+}
+
+.ais-pagination--item.ais-pagination--item__next a,
+.ais-pagination--item.ais-pagination--item__previous a {
+    font-weight: bold;
+    color: #606060;
+}
+
 
 #algolia-searchbox .algolia-search-input:focus:not([value=""]) {
     background: transparent;
@@ -992,4 +1049,8 @@ a.ais-current-refined-values--link:hover {
 
 #algolia_sortby {
     display : none;
+}
+
+#algolia_hit_per_page {
+    float : right;
 }

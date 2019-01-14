@@ -39,7 +39,7 @@
     <fieldset name="main_information">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" xsi:type="string" translate="true">Main Information</item>
+                <item name="label" xsi:type="string" translate="true">Basic Settings</item>
             </item>
         </argument>
         <field name="landing_page_id">
@@ -53,31 +53,15 @@
                 </item>
             </argument>
         </field>
-        <field name="is_active">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="formElement" xsi:type="string">checkbox</item>
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="default" xsi:type="number">1</item>
-                    <item name="dataType" xsi:type="string">boolean</item>
-                    <item name="prefer" xsi:type="string">toggle</item>
-                    <item name="label" xsi:type="string" translate="true">Enable Landing Page</item>
-                    <item name="dataScope" xsi:type="string">is_active</item>
-                    <item name="valueMap" xsi:type="array">
-                        <item name="true" xsi:type="number">1</item>
-                        <item name="false" xsi:type="number">0</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
-        <field name="title">
+        <field name="url_key">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">landing_page</item>
-                    <item name="label" xsi:type="string" translate="true">Page Title</item>
+                    <item name="label" xsi:type="string" translate="true">Unique URL key</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
-                    <item name="dataScope" xsi:type="string">title</item>
+                    <item name="dataScope" xsi:type="string">url_key</item>
+                    <item name="notice" xsi:type="string" translate="true">Please make sure that the chosen URL isn't already used by the Magento's URL rewrite system (including products, categories and CMS pages)</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -100,16 +84,69 @@
                 </item>
             </argument>
         </field>
-        <field name="url_key">
+        <field name="title">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">landing_page</item>
-                    <item name="label" xsi:type="string" translate="true">Url key</item>
+                    <item name="label" xsi:type="string" translate="true">Page Title</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
-                    <item name="dataScope" xsi:type="string">url_key</item>
+                    <item name="dataScope" xsi:type="string">title</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="meta_title">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="label" xsi:type="string" translate="true">Meta Title</item>
+                    <item name="notice" xsi:type="string" translate="true">If no meta title is set, the page title will be used.</item>
+                    <item name="dataScope" xsi:type="string">meta_title</item>
+                </item>
+            </argument>
+        </field>
+        <field name="meta_description">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="label" xsi:type="string" translate="true">Meta Description</item>
+                    <item name="dataScope" xsi:type="string">meta_description</item>
+                </item>
+            </argument>
+        </field>
+        <field name="meta_keywords">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="label" xsi:type="string" translate="true">Meta Keywords</item>
+                    <item name="placeholder" xsi:type="string" translate="true">product, red, woman, accessory</item>
+                    <item name="dataScope" xsi:type="string">meta_keywords</item>
+                </item>
+            </argument>
+        </field>
+        <field name="is_active">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="default" xsi:type="number">1</item>
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="label" xsi:type="string" translate="true">Publish Landing Page</item>
+                    <item name="notice" xsi:type="string" translate="true">If the landing page is not published, it won't be accessible on frontend.</item>
+                    <item name="dataScope" xsi:type="string">is_active</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="number">1</item>
+                        <item name="false" xsi:type="number">0</item>
                     </item>
                 </item>
             </argument>
@@ -120,7 +157,7 @@
                     <item name="source" xsi:type="string">landing_page</item>
                     <item name="formElement" xsi:type="string">date</item>
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">From</item>
+                    <item name="label" xsi:type="string" translate="true">Timeframe (From)</item>
                     <item name="dataScope" xsi:type="string">date_from</item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-date" xsi:type="boolean">true</item>
@@ -134,8 +171,9 @@
                     <item name="source" xsi:type="string">landing_page</item>
                     <item name="formElement" xsi:type="string">date</item>
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">To</item>
+                    <item name="label" xsi:type="string" translate="true">Timeframe (To)</item>
                     <item name="dataScope" xsi:type="string">date_to</item>
+                    <item name="notice" xsi:type="string" translate="true">If you don't set any timeframe, the landing page will be accessible indefinitely.</item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-date" xsi:type="boolean">true</item>
                     </item>
@@ -147,7 +185,7 @@
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">true</item>
-                <item name="label" xsi:type="string" translate="true">Content</item>
+                <item name="label" xsi:type="string" translate="true">CMS Content</item>
             </item>
         </argument>
         <field name="content">
@@ -163,52 +201,11 @@
             </argument>
         </field>
     </fieldset>
-    <fieldset name="meta_data">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="collapsible" xsi:type="boolean">true</item>
-                <item name="label" xsi:type="string" translate="true">Meta Data</item>
-            </item>
-        </argument>
-        <field name="meta_title">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true">Meta Title</item>
-                    <item name="dataScope" xsi:type="string">meta_title</item>
-                </item>
-            </argument>
-        </field>
-        <field name="meta_description">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true">Meta Description</item>
-                    <item name="dataScope" xsi:type="string">meta_description</item>
-                </item>
-            </argument>
-        </field>
-        <field name="meta_keywords">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true">Meta Keywords</item>
-                    <item name="dataScope" xsi:type="string">meta_keywords</item>
-                </item>
-            </argument>
-        </field>
-    </fieldset>
     <fieldset name="search_configuration">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
                 <item name="collapsible" xsi:type="boolean">true</item>
-                <item name="label" xsi:type="string" translate="true">Search Configuration</item>
+                <item name="label" xsi:type="string" translate="true">Search Configuration (query, filters, product ordering)</item>
             </item>
         </argument>
         <field name="query">

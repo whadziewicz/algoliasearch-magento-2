@@ -837,6 +837,24 @@ class Data
         return $this->configHelper->getIndexPrefix($storeId) . $this->storeManager->getStore($storeId)->getCode();
     }
 
+    public function getIndexDataByStoreIds()
+    {
+        $indexNames = [];
+
+        $indexNames[0] = [
+            'indexName' => $this->getBaseIndexName(),
+            'priceKey' => '.' . $this->configHelper->getCurrencyCode() . '.default'
+        ];
+        foreach ($this->storeManager->getStores() as $store) {
+            $indexNames[$store->getId()] = [
+                'indexName' => $this->getBaseIndexName($store->getId()),
+                'priceKey' => '.' . $store->getCurrentCurrencyCode($store->getId()) . '.default'
+            ];
+        }
+
+        return $indexNames;
+    }
+
     private function deleteInactiveIds($storeId, $objectIds, $indexName)
     {
         $collection = $this->productHelper->getProductCollectionQuery($storeId, $objectIds);

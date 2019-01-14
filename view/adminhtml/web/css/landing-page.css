@@ -989,3 +989,7 @@ a.ais-current-refined-values--link:hover {
 #algolia_instant_selector .ais-header.ais-current-refined-values--header {
     margin-bottom: 13px;
 }
+
+#algolia_sortby {
+    display : none;
+}

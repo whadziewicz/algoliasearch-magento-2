@@ -12,10 +12,9 @@ $landingPageId = $landingPage->getId();
 $isConfig = [
     'appId' => $configHelper->getApplicationID(),
     'apiKey' => $configHelper->getSearchOnlyAPIKey(),
-    'indexName' => $configHelper->getIndexPrefix() . 'default_products',
+    'indexDataByStoreIds' => $block->getCoreHelper()->getIndexDataByStoreIds(),
     'routing' => false,
     'facets' => $configHelper->getFacets(),
-    'priceKey' => '.' . $configHelper->getCurrencyCode() . '.default',
     'maxValuesPerFacet' => (int) $configHelper->getMaxValuesPerFacet(),
     'landingPageConfig' => json_decode($landingPage->getConfiguration()),
     'searchParameters' => [
@@ -61,6 +60,7 @@ $isConfig = [
     </div>
     <div class="algolia_merchandising_items_right_container" id="algolia_merchandising_items_right_container">
         <div id="algolia_merchandising_search_box"></div>
+        <div id="algolia_sortby"></div>
         <div id="algolia_merchandising_hits"></div>
     </div>
 </div>
@@ -202,6 +202,7 @@ $isConfig = [
   requirejs(['algoliaAdminBundle'], function (algoliaAdminBundle) {
     algoliaAdminBundle.$(function ($) {
       var config = <?php echo json_encode($isConfig); ?>;
+      config.indexName = getCurrentIndexName();
       var search = algoliaAdminBundle.instantsearch(config);
       var facetWrapper = document.getElementById('algolia_merchandising_facet_wrapper');
 
@@ -215,7 +216,7 @@ $isConfig = [
         }
 
         if (name === 'price') {
-          name = facet.attribute + config.priceKey
+          name = facet.attribute + getCurrentPriceKey()
         }
 
         attributes.push({
@@ -237,6 +238,26 @@ $isConfig = [
                return search(inputValue);
              }
          })
+      );
+
+      // initialize SortBy selector
+      var sortingIndices = [];
+      for (var storeId in config.indexDataByStoreIds) {
+        var currentIndexName = config.indexDataByStoreIds[storeId].indexName;
+        if (typeof currentIndexName === "undefined" ) {
+          continue;
+        }
+        sortingIndices.push ({
+          'name': currentIndexName + '_products',
+          'label': currentIndexName
+        });
+      }
+
+      search.addWidget(
+        algoliaAdminBundle.instantsearch.widgets.sortBySelector({
+          container: '#algolia_sortby',
+          indices: sortingIndices
+        })
       );
 
       // initialize Current refined values
@@ -303,13 +324,21 @@ $isConfig = [
           }
         }
 
-        var priceFacet = 'price' + config.priceKey;
+        var priceFacet = 'price' + getCurrentPriceKey();
         if (typeof numericRefinements[priceFacet] !== "undefined") {
           formattedConfig[priceFacet] =  numericRefinements[priceFacet];
         }
 
         $('input[name="configuration"]').val(JSON.stringify(formattedConfig)).change();
         $('input[name="algolia_configuration"]').val(JSON.stringify(formattedConfig)).change();
+      }
+
+      function getCurrentIndexName() {
+        return config.indexDataByStoreIds[$('select[name="store_id"]').val()].indexName + '_products';
+      }
+
+      function getCurrentPriceKey() {
+        return config.indexDataByStoreIds[$('select[name="store_id"]').val()].priceKey;
       }
 
       var customAttributeFacet = {
@@ -411,7 +440,7 @@ $isConfig = [
       $.each(config.facets, function (i, facet) {
 
         if (facet.attribute.indexOf("price") !== -1)
-          facet.attribute = facet.attribute + config.priceKey;
+          facet.attribute = facet.attribute + getCurrentPriceKey();
 
         facet.wrapper = facetWrapper;
 
@@ -508,9 +537,13 @@ $isConfig = [
         return false;
       });
 
+      $('select[name="store_id"]').on('change', function(e) {
+        $('.ais-sort-by-selector').val(config.indexDataByStoreIds[$(this).val()].indexName + '_products').change();
+      });
+
       var initAutocomplete = function() {
         var client = algoliaAdminBundle.algoliasearch(config.appId, config.apiKey),
-          index = client.initIndex(config.indexName),
+          index = client.initIndex(getCurrentIndexName()),
           template = algoliaAdminBundle.Hogan.compile($('#algolia_merchandising_autocomplete_hit').html()),
           options = {
             hitsPerPage: config.searchParameters.hitsPerPage + 5,

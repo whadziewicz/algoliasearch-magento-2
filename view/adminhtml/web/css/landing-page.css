@@ -1,3 +1,20 @@
+/* LISTING */
+
+.algolia-suggestions-header {
+    width : 100%;
+    background-color : #F5FAFD;
+    border : 1px solid #E2F0FA;
+    padding : 20px;
+    margin : 5px 0 20px;
+}
+
+.algolia-suggestions-header .book{
+    float : left;
+    margin-right : 20px;
+    margin-top: 5px;
+}
+
+/* FORM */
 #algolia_merchandising_autocomplete {
     width: 500px;
     height: 50px;

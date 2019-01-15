@@ -13,20 +13,45 @@ abstract class AbstractButton
     /** @var LandingPageFactory */
     protected $landingPageFactory;
 
+    /** @var \Magento\Framework\UrlInterface */
+    protected $frontendUrlBuilder;
+
     /**
      * PHP Constructor
      *
      * @param Context $context
      * @param LandingPageFactory $landingPageFactory
+     * @param \Magento\Framework\UrlInterface $frontendUrlBuilder
      *
      * @return AbstractButton
      */
     public function __construct(
         Context $context,
-        LandingPageFactory $landingPageFactory
+        LandingPageFactory $landingPageFactory,
+        \Magento\Framework\UrlInterface $frontendUrlBuilder
     ) {
         $this->context = $context;
         $this->landingPageFactory = $landingPageFactory;
+        $this->frontendUrlBuilder = $frontendUrlBuilder;
+    }
+
+
+    /**
+     * Return object
+     *
+     * @return int|null
+     */
+    public function getObject()
+    {
+        try {
+            $modelId = $this->context->getRequest()->getParam('id');
+            /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
+            $landingPage = $this->landingPageFactory->create();
+            $landingPage->getResource()->load($landingPage, $modelId);
+            return $landingPage;
+        } catch (NoSuchEntityException $e) {
+        }
+        return null;
     }
 
     /**
@@ -36,17 +61,19 @@ abstract class AbstractButton
      */
     public function getObjectId()
     {
-        try {
-            $modelId = $this->context->getRequest()->getParam('id');
-
-            /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
-            $landingPage = $this->landingPageFactory->create();
-            $landingPage->getResource()->load($landingPage, $modelId);
-            return $landingPage->getId();
-        } catch (NoSuchEntityException $e) {
-        }
-        return null;
+        return $this->getObject() ? $this->getObject()->getId() : null;
     }
+
+    /**
+     * Return object ID
+     *
+     * @return int|null
+     */
+    public function getObjectUrlKey()
+    {
+        return $this->getObject() ? $this->getObject()->getUrlKey() : null;
+    }
+
 
     /**
      * Generate url by route and parameters

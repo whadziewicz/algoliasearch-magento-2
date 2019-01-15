@@ -10,11 +10,11 @@ class LandingPageStatuses implements \Magento\Framework\Data\OptionSourceInterfa
         $options = [
             [
                 'value' => 0,
-                'label' => 'Disabled',
+                'label' => 'Not Published',
             ],
             [
                 'value' => 1,
-                'label' => 'Enabled',
+                'label' => 'Published',
             ]
         ];
 

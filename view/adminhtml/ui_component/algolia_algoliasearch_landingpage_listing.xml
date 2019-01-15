@@ -60,14 +60,6 @@
     </listingToolbar>
 
     <columns name="algolia_algoliasearch_landingpage_columns">
-        <selectionsColumn name="ids">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="resizeEnabled" xsi:type="boolean">false</item>
-                    <item name="indexField" xsi:type="string">landing_page_id</item>
-                </item>
-            </argument>
-        </selectionsColumn>
         <column name="landing_page_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -103,7 +95,29 @@
                     <item name="editor" xsi:type="array">
                         <item name="editorType" xsi:type="string">text</item>
                     </item>
-                    <item name="label" xsi:type="string" translate="true">Url</item>
+                    <item name="label" xsi:type="string" translate="true">URL Key</item>
+                </item>
+            </argument>
+        </column>
+        <column name="date_from" >
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <!--<item name="dateFormat" xsi:type="string" translate="true">YYYY-MM-dd</item>-->
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Timeframe (date from)</item>
+                </item>
+            </argument>
+        </column>
+        <column name="date_to" >
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <!--<item name="dateFormat" xsi:type="string" translate="true">YYYY-MM-dd</item>-->
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Timeframe (date to)</item>
                 </item>
             </argument>
         </column>

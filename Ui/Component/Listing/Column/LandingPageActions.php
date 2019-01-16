@@ -12,6 +12,7 @@ class LandingPageActions extends Column
 {
     const URL_PATH_EDIT = 'algolia_algoliasearch/landingpage/edit';
     const URL_PATH_DELETE = 'algolia_algoliasearch/landingpage/delete';
+    const URL_PATH_DUPLICATE = 'algolia_algoliasearch/landingpage/duplicate';
 
     /** @var UrlInterface */
     protected $urlBuilder;
@@ -70,8 +71,21 @@ class LandingPageActions extends Column
                         ),
                         'label' => __('Delete'),
                         'confirm' => [
-                            'title' => __('Delete %1', $title),
-                            'message' => __('Are you sure you want to delete %1?', $title)
+                            'title' => __('Delete "%1"', $title),
+                            'message' => __('Are you sure you want to delete "%1"?', $title)
+                        ]
+                    ],
+                    'duplicate' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            static::URL_PATH_DUPLICATE,
+                            [
+                                'id' => $item['landing_page_id'],
+                            ]
+                        ),
+                        'label' => __('Duplicate'),
+                        'confirm' => [
+                            'title' => __('Duplicate "%1"', $title),
+                            'message' => __('Are you sure you want to duplicate "%1"?', $title)
                         ]
                     ]
                 ];

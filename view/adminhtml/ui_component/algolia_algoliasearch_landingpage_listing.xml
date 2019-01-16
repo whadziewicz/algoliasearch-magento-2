@@ -64,7 +64,7 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
-                    <item name="label" xsi:type="string" translate="true">Landing Page Id</item>
+                    <item name="label" xsi:type="string" translate="true">Id</item>
                 </item>
             </argument>
         </column>
@@ -103,7 +103,6 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">dateRange</item>
-                    <!--<item name="dateFormat" xsi:type="string" translate="true">YYYY-MM-dd</item>-->
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="dataType" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Timeframe (date from)</item>
@@ -114,7 +113,6 @@
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">dateRange</item>
-                    <!--<item name="dateFormat" xsi:type="string" translate="true">YYYY-MM-dd</item>-->
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
                     <item name="dataType" xsi:type="string">date</item>
                     <item name="label" xsi:type="string" translate="true">Timeframe (date to)</item>

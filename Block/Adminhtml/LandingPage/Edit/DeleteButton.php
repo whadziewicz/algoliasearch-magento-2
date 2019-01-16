@@ -13,7 +13,7 @@ class DeleteButton extends AbstractButton implements ButtonProviderInterface
             $message = htmlentities(__('Are you sure you want to delete this landing page?'));
 
             $data = [
-                'label'      => __('Delete Landing Page'),
+                'label'      => __('Delete'),
                 'class'      => 'delete',
                 'on_click'   => "deleteConfirm('{$message}', '{$this->getDeleteUrl()}')",
                 'sort_order' => 20,

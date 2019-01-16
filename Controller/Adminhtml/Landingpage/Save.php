@@ -17,24 +17,14 @@ class Save extends AbstractAction
     protected $dataPersistor;
 
     /**
-     * @var MerchandisingHelper
-     */
-    protected $merchandisingHelper;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * PHP Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param LandingPageFactory $landingPageFactory
-     * @param DataPersistorInterface $dataPersistor
      * @param MerchandisingHelper $merchandisingHelper
      * @param StoreManagerInterface $storeManager
+     * @param DataPersistorInterface $dataPersistor
      *
      * @return Save
      */
@@ -42,15 +32,19 @@ class Save extends AbstractAction
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
         LandingPageFactory $landingPageFactory,
-        DataPersistorInterface $dataPersistor,
         MerchandisingHelper $merchandisingHelper,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        DataPersistorInterface $dataPersistor
     ) {
         $this->dataPersistor = $dataPersistor;
-        $this->merchandisingHelper = $merchandisingHelper;
-        $this->storeManager = $storeManager;
 
-        parent::__construct($context, $coreRegistry, $landingPageFactory);
+        parent::__construct(
+            $context,
+            $coreRegistry,
+            $landingPageFactory,
+            $merchandisingHelper,
+            $storeManager
+        );
     }
 
     /**
@@ -97,35 +91,7 @@ class Save extends AbstractAction
                 $landingPage->getResource()->save($landingPage);
 
                 if (isset($data['algolia_merchandising_positions']) && $data['algolia_merchandising_positions'] != '') {
-                    $positions = json_decode($data['algolia_merchandising_positions'], true);
-                    $stores = [];
-                    if ($data['store_id'] == 0) {
-                        foreach ($this->storeManager->getStores() as $store) {
-                            if ($store->getIsActive()) {
-                                $stores[] = $store->getId();
-                            }
-                        }
-                    } else {
-                        $stores[] = $data['store_id'];
-                    }
-
-                    foreach ($stores as $storeId) {
-                        if (!$positions) {
-                            $this->merchandisingHelper->deleteQueryRule(
-                                $storeId,
-                                $landingPageId,
-                                'landingpage'
-                            );
-                        } else {
-                            $this->merchandisingHelper->saveQueryRule(
-                                $storeId,
-                                $landingPageId,
-                                $positions,
-                                'landingpage',
-                                $data['query']
-                            );
-                        }
-                    }
+                    $this->manageQueryRules($landingPage->getId(), $data);
                 }
 
                 $this->messageManager->addSuccessMessage(__('The landing page has been saved.'));
@@ -150,5 +116,38 @@ class Save extends AbstractAction
             return $resultRedirect->setPath('*/*/edit', ['id' => $landingPageId]);
         }
         return $resultRedirect->setPath('*/*/');
+    }
+
+    private function manageQueryRules($landingPageId, $data)
+    {
+        $positions = json_decode($data['algolia_merchandising_positions'], true);
+        $stores = [];
+        if ($data['store_id'] == 0) {
+            foreach ($this->storeManager->getStores() as $store) {
+                if ($store->getIsActive()) {
+                    $stores[] = $store->getId();
+                }
+            }
+        } else {
+            $stores[] = $data['store_id'];
+        }
+
+        foreach ($stores as $storeId) {
+            if (!$positions) {
+                $this->merchandisingHelper->deleteQueryRule(
+                    $storeId,
+                    $landingPageId,
+                    'landingpage'
+                );
+            } else {
+                $this->merchandisingHelper->saveQueryRule(
+                    $storeId,
+                    $landingPageId,
+                    $positions,
+                    'landingpage',
+                    $data['query']
+                );
+            }
+        }
     }
 }

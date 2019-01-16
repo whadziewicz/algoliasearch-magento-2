@@ -19,6 +19,7 @@ class Delete extends AbstractAction
                 $landingPage = $this->landingPageFactory->create();
                 $landingPage->getResource()->load($landingPage, $landingPageId);
                 $landingPage->getResource()->delete($landingPage);
+                $this->deleteQueryRules($landingPage);
 
                 $this->messageManager->addSuccessMessage(__('The landing page has been deleted.'));
                 return $resultRedirect->setPath('*/*/');
@@ -29,5 +30,27 @@ class Delete extends AbstractAction
         }
         $this->messageManager->addErrorMessage(__('The landing page to delete does not exist.'));
         return $resultRedirect->setPath('*/*/');
+    }
+
+    private function deleteQueryRules($landingPage)
+    {
+        $stores = [];
+        if ($landingPage->getStoreId() == 0) {
+            foreach ($this->storeManager->getStores() as $store) {
+                if ($store->getIsActive()) {
+                    $stores[] = $store->getId();
+                }
+            }
+        } else {
+            $stores[] = $landingPage->getStoreId();
+        }
+
+        foreach ($stores as $storeId) {
+            $this->merchandisingHelper->deleteQueryRule(
+                $storeId,
+                $landingPage->getId(),
+                'landingpage'
+            );
+        }
     }
 }

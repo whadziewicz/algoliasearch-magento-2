@@ -85,6 +85,59 @@ class MerchandisingHelper
         return $transformedPositions;
     }
 
+    /**
+     * @param $storeId
+     * @param $entityIdFrom
+     * @param $entityIdTo
+     * @param $entityType
+     *
+     * @throws AlgoliaException
+     */
+    public function copyQueryRules($storeId, $entityIdFrom, $entityIdTo, $entityType)
+    {
+        $productsIndexName = $this->coreHelper->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
+        $productIndex = $this->algoliaHelper->getIndex($productsIndexName);
+        $context = $this->getQueryRuleId($entityIdFrom, $entityType);
+        $queryRulesToSet = [];
+        try {
+            $hitsPerPage = 100;
+            $page = 0;
+            do {
+                $fetchedQueryRules = $productIndex->searchRules([
+                    'context' => $context,
+                    'page' => $page,
+                    'hitsPerPage' => $hitsPerPage,
+                ]);
+
+                if (!$fetchedQueryRules || !array_key_exists('hits', $fetchedQueryRules)) {
+                    break;
+                }
+
+                foreach ($fetchedQueryRules['hits'] as $hit) {
+                    unset($hit['_highlightResult']);
+
+                    $newContext = $this->getQueryRuleId($entityIdTo, $entityType);
+                    $hit['objectID'] = $newContext;
+                    if (isset($hit['condition']['context']) && $hit['condition']['context'] == $context) {
+                        $hit['condition']['context'] = $newContext;
+                    }
+                    $queryRulesToSet[] = $hit;
+                }
+
+                $page++;
+            } while (($page * $hitsPerPage) < $fetchedQueryRules['nbHits']);
+
+            $productIndex->batchRules($queryRulesToSet, false, false);
+
+        } catch (AlgoliaException $e) {
+            // Fail silently if query rules are disabled on the app
+            // If QRs are disabled, nothing will happen and the extension will work as expected
+            if ($e->getMessage() !== 'Query Rules are not enabled on this application') {
+                throw $e;
+            }
+        }
+    }
+
     private function getQueryRuleId($entityId, $entityType)
     {
         return 'magento-' . $entityType . '-' . $entityId;

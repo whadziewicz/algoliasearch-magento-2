@@ -379,6 +379,29 @@ input::-ms-clear {
     padding : 0 10px;
 }
 
+#filters-box {
+    padding : 0 10px;
+}
+
+#filters-box #current-refinements .facet .name,
+#filters-box #algolia_merchandising_facet_wrapper .facet .name {
+    color: #303030;
+    font-size: 1.5rem;
+    font-weight: 600;
+    background : none;
+}
+
+#filters-box #current-refinements .facet .ais-header,
+#filters-box #algolia_merchandising_facet_wrapper .facet .ais-header {
+    border-bottom : 1px solid #efefef;
+}
+
+#filters-box #current-refinements .facet ,
+#filters-box #algolia_merchandising_facet_wrapper .facet {
+    border : none;
+}
+
+
 /** REFINEMENT LIST */
 
 .ais-menu--link,
@@ -702,7 +725,7 @@ a.ais-current-refined-values--link:hover {
 }
 
 #algolia_instant_selector .facet .name {
-    padding: 4px 8px;
+    padding: 10px 8px;
     font-weight: 500;
     background-color: #514943;
     color: #FFFFFF;

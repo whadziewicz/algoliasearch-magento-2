@@ -37,7 +37,7 @@ class Edit extends AbstractAction
         $resultPage->getConfig()->getTitle()->prepend(__('Landing Pages'));
         $resultPage->getConfig()->getTitle()->prepend(
             $landingPage->getId()
-                ? __("Edit Landing Page %1", $landingPage->getTitle())
+                ? __('Edit Landing Page "%1"', $landingPage->getTitle())
                 : __('New Landing Page')
         );
 

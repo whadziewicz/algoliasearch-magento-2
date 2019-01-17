@@ -153,35 +153,47 @@
                 </item>
             </argument>
         </field>
-        <field name="date_from">
+        <container name="date_group" component="Magento_Ui/js/form/components/group">
             <argument name="data" xsi:type="array">
+                <item name="type" xsi:type="string">group</item>
                 <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="formElement" xsi:type="string">date</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Timeframe (From)</item>
-                    <item name="dataScope" xsi:type="string">date_from</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="validate-date" xsi:type="boolean">true</item>
-                    </item>
+                    <item name="additionalClasses" xsi:type="string">admin__control-grouped-date</item>
+                    <item name="required" xsi:type="boolean">false</item>
+                    <item name="breakLine" xsi:type="boolean">false</item>
                 </item>
             </argument>
-        </field>
-        <field name="date_to">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">landing_page</item>
-                    <item name="formElement" xsi:type="string">date</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Timeframe (To)</item>
-                    <item name="dataScope" xsi:type="string">date_to</item>
-                    <item name="notice" xsi:type="string" translate="true">If you don't set any timeframe, the landing page will be accessible indefinitely.</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="validate-date" xsi:type="boolean">true</item>
+            <field name="date_from">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="additionalClasses" xsi:type="string">admin__field-date</item>
+                        <item name="source" xsi:type="string">landing_page</item>
+                        <item name="formElement" xsi:type="string">date</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="string" translate="true">Timeframe From</item>
+                        <item name="dataScope" xsi:type="string">date_from</item>
+                        <item name="notice" xsi:type="string" translate="true">If you don't set any timeframe, the landing page will be accessible indefinitely.</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="validate-date" xsi:type="boolean">true</item>
+                        </item>
                     </item>
-                </item>
-            </argument>
-        </field>
+                </argument>
+            </field>
+            <field name="date_to">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="additionalClasses" xsi:type="string">admin__field-date</item>
+                        <item name="source" xsi:type="string">landing_page</item>
+                        <item name="formElement" xsi:type="string">date</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="label" xsi:type="string" translate="true">To</item>
+                        <item name="dataScope" xsi:type="string">date_to</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="validate-date" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </container>
     </fieldset>
     <fieldset name="content">
         <argument name="data" xsi:type="array">

@@ -109,4 +109,36 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 
         return $this->getConnection()->fetchOne($select);
     }
+
+    /**
+     * Check if the url_key already exists in the url_rewrite table
+     * return  id if page exists
+     *
+     * @param string $urlKey
+     * @param int $storeId
+     * @param int $landingPageId
+     *
+     * @return int
+     */
+    public function checkUrlRewriteTable($urlKey, $storeId = null, $landingPageId = null)
+    {
+        $select = $this->getConnection()
+            ->select()
+            ->from(['ur' => $this->getConnection()->getTableName('url_rewrite')])
+            ->where('request_path = ?', $urlKey);
+
+        // Only check a particular store if specified
+        if (!is_null($storeId) && $storeId != 0) {
+            $select->where('store_id = ?', $storeId);
+        }
+
+        // Handle the already existing url rewrite for the landing page
+        if (!is_null($landingPageId) && $landingPageId != 0) {
+            $select->where('!(entity_type = "landing-page" AND entity_id = ?)', $landingPageId);
+        }
+
+        $select->limit(1);
+
+        return $this->getConnection()->fetchOne($select);
+    }
 }

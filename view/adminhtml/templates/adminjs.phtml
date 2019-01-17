@@ -152,5 +152,39 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	        }
         });
     });
+
+  requirejs([
+    'jquery',
+    'Magento_Ui/js/lib/validation/validator',
+    'mage/translate'
+  ], function ($, validator, mage) {
+    'use strict';
+
+    validator.addRule(
+      'validate-url-unicity',
+      function (value) {
+        var isValid = false;
+        var storeId = $('select[name="store_id"]').val();
+        var landingPageId = $('input[name="landing_page_id"]').val();
+        var url = '<?php echo $this->getAjaxCheckUrl() ?>';
+
+        new Ajax.Request(
+          url,
+          {
+            parameters: {'store_id': storeId, 'url_key': value, 'landing_page_id': landingPageId},
+            method: 'post',
+            asynchronous: false,
+            onComplete: function (transport) {
+              var response = JSON.parse(transport.responseText);
+              isValid = response.isValid;
+            }
+          }
+        );
+        return isValid;
+      },
+      $.mage.__('This URL key is already in use. Please find another one.')
+    );
+
+  });
 });
 </script>

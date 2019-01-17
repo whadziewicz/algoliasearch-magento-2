@@ -66,6 +66,7 @@
                     <item name="notice" xsi:type="string" translate="true">Please make sure that the chosen URL isn't already used by the Magento's URL rewrite system (including products, categories and CMS pages)</item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
+                        <item name="validate-url-unicity" xsi:type="boolean">true</item>
                     </item>
                 </item>
             </argument>

@@ -219,4 +219,9 @@ class Algolia extends Template implements CollectionDataSourceInterface
 
         return $this->landingPageHelper->getLandingPage($landingPageId);
     }
+
+    public function getAjaxCheckUrl()
+    {
+        return $this->_urlBuilder->getUrl('algolia_algoliasearch/landingpage/checkUrl');
+    }
 }

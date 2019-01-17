@@ -45,6 +45,8 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
 
     public function execute($productIds)
     {
+        $start = microtime(true);
+
         if (!$this->configHelper->getApplicationID()
             || !$this->configHelper->getAPIKey()
             || !$this->configHelper->getSearchOnlyAPIKey()) {
@@ -126,6 +128,11 @@ class Product implements Magento\Framework\Indexer\ActionInterface, Magento\Fram
                 ]);
             }
         }
+
+        $stop = microtime(true);
+
+        var_dump($stop - $start);
+        var_dump(memory_get_peak_usage(true));
     }
 
     public function executeFull()

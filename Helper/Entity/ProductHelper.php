@@ -314,7 +314,7 @@ class ProductHelper
 
         // Merge current replicas with sorting replicas to not delete A/B testing replica indices
         try {
-            $currentSettings = $this->algoliaHelper->getSettings($indexName);
+            $currentSettings = []; // $this->algoliaHelper->getSettings($indexName);
             if (array_key_exists('replicas', $currentSettings)) {
                 $replicas = array_values(array_unique(array_merge($replicas, $currentSettings['replicas'])));
             }
@@ -326,7 +326,6 @@ class ProductHelper
 
         if (count($replicas) > 0) {
             $this->algoliaHelper->setSettings($indexName, ['replicas' => $replicas]);
-            $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
 
             foreach ($sortingIndices as $values) {
                 $indexSettings['ranking'] = $values['ranking'];
@@ -334,11 +333,7 @@ class ProductHelper
             }
         } else {
             $this->algoliaHelper->setSettings($indexName, ['replicas' => []]);
-            $setReplicasTaskId = $this->algoliaHelper->getLastTaskId();
         }
-
-        // Commented out as it doesn't delete anything now because of merging replica indices earlier
-        // $this->deleteUnusedReplicas($indexName, $replicas, $setReplicasTaskId);
 
         if ($this->configHelper->isEnabledSynonyms($storeId) === true) {
             if ($synonymsFile = $this->configHelper->getSynonymsFile($storeId)) {
@@ -1030,7 +1025,7 @@ class ProductHelper
         }
 
         if ($rules) {
-            $index->batchRules($rules, true);
+            // $index->batchRules($rules, true);
         }
     }
 
@@ -1040,11 +1035,12 @@ class ProductHelper
             $hitsPerPage = 100;
             $page = 0;
             do {
-                $fetchedQueryRules = $index->searchRules([
-                    'context' => 'magento_filters',
-                    'page' => $page,
-                    'hitsPerPage' => $hitsPerPage,
-                ]);
+                $fetchedQueryRules = false;
+//                $index->searchRules([
+//                    'context' => 'magento_filters',
+//                    'page' => $page,
+//                    'hitsPerPage' => $hitsPerPage,
+//                ]);
 
                 if (!$fetchedQueryRules || !array_key_exists('hits', $fetchedQueryRules)) {
                     break;

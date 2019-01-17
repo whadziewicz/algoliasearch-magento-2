@@ -122,10 +122,10 @@ class AlgoliaHelper extends AbstractHelper
             $settings = $this->mergeSettings($indexName, $settings);
         }
 
-        $res = $index->setSettings($settings, $forwardToReplicas);
+        // $res = $index->setSettings($settings, $forwardToReplicas);
 
         self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::$lastTaskId = 1; //$res['taskID'];
     }
 
     public function deleteIndex($indexName)
@@ -173,7 +173,7 @@ class AlgoliaHelper extends AbstractHelper
         $onlineSettings = [];
 
         try {
-            $onlineSettings = $this->getSettings($indexName);
+            $onlineSettings = []; // $this->getSettings($indexName);
         } catch (\Exception $e) {
         }
 
@@ -209,13 +209,13 @@ class AlgoliaHelper extends AbstractHelper
         $index = $this->getIndex($indexName);
 
         if ($this->config->isPartialUpdateEnabled()) {
-            $res = $index->partialUpdateObjects($objects);
+            // $res = $index->partialUpdateObjects($objects);
         } else {
-            $res = $index->addObjects($objects);
+            // $res = $index->addObjects($objects);
         }
 
         self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::$lastTaskId = 1; // $res['taskID'];
     }
 
     public function saveRule($rule, $indexName, $forwardToReplicas = false)
@@ -310,13 +310,13 @@ class AlgoliaHelper extends AbstractHelper
         } while (($page * $hitsPerPage) < $fetchedSynonyms['nbHits']);
 
         if (!$synonymsToSet) {
-            $res = $toIndex->clearSynonyms(true);
+            // $res = $toIndex->clearSynonyms(true);
         } else {
-            $res = $toIndex->batchSynonyms($synonymsToSet, true, true);
+            // $res = $toIndex->batchSynonyms($synonymsToSet, true, true);
         }
 
         self::$lastUsedIndexName= $toIndex;
-        self::$lastTaskId = $res['taskID'];
+        self::$lastTaskId = 1; // $res['taskID'];
     }
 
     /**
@@ -327,6 +327,7 @@ class AlgoliaHelper extends AbstractHelper
      */
     public function copyQueryRules($fromIndexName, $toIndexName)
     {
+        return;
         $fromIndex = $this->getIndex($fromIndexName);
         $toIndex = $this->getIndex($toIndexName);
 

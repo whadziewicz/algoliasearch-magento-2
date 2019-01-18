@@ -92,6 +92,8 @@ class LandingPage extends Result
         $this->pageConfig->setDescription($page->getMetaDescription());
 
         $this->getLayout()->getBlock('landing_page_content')->setText($this->getLandingPageContent());
+        $this->getLayout()->getBlock('landing_page_custom_js')->setText($this->getLandingCustomJs());
+        $this->getLayout()->getBlock('landing_page_custom_css')->setText($this->getLandingCustomCss());
 
         return $this;
     }
@@ -100,6 +102,28 @@ class LandingPage extends Result
     protected function getLandingPageContent()
     {
         return $this->filterProvider->getPageFilter()->filter($this->getPage()->getContent());
+    }
+
+    protected function getLandingCustomJs()
+    {
+        $customJs = $this->getPage()->getCustomJs();
+
+        if (!$customJs) {
+            return '';
+        }
+
+        return '<script type="text/javascript">' . $customJs . '</script>';
+    }
+
+    protected function getLandingCustomCss()
+    {
+        $customCss = $this->getPage()->getCustomCss();
+
+        if (!$customCss) {
+            return '';
+        }
+
+        return '<style type="text/css">' . $customCss . '</style>';
     }
 
     /**

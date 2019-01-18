@@ -454,6 +454,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 null,
                 ['nullable' => false, 'default' => null]
             );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CUSTOM_JS,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CUSTOM_CSS,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
 
             $connection->createTable($table);
         }

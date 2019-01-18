@@ -135,6 +135,22 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     /**
      * @inheritdoc
      */
+    public function getCustomJs()
+    {
+        return (string) $this->getData(self::FIELD_CUSTOM_JS);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCustomCss()
+    {
+        return (string) $this->getData(self::FIELD_CUSTOM_CSS);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setLandingPageId($value)
     {
         return $this->setId((int) $value);
@@ -234,6 +250,22 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     public function setConfiguration($value)
     {
         return $this->setData(self::FIELD_CONFIGURATION, (string) $value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomJs($value)
+    {
+        return $this->setData(self::FIELD_CUSTOM_JS, (string) $value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCustomCss($value)
+    {
+        return $this->setData(self::FIELD_CUSTOM_CSS, (string) $value);
     }
 
     /**

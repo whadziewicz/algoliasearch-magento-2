@@ -195,6 +195,30 @@
                 </argument>
             </field>
         </container>
+        <field name="custom_js">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="label" xsi:type="string" translate="true">Javascript</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Add javascript to enchance your page even more. Paste your code here.</item>
+                    <item name="dataScope" xsi:type="string">custom_js</item>
+                </item>
+            </argument>
+        </field>
+        <field name="custom_css">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">landing_page</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="label" xsi:type="string" translate="true">Custom CSS</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Add Custom CSS</item>
+                    <item name="dataScope" xsi:type="string">custom_css</item>
+                </item>
+            </argument>
+        </field>
     </fieldset>
     <fieldset name="content">
         <argument name="data" xsi:type="array">

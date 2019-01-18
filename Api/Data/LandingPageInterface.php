@@ -27,6 +27,8 @@ interface LandingPageInterface
     const FIELD_CONTENT = 'content';
     const FIELD_QUERY = 'query';
     const FIELD_CONFIGURATION = 'configuration';
+    const FIELD_CUSTOM_JS = 'custom_js';
+    const FIELD_CUSTOM_CSS = 'custom_css';
     /**#@-*/
 
     /**
@@ -119,6 +121,20 @@ interface LandingPageInterface
      * @return string
      */
     public function getConfiguration();
+
+    /**
+     * Get field: custom_js
+     *
+     * @return string
+     */
+    public function getCustomJs();
+
+    /**
+     * Get field: custom_css
+     *
+     * @return string
+     */
+    public function getCustomCss();
 
     /**
      * Set field: landing_page_id
@@ -236,4 +252,22 @@ interface LandingPageInterface
      * @return LandingPageInterface
      */
     public function setConfiguration($value);
+
+    /**
+     * Set field: custom_js
+     *
+     * @param string $value
+     *
+     * @return LandingPageInterface
+     */
+    public function setCustomJs($value);
+
+    /**
+     * Set field: custom_css
+     *
+     * @param string $value
+     *
+     * @return LandingPageInterface
+     */
+    public function setCustomCss($value);
 }

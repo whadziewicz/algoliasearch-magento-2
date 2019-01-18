@@ -19,8 +19,8 @@ class DuplicateButton extends AbstractButton implements ButtonProviderInterface
                 'sort_order' => 30,
             ];
         }
-        return $data;
 
+        return $data;
     }
 
     public function getDuplicateUrl()

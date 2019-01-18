@@ -73,7 +73,8 @@ class Algolia implements AdapterInterface
     public function query(RequestInterface $request)
     {
         if (!$this->adapterHelper->isAllowed()
-            || !($this->adapterHelper->isSearch() ||
+            || !(
+                $this->adapterHelper->isSearch() ||
                 $this->adapterHelper->isReplaceCategory() ||
                 $this->adapterHelper->isReplaceAdvancedSearch() ||
                 $this->adapterHelper->isLandingPage()

@@ -22,13 +22,16 @@ class Delete extends AbstractAction
                 $this->deleteQueryRules($landingPage);
 
                 $this->messageManager->addSuccessMessage(__('The landing page has been deleted.'));
+
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
+
                 return $resultRedirect->setPath('*/*/edit', ['landing_page_id' => $landingPageId]);
             }
         }
         $this->messageManager->addErrorMessage(__('The landing page to delete does not exist.'));
+
         return $resultRedirect->setPath('*/*/');
     }
 

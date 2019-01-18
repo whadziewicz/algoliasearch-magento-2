@@ -4,9 +4,9 @@ namespace Algolia\AlgoliaSearch\Controller;
 
 use Algolia\AlgoliaSearch\Model\LandingPageFactory;
 use Magento\Framework\App\ActionFactory;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Stdlib\DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -25,7 +25,7 @@ class Router implements \Magento\Framework\App\RouterInterface
     /** @var DateTime */
     protected $dateTime;
 
-    /**  @var LandingPageFactory */
+    /** @var LandingPageFactory */
     protected $landingPageFactory;
 
     /**
@@ -53,6 +53,7 @@ class Router implements \Magento\Framework\App\RouterInterface
      * Validate and match landing pages from Algolia and modify request
      *
      * @param \Magento\Framework\App\RequestInterface $request
+     *
      * @return \Magento\Framework\App\ActionInterface|null
      */
     public function match(\Magento\Framework\App\RequestInterface $request)
@@ -76,6 +77,7 @@ class Router implements \Magento\Framework\App\RouterInterface
             ->setParam('landing_page_id', $pageId);
 
         $request->setAlias(\Magento\Framework\Url::REWRITE_REQUEST_PATH_ALIAS, $identifier);
+
         return $this->actionFactory->create(\Magento\Framework\App\Action\Forward::class);
     }
 }

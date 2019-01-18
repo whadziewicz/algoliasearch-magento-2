@@ -7,7 +7,7 @@ use Magento\Backend\Block\Widget\Context;
 
 abstract class AbstractButton
 {
-    /**  @var Context */
+    /** @var Context */
     protected $context;
 
     /** @var LandingPageFactory */
@@ -35,7 +35,6 @@ abstract class AbstractButton
         $this->frontendUrlBuilder = $frontendUrlBuilder;
     }
 
-
     /**
      * Return object
      *
@@ -48,9 +47,11 @@ abstract class AbstractButton
             /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
             $landingPage = $this->landingPageFactory->create();
             $landingPage->getResource()->load($landingPage, $modelId);
+
             return $landingPage;
         } catch (NoSuchEntityException $e) {
         }
+
         return null;
     }
 
@@ -73,7 +74,6 @@ abstract class AbstractButton
     {
         return $this->getObject() ? $this->getObject()->getUrlKey() : null;
     }
-
 
     /**
      * Generate url by route and parameters

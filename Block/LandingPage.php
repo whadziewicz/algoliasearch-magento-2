@@ -5,11 +5,10 @@ namespace Algolia\AlgoliaSearch\Block;
 use Algolia\AlgoliaSearch\Model\LandingPage as LandingPageModel;
 use Algolia\AlgoliaSearch\Model\LandingPageFactory;
 use Magento\Catalog\Model\Layer\Resolver as LayerResolver;
-use Magento\CatalogSearch\Helper\Data;
 use Magento\CatalogSearch\Block\Result;
+use Magento\CatalogSearch\Helper\Data;
 use Magento\Cms\Model\Template\FilterProvider;
 use Magento\Search\Model\QueryFactory;
-use Magento\Store\Model\ScopeInterface;
 
 class LandingPage extends Result
 {
@@ -74,6 +73,7 @@ class LandingPage extends Result
             }
             $this->setData('page', $page);
         }
+
         return $this->getData('page');
     }
 
@@ -97,7 +97,6 @@ class LandingPage extends Result
 
         return $this;
     }
-
 
     protected function getLandingPageContent()
     {

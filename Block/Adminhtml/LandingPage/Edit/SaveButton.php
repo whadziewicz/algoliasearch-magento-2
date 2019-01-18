@@ -13,7 +13,7 @@ class SaveButton extends AbstractButton implements ButtonProviderInterface
             'class' => 'save primary',
             'data_attribute' => [
                 'mage-init' => ['button' => ['event' => 'save']],
-                'form-role' => 'save'
+                'form-role' => 'save',
             ],
             'sort_order' => 90,
         ];

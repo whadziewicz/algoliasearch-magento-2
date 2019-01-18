@@ -73,6 +73,7 @@ class Save extends AbstractAction
 
                 if (!$landingPage->getId()) {
                     $this->messageManager->addErrorMessage(__('This landing page does not exist.'));
+
                     return $resultRedirect->setPath('*/*/');
                 }
             }
@@ -115,6 +116,7 @@ class Save extends AbstractAction
 
             return $resultRedirect->setPath('*/*/edit', ['id' => $landingPageId]);
         }
+
         return $resultRedirect->setPath('*/*/');
     }
 

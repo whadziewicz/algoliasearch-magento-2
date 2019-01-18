@@ -2,11 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\LandingPage;
 
-use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
-use Algolia\AlgoliaSearch\Model\LandingPageFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Store\Model\StoreManagerInterface;
 
 class Duplicate extends AbstractAction
 {
@@ -19,6 +16,7 @@ class Duplicate extends AbstractAction
         $landingPageId = (int) $this->getRequest()->getParam('id');
         if (!$landingPageId) {
             $this->messageManager->addErrorMessage(__('The landing page to duplicate does not exist.'));
+
             return $resultRedirect->setPath('*/*/');
         }
 
@@ -28,6 +26,7 @@ class Duplicate extends AbstractAction
 
         if (is_null($landingPage)) {
             $this->messageManager->addErrorMessage(__('This landing page does not exists.'));
+
             return $resultRedirect->setPath('*/*/');
         }
 
@@ -51,6 +50,7 @@ class Duplicate extends AbstractAction
         }
 
         $this->messageManager->addErrorMessage(__('An error occurred during the landing page duplication.'));
+
         return $resultRedirect->setPath('*/*/');
     }
 

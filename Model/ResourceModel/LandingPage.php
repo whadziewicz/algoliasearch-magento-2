@@ -4,7 +4,6 @@ namespace Algolia\AlgoliaSearch\Model\ResourceModel;
 
 use Algolia\AlgoliaSearch\Api\Data\LandingPageInterface;
 use Algolia\AlgoliaSearch\Model\LandingPageUrlRewriteGenerator;
-use Magento\Framework\DB\Select;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\Context;
 use Magento\Store\Model\Store;
@@ -48,8 +47,10 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * Create url rewrite before saving
      *
      * @param AbstractModel $object
-     * @return $this
+     *
      * @throws LocalizedException
+     *
+     * @return $this
      */
     protected function _afterSave(AbstractModel $object)
     {
@@ -70,8 +71,10 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * Delete url rewrite after deletion
      *
      * @param AbstractModel $object
-     * @return $this
+     *
      * @throws LocalizedException
+     *
+     * @return $this
      */
     protected function _afterDelete(AbstractModel $object)
     {
@@ -92,6 +95,7 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * @param string $identifier
      * @param int $storeId
      * @param string $date
+     *
      * @return int
      */
     public function checkIdentifier($identifier, $storeId, $date)

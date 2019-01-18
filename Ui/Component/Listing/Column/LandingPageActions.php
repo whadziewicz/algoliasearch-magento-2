@@ -2,10 +2,10 @@
 
 namespace Algolia\AlgoliaSearch\Ui\Component\Listing\Column;
 
+use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
-use Magento\Framework\Escaper;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 class LandingPageActions extends Column
@@ -66,14 +66,14 @@ class LandingPageActions extends Column
                         'href' => $this->urlBuilder->getUrl(
                             static::URL_PATH_DELETE,
                             [
-                                'id' => $item['landing_page_id']
+                                'id' => $item['landing_page_id'],
                             ]
                         ),
                         'label' => __('Delete'),
                         'confirm' => [
                             'title' => __('Delete "%1"', $title),
-                            'message' => __('Are you sure you want to delete "%1"?', $title)
-                        ]
+                            'message' => __('Are you sure you want to delete "%1"?', $title),
+                        ],
                     ],
                     'duplicate' => [
                         'href' => $this->urlBuilder->getUrl(
@@ -85,9 +85,9 @@ class LandingPageActions extends Column
                         'label' => __('Duplicate'),
                         'confirm' => [
                             'title' => __('Duplicate "%1"', $title),
-                            'message' => __('Are you sure you want to duplicate "%1"?', $title)
-                        ]
-                    ]
+                            'message' => __('Are you sure you want to duplicate "%1"?', $title),
+                        ],
+                    ],
                 ];
             }
         }

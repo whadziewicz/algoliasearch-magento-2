@@ -3,9 +3,9 @@
 namespace Algolia\AlgoliaSearch\Controller\Landingpage;
 
 use Algolia\AlgoliaSearch\Helper\LandingPageHelper;
-use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 
 class View extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
@@ -36,8 +36,10 @@ class View extends Action implements HttpGetActionInterface, HttpPostActionInter
         $resultPage = $this->_objectManager->get(LandingPageHelper::class)->prepareResultPage($this, $pageId);
         if (!$resultPage) {
             $resultForward = $this->resultForwardFactory->create();
+
             return $resultForward->forward('noroute');
         }
+
         return $resultPage;
     }
 }

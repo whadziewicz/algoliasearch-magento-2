@@ -15,7 +15,7 @@ class LandingPageStatuses implements \Magento\Framework\Data\OptionSourceInterfa
             [
                 'value' => 1,
                 'label' => 'Published',
-            ]
+            ],
         ];
 
         return $options;

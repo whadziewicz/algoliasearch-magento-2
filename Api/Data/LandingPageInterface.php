@@ -55,7 +55,7 @@ interface LandingPageInterface
     /**
      * Get field: is_active
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsActive();
 
@@ -166,7 +166,7 @@ interface LandingPageInterface
     /**
      * Set field: is_active
      *
-     * @param boolean $value
+     * @param bool $value
      *
      * @return LandingPageInterface
      */

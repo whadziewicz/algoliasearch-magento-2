@@ -128,7 +128,6 @@ class MerchandisingHelper
             } while (($page * $hitsPerPage) < $fetchedQueryRules['nbHits']);
 
             $productIndex->batchRules($queryRulesToSet, false, false);
-
         } catch (AlgoliaException $e) {
             // Fail silently if query rules are disabled on the app
             // If QRs are disabled, nothing will happen and the extension will work as expected

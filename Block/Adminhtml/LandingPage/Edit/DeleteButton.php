@@ -19,8 +19,8 @@ class DeleteButton extends AbstractButton implements ButtonProviderInterface
                 'sort_order' => 20,
             ];
         }
-        return $data;
 
+        return $data;
     }
 
     public function getDeleteUrl()

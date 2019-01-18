@@ -4,7 +4,6 @@ namespace Algolia\AlgoliaSearch\DataProvider\LandingPage;
 
 use Algolia\AlgoliaSearch\Model\ResourceModel\LandingPage\CollectionFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Ui\DataProvider\Modifier\PoolInterface;
 
 class LandingPageDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {

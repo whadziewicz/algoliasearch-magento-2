@@ -43,6 +43,7 @@ class LandingPageUrlRewriteGenerator
 
     /**
      * @param \Algolia\AlgoliaSearch\Model\LandingPage $landingPage
+     *
      * @return \Magento\UrlRewrite\Service\V1\Data\UrlRewrite[]
      */
     public function generate($landingPage)
@@ -52,6 +53,7 @@ class LandingPageUrlRewriteGenerator
         $urls = $storeId == 0 ? $this->generateForAllStores()
             : $this->generateForSpecificStore($storeId);
         $this->landingPage = null;
+
         return $urls;
     }
 
@@ -66,6 +68,7 @@ class LandingPageUrlRewriteGenerator
         foreach ($this->storeManager->getStores() as $store) {
             $urls[] = $this->createUrlRewrite($store->getStoreId());
         }
+
         return $urls;
     }
 
@@ -73,6 +76,7 @@ class LandingPageUrlRewriteGenerator
      * Generate url for one store
      *
      * @param int $storeId
+     *
      * @return \Magento\UrlRewrite\Service\V1\Data\UrlRewrite[]
      */
     protected function generateForSpecificStore($storeId)
@@ -92,6 +96,7 @@ class LandingPageUrlRewriteGenerator
      *
      * @param int $storeId
      * @param int $redirectType
+     *
      * @return \Magento\UrlRewrite\Service\V1\Data\UrlRewrite
      */
     protected function createUrlRewrite($storeId, $redirectType = 0)

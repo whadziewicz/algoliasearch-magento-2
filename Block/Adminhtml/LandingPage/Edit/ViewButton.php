@@ -23,6 +23,7 @@ class ViewButton extends AbstractButton implements ButtonProviderInterface
      *
      * @param string $scope
      * @param string $store
+     *
      * @return string
      */
     public function getLandingPageUrl($scope = null, $store = null)

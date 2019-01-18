@@ -843,12 +843,12 @@ class Data
 
         $indexNames[0] = [
             'indexName' => $this->getBaseIndexName(),
-            'priceKey' => '.' . $this->configHelper->getCurrencyCode() . '.default'
+            'priceKey' => '.' . $this->configHelper->getCurrencyCode() . '.default',
         ];
         foreach ($this->storeManager->getStores() as $store) {
             $indexNames[$store->getId()] = [
                 'indexName' => $this->getBaseIndexName($store->getId()),
-                'priceKey' => '.' . $store->getCurrentCurrencyCode($store->getId()) . '.default'
+                'priceKey' => '.' . $store->getCurrentCurrencyCode($store->getId()) . '.default',
             ];
         }
 

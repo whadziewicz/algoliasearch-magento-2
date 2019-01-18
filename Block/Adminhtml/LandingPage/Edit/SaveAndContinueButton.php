@@ -13,7 +13,7 @@ class SaveAndContinueButton extends AbstractButton implements ButtonProviderInte
             'class' => 'save',
             'data_attribute' => [
                 'mage-init' => ['button' => ['event' => 'saveAndContinueEdit']],
-                'form-role' => 'save'
+                'form-role' => 'save',
             ],
             'sort_order' => 80,
         ];

@@ -8,6 +8,7 @@ use Magento\Framework\App\Action\Action;
 
 /**
  * Landing Page Helper
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -17,7 +18,7 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
     /** @var LandingPage */
     protected $landingPage;
 
-    /**  @var \Magento\Store\Model\StoreManagerInterface */
+    /** @var \Magento\Store\Model\StoreManagerInterface */
     protected $storeManager;
 
     /** @var LandingPageFactory */
@@ -98,6 +99,7 @@ class LandingPageHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * Retrieve landing page direct URL
      *
      * @param string $pageId
+     *
      * @return string
      */
     public function getPageUrl($pageId = null)

@@ -29,7 +29,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getLandingPageId()
     {
@@ -37,7 +37,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getStoreId()
     {
@@ -45,7 +45,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getUrlKey()
     {
@@ -53,15 +53,15 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getIsActive()
     {
-        return (boolean) $this->getData(self::FIELD_IS_ACTIVE);
+        return (bool) $this->getData(self::FIELD_IS_ACTIVE);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTitle()
     {
@@ -69,7 +69,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDateFrom()
     {
@@ -77,7 +77,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDateTo()
     {
@@ -85,7 +85,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetaTitle()
     {
@@ -93,7 +93,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetaDescription()
     {
@@ -101,7 +101,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMetaKeywords()
     {
@@ -109,7 +109,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getContent()
     {
@@ -117,7 +117,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getQuery()
     {
@@ -125,7 +125,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getConfiguration()
     {
@@ -133,7 +133,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCustomJs()
     {
@@ -141,7 +141,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCustomCss()
     {
@@ -149,7 +149,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setLandingPageId($value)
     {
@@ -157,7 +157,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setStoreId($value)
     {
@@ -165,7 +165,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setUrlKey($value)
     {
@@ -173,15 +173,15 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setIsActive($value)
     {
-        return $this->setData(self::FIELD_IS_ACTIVE, (boolean) $value);
+        return $this->setData(self::FIELD_IS_ACTIVE, (bool) $value);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setTitle($value)
     {
@@ -189,7 +189,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setDateFrom($value)
     {
@@ -197,7 +197,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setDateTo($value)
     {
@@ -205,7 +205,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setMetaTitle($value)
     {
@@ -213,7 +213,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setMetaDescription($value)
     {
@@ -221,7 +221,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setMetaKeywords($value)
     {
@@ -229,7 +229,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setContent($value)
     {
@@ -237,7 +237,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setQuery($value)
     {
@@ -245,7 +245,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setConfiguration($value)
     {
@@ -253,7 +253,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setCustomJs($value)
     {
@@ -261,7 +261,7 @@ class LandingPage extends \Magento\Framework\Model\AbstractModel implements Iden
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setCustomCss($value)
     {

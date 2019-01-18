@@ -386,7 +386,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $table->addColumn(
                 LandingPageInterface::FIELD_STORE_ID,
                 $table::TYPE_INTEGER,
-                10, ['nullable' => false]
+                10,
+                ['nullable' => false]
             );
             $table->addColumn(
                 LandingPageInterface::FIELD_URL_KEY,

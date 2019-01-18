@@ -3,7 +3,7 @@
 /** @var \Algolia\AlgoliaSearch\Block\Adminhtml\LandingPage\SearchConfiguration $block */
 
 $configHelper = $block->getConfigHelper();
-
+$merchIllustration = $this->getViewFileUrl('Algolia_AlgoliaSearch::images/illu-merchtool.svg');
 $indexName = $block->getCoreHelper()->getBaseIndexName();
 
 $landingPage = $block->getLandingPage();
@@ -36,18 +36,19 @@ $isConfig = [
 <input type="hidden" name="algolia_configuration" value="<?php echo htmlentities($landingPage->getConfiguration()) ?>" data-form-part="algolia_algoliasearch_landingpage_form" />
 
 <div class="with-facets" id="algolia_instant_selector">
-    <div>
-        <p>
-            Here you can define the search term and the preselected facets on the page.
-        </p>
-        <p>
-            You can also drag & drop products to a specific position and pin it there to have the product displayed always in this position.<br>
-            This Merchandising action will create <a href="https://www.algolia.com/doc/guides/query-rules/query-rules-overview/" target="_blank">1 query rule</a>
-            for each merchandised landing page. Each Algolia plan has a <a href="https://www.algolia.com/pricing" target="_blank">query rules quota</a>,
-            which cannot be exceeded.<br>
-            Query rule is created only when a landing page contains at least one "pinned" product.
-            When there are no "pinned" products, no query rule is created.
-        </p>
+    <div class="merchandising-tutorial">
+        <div class="col-left">
+            <h3>How does it work?</h3>
+            <p>1. Enter the search query (keyword) that is the focus of your landing page. For example "weekender bag".</p>
+            <p>2. Pre-select applicable filters, for example a price range that is interesting to your customers.</p>
+        </div>
+        <div class="col-middle">
+            <img src="<?php echo $merchIllustration ?>"/>
+        </div>
+        <div class="col-right">
+            <p>3. You can see which products (and in what order) will be shown on the final landing page. If you're on Algolia's higher plans, you may manually set specific order of products, promote or demote as desired.</p>
+            <p>Read more about Merchandising in our <a href="https://www.algolia.com/doc/guides/managing-results/refine-results/merchandising-and-promoting/" target="_blank">Documentation</a>.</p>
+        </div>
     </div>
     <br>
 

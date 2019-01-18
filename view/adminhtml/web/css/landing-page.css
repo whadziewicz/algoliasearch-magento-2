@@ -21,6 +21,36 @@
 }
 
 /* FORM */
+.merchandising-tutorial {
+    background-color : #F5FAFD;
+    border : 1px solid #E2F0FA;
+    padding : 20px;
+    margin : 0 0 20px;
+}
+
+.merchandising-tutorial p,
+.merchandising-tutorial h3{
+    color : black;
+    padding : 10px 40px;
+}
+
+.merchandising-tutorial .col-left {
+    display: inline-block;
+    width : 38%;
+    padding: 20px 0 50px;
+}
+
+.merchandising-tutorial .col-middle {
+    display: inline-block;
+    width : 24%;
+}
+
+.merchandising-tutorial .col-right {
+    width : 38%;
+    display: inline-block;
+    padding: 20px 0 50px;
+}
+
 #algolia_merchandising_autocomplete {
     width: 500px;
     height: 50px;
@@ -42,15 +72,15 @@
     margin-top: 20px;
 }
 
-
 .algolia_merchandising_items_left_container {
     width: 25%;
     min-height: 1px;
     float: left;
+    clear : both;
 }
 
 .algolia_merchandising_items_right_container {
-    width: 75%;
+    width: 74%;
     float: right;
 }
 

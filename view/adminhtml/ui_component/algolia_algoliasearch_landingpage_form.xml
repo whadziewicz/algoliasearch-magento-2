@@ -64,6 +64,9 @@
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">url_key</item>
                     <item name="notice" xsi:type="string" translate="true">Please make sure that the chosen URL isn't already used by the Magento's URL rewrite system (including products, categories and CMS pages)</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">The URL key determine which URL the landing will have (ex : http://www.mystore.com/url-to-the-landing-page)</item>
+                    </item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                         <item name="validate-url-unicity" xsi:type="boolean">true</item>
@@ -81,6 +84,9 @@
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="dataType" xsi:type="string">int</item>
                     <item name="dataScope" xsi:type="string">store_id</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">Here you can select the store view where the landing page will be displayed. ("All Store Views" allows the landing page to be displayed in all your stores)</item>
+                    </item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -95,6 +101,9 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">title</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">This is the title that will be displayed on top of the landing page.</item>
+                    </item>
                     <item name="validation" xsi:type="array">
                         <item name="required-entry" xsi:type="boolean">true</item>
                     </item>
@@ -108,6 +117,9 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Meta Title</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">The meta title can be customized to enhance your SEO.</item>
+                    </item>
                     <item name="notice" xsi:type="string" translate="true">If no meta title is set, the page title will be used.</item>
                     <item name="dataScope" xsi:type="string">meta_title</item>
                 </item>
@@ -119,6 +131,9 @@
                     <item name="source" xsi:type="string">landing_page</item>
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">textarea</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">The meta description can be customized to enhance your SEO.</item>
+                    </item>
                     <item name="label" xsi:type="string" translate="true">Meta Description</item>
                     <item name="dataScope" xsi:type="string">meta_description</item>
                 </item>
@@ -131,6 +146,9 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Meta Keywords</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">The meta keywords can be customized to enhance your SEO.</item>
+                    </item>
                     <item name="placeholder" xsi:type="string" translate="true">product, red, woman, accessory</item>
                     <item name="dataScope" xsi:type="string">meta_keywords</item>
                 </item>
@@ -202,6 +220,9 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">textarea</item>
                     <item name="label" xsi:type="string" translate="true">Javascript</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">You can add some Javascript code on the top of the page according to your needs.</item>
+                    </item>
                     <item name="placeholder" xsi:type="string" translate="true">Add javascript to enchance your page even more. Paste your code here.</item>
                     <item name="dataScope" xsi:type="string">custom_js</item>
                 </item>
@@ -215,6 +236,9 @@
                     <item name="formElement" xsi:type="string">textarea</item>
                     <item name="label" xsi:type="string" translate="true">Custom CSS</item>
                     <item name="placeholder" xsi:type="string" translate="true">Add Custom CSS</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">You can add some custom CSS on the top of the page according to your needs.</item>
+                    </item>
                     <item name="dataScope" xsi:type="string">custom_css</item>
                 </item>
             </argument>

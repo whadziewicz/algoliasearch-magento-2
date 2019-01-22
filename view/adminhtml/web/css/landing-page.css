@@ -1063,9 +1063,10 @@ a.ais-current-refined-values--link:hover {
 /** PAGINATION */
 
 #instant-search-pagination-container {
-    width: 100%;
+    width: auto;
     padding : 10px;
     background-color : #f5f5f5;
+    margin-bottom : 20px;
 }
 .ais-pagination {
     background-color: transparent;
@@ -1129,4 +1130,34 @@ a.ais-current-refined-values--link:hover {
 
 #algolia_hit_per_page {
     float : right;
+}
+
+/* DENIED PAGE */
+.algolia-denied-page {
+    width : 50%;
+    margin: 50px auto;
+    text-align: center;
+}
+
+.algolia-denied-page img{
+    margin : 40px 0 40px;
+}
+
+.algolia-denied-page .algolia-suggestions-header{
+    text-align: left;
+    padding : 25px;
+}
+
+.algolia-suggestions-header-wbg{
+    background: none;
+    width : auto;
+}
+
+.algolia-suggestions-header-wbg p{
+    font-size : 1.6rem;
+}
+
+.algolia-suggestions-header-wbg .stars{
+    float: left;
+    margin: 0 20px 0 0;
 }

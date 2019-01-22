@@ -2,27 +2,10 @@
 
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Landingpage;
 
-use Algolia\AlgoliaSearch\Helper\ConfigHelper;
-use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 
-class Index extends \Magento\Backend\App\Action
+class Index extends AbstractAction
 {
-    /** @var Algolia\AlgoliaSearch\Helper\ConfigHelper */
-    protected $configHelper;
-
-    /**
-     * @param Context       $context
-     * @param ConfigHelper  $configHelper
-     */
-    public function __construct(
-        Context $context,
-        ConfigHelper $configHelper
-    ) {
-        parent::__construct($context);
-        $this->configHelper = $configHelper;
-    }
-
     /** @return \Magento\Framework\View\Result\Page */
     public function execute()
     {
@@ -37,5 +20,11 @@ class Index extends \Magento\Backend\App\Action
         $dataPersistor->clear('landing_page');
 
         return $resultPage;
+    }
+
+    /** @return bool */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed('Algolia_AlgoliaSearch::manage');
     }
 }

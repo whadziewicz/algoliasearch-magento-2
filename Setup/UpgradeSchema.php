@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Setup;
 
+use Algolia\AlgoliaSearch\Api\Data\LandingPageInterface;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\DB\Ddl\Table;
@@ -375,6 +376,103 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $table->addColumn('error_log', $table::TYPE_TEXT, null, ['nullable' => false]);
             $table->addColumn('data_size', $table::TYPE_INTEGER, 11, ['nullable' => true, 'default' => null]);
             $table->addColumn('created_at', $table::TYPE_DATETIME, null, ['nullable' => false]);
+
+            $connection->createTable($table);
+        }
+
+        if (!$connection->isTableExists(LandingPageInterface::TABLE_NAME)) {
+            $table = $connection->newTable($setup->getTable(LandingPageInterface::TABLE_NAME));
+
+            $table->addColumn(
+                LandingPageInterface::FIELD_LANDING_PAGE_ID,
+                $table::TYPE_INTEGER,
+                10,
+                ['identity' => true, 'nullable' => false, 'primary' => true]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_STORE_ID,
+                $table::TYPE_INTEGER,
+                10,
+                ['nullable' => false]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_URL_KEY,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => false]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_IS_ACTIVE,
+                $table::TYPE_BOOLEAN,
+                null,
+                ['nullable' => false, 'default' => 0]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_TITLE,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => false]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_DATE_FROM,
+                $table::TYPE_DATETIME,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_DATE_TO,
+                $table::TYPE_DATETIME,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_META_TITLE,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_META_DESCRIPTION,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_META_KEYWORDS,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CONTENT,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_QUERY,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CONFIGURATION,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => false, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CUSTOM_JS,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                LandingPageInterface::FIELD_CUSTOM_CSS,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
 
             $connection->createTable($table);
         }

@@ -15,7 +15,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             /** @var Http $request */
             $request = $this->getRequest();
 
-            if ($request->getFullActionName() === 'catalogsearch_result_index') {
+            if ($request->getFullActionName() === 'catalogsearch_result_index' || $this->isLandingPage()) {
                 return true;
             }
 
@@ -149,6 +149,10 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'nbOfQueriesSuggestions' => $config->getNumberOfQueriesSuggestions(),
                 'isDebugEnabled' => $config->isAutocompleteDebugEnabled(),
             ],
+            'landingPage' => [
+                'query' => $this->getLandingPageQuery(),
+                'configuration' => $this->getLandingPageConfiguration(),
+            ],
             'extensionVersion' => $config->getExtensionVersion(),
             'applicationId' => $config->getApplicationID(),
             'indexName' => $coreHelper->getBaseIndexName(),
@@ -166,6 +170,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             )),
             'isSearchPage' => $this->isSearchPage(),
             'isCategoryPage' => $isCategoryPage,
+            'isLandingPage' => $this->isLandingPage(),
             'removeBranding' => (bool) $config->isRemoveBranding(),
             'productId' => $productId,
             'priceKey' => $priceKey,
@@ -179,6 +184,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'refinementKey' => $refinementKey,
                 'refinementValue' => $refinementValue,
                 'categoryId' => $categoryId,
+                'landingPageId' => $this->getLandingPageId(),
                 'path' => $path,
                 'level' => $level,
             ],
@@ -274,5 +280,37 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         }
 
         return $ids;
+    }
+
+    private function isLandingPage()
+    {
+        return $this->getRequest()->getFullActionName() === 'algolia_landingpage_view';
+    }
+
+    private function getLandingPageId()
+    {
+        if (!$this->isLandingPage()) {
+            return '';
+        }
+
+        return $this->getCurrentLandingPage()->getId();
+    }
+
+    private function getLandingPageQuery()
+    {
+        if (!$this->isLandingPage()) {
+            return '';
+        }
+
+        return $this->getCurrentLandingPage()->getQuery();
+    }
+
+    private function getLandingPageConfiguration()
+    {
+        if (!$this->isLandingPage()) {
+            return json_encode([]);
+        }
+
+        return $this->getCurrentLandingPage()->getConfiguration();
     }
 }

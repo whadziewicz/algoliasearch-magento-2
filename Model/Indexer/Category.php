@@ -89,7 +89,7 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
                 $this->fullAction,
                 'rebuildStoreCategoryIndex',
                 ['store_id' => $storeId, 'category_ids' => $categoryIds],
-                count($categoryIds)
+                is_array($categoryIds) ? count($categoryIds) : 1
             );
 
             if ($affectedProductsCount > 0 && $this->configHelper->indexProductOnCategoryProductsUpdate($storeId)) {

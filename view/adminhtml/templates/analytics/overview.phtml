@@ -51,8 +51,7 @@ $view = $this->getViewModel();
             <div class="one-third col-2">
                 <div class="title">
                     <h4><?php echo __('Conversion rate') ?>
-                        <?php echo $view->getTooltipHtml(__('Percentage of tracked searches (searches with clickAnalytics=true) where you signaled to us that it led to a successful conversion. Settings to determine conversion can be found in your <a href="%1">Magento Algolia Configuration</a> for Click Analytics.',
-                            $view->getAnalyticsConfigurationUrl())) ?>
+                        <?php echo $view->getTooltipHtml(__('Percentage of tracked searches (searches with clickAnalytics=true) where you signaled to us that it led to a successful conversion. Settings to determine conversion can be found in your <a href="%1">Magento Algolia Configuration</a> for Click Analytics.', $view->getAnalyticsConfigurationUrl())) ?>
                     </h4>
                 </div>
                 <?php $conversion = $view->getConversionRate() ?>
@@ -193,6 +192,6 @@ $view = $this->getViewModel();
         like Click-through Rate, Conversion Rate from searches and average click position.
         Click Analytics are only available for higher plans and require only minor additional settings.
         <br><br>
-        Find more information in <a href="https://community.algolia.com/magento/doc/m2/click-analytics/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link" target="_blank">documentation</a>.
+        Find more information in <a href="https://www.algolia.com/doc/integration/magento-2/how-it-works/click-and-conversion-analytics/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link" target="_blank">documentation</a>.
     </div>
 <?php endif ?>

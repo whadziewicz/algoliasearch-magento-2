@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Setup;
 
 use Algolia\AlgoliaSearch\Api\Data\LandingPageInterface;
+use Algolia\AlgoliaSearch\Api\Data\QueryInterface;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\DB\Ddl\Table;
@@ -490,6 +491,61 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Indicates if the job is part of a full reindex',
                 ]
             );
+        }
+
+        if (!$connection->isTableExists(QueryInterface::TABLE_NAME)) {
+            $table = $connection->newTable($setup->getTable(QueryInterface::TABLE_NAME));
+
+            $table->addColumn(
+                QueryInterface::FIELD_QUERY_ID,
+                $table::TYPE_INTEGER,
+                10,
+                ['identity' => true, 'nullable' => false, 'primary' => true]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_STORE_ID,
+                $table::TYPE_INTEGER,
+                10,
+                ['nullable' => false]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_QUERY_TEXT,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => false]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_BANNER_IMAGE,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_BANNER_URL,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_BANNER_ALT,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_BANNER_CONTENT,
+                $table::TYPE_TEXT,
+                null,
+                ['nullable' => true, 'default' => null]
+            );
+            $table->addColumn(
+                QueryInterface::FIELD_CREATED_AT,
+                $table::TYPE_DATETIME,
+                null,
+                ['nullable' => false, 'default' => new \Zend_Db_Expr('CURRENT_TIMESTAMP')]
+            );
+
+            $connection->createTable($table);
         }
 
         $setup->endSetup();

@@ -2,21 +2,15 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use Algolia\AlgoliaSearch\Exception\ProductDeletedException;
-use Algolia\AlgoliaSearch\Exception\ProductDisabledException;
-use Algolia\AlgoliaSearch\Exception\ProductNotVisibleException;
-use Algolia\AlgoliaSearch\Exception\ProductOutOfStockException;
+use Algolia\AlgoliaSearch\Exception\CategoryReindexingException;
 use Algolia\AlgoliaSearch\Exception\ProductReindexingException;
 use Algolia\AlgoliaSearch\Helper\Entity\AdditionalSectionHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\CategoryHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\PageHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\SuggestionHelper;
-use AlgoliaSearch\AlgoliaException;
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\Product\Attribute\Source\Status;
-use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\App\Area;
@@ -28,8 +22,6 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class Data
 {
-    const COLLECTION_PAGE_SIZE = 100;
-
     private $algoliaHelper;
 
     private $pageHelper;
@@ -92,51 +84,6 @@ class Data
         }
 
         $this->algoliaHelper->deleteObjects($ids, $indexName);
-    }
-
-    public function saveConfigurationToAlgolia($storeId, $useTmpIndex = false)
-    {
-        if (!($this->configHelper->getApplicationID() && $this->configHelper->getAPIKey())) {
-            return;
-        }
-
-        if ($this->isIndexingEnabled($storeId) === false) {
-            return;
-        }
-
-        $this->algoliaHelper->setSettings(
-            $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId),
-            $this->categoryHelper->getIndexSettings($storeId),
-            false,
-            true
-        );
-        $this->algoliaHelper->setSettings(
-            $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId),
-            $this->pageHelper->getIndexSettings($storeId)
-        );
-        $this->algoliaHelper->setSettings(
-            $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId),
-            $this->suggestionHelper->getIndexSettings($storeId)
-        );
-
-        $protectedSections = ['products', 'categories', 'pages', 'suggestions'];
-        foreach ($this->configHelper->getAutocompleteSections() as $section) {
-            if (in_array($section['name'], $protectedSections, true)) {
-                continue;
-            }
-
-            $indexName = $this->getIndexName($this->additionalSectionHelper->getIndexNameSuffix(), $storeId);
-            $indexName = $indexName . '_' . $section['name'];
-
-            $this->algoliaHelper->setSettings($indexName, $this->additionalSectionHelper->getIndexSettings($storeId));
-        }
-
-        $productsIndexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
-        $productsIndexNameTmp = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId, true);
-
-        $this->productHelper->setSettings($productsIndexName, $productsIndexNameTmp, $storeId, $useTmpIndex);
-
-        $this->setExtraSettings($storeId, $useTmpIndex);
     }
 
     public function getSearchResult($query, $storeId, $searchParams = null, $targetedIndex = null)
@@ -257,7 +204,8 @@ class Data
                         $storeId,
                         $collection,
                         $page,
-                        $this->configHelper->getNumberOfElementByPage()
+                        $this->configHelper->getNumberOfElementByPage(),
+                        $categoryIds
                     );
 
                     $page++;
@@ -385,6 +333,16 @@ class Data
         $this->rebuildStoreProductIndexPage($storeId, $collection, $page, $pageSize, null, $productIds, $useTmpIndex);
     }
 
+    public function rebuildCategoryIndex($storeId, $page, $pageSize)
+    {
+        if ($this->isIndexingEnabled($storeId) === false) {
+            return;
+        }
+
+        $collection = $this->categoryHelper->getCategoryCollectionQuery($storeId, null);
+        $this->rebuildStoreCategoryIndexPage($storeId, $collection, $page, $pageSize);
+    }
+
     public function rebuildStoreSuggestionIndexPage($storeId, $collectionDefault, $page, $pageSize)
     {
         if ($this->isIndexingEnabled($storeId) === false) {
@@ -423,7 +381,7 @@ class Data
         unset($collection);
     }
 
-    public function rebuildStoreCategoryIndexPage($storeId, $collectionDefault, $page, $pageSize)
+    public function rebuildStoreCategoryIndexPage($storeId, $collectionDefault, $page, $pageSize, $categoryIds = null)
     {
         if ($this->isIndexingEnabled($storeId) === false) {
             return;
@@ -436,26 +394,28 @@ class Data
 
         $indexName = $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId);
 
-        $indexData = [];
+        $indexData = $this->getCategoryRecords($storeId, $collection, $categoryIds);
 
-        /** @var Category $category */
-        foreach ($collection as $category) {
-            if (!$this->categoryHelper->isCategoryActive($category->getId(), $storeId)) {
-                continue;
-            }
+        if ($indexData['toIndex'] && $indexData['toIndex'] !== []) {
+            $this->logger->start('ADD/UPDATE TO ALGOLIA');
 
-            $category->setStoreId($storeId);
+            $this->algoliaHelper->addObjects($indexData['toIndex'], $indexName);
 
-            $categoryObject = $this->categoryHelper->getObject($category);
-
-            if ($this->configHelper->shouldIndexEmptyCategories($storeId) === true
-                || $categoryObject['product_count'] > 0) {
-                array_push($indexData, $categoryObject);
-            }
+            $this->logger->log('Product IDs: ' . implode(', ', array_keys($indexData['toIndex'])));
+            $this->logger->stop('ADD/UPDATE TO ALGOLIA');
         }
 
-        if (count($indexData) > 0) {
-            $this->algoliaHelper->addObjects($indexData, $indexName);
+        if ($indexData['toRemove'] && $indexData['toRemove'] !== []) {
+            $toRealRemove = $this->getIdsToRealRemove($indexName, $indexData['toRemove']);
+
+            if ($toRealRemove && $toRealRemove !== []) {
+                $this->logger->start('REMOVE FROM ALGOLIA');
+
+                $this->algoliaHelper->deleteObjects($toRealRemove, $indexName);
+
+                $this->logger->log('Category IDs: ' . implode(', ', $toRealRemove));
+                $this->logger->stop('REMOVE FROM ALGOLIA');
+            }
         }
 
         unset($indexData);
@@ -502,7 +462,7 @@ class Data
             }
 
             try {
-                $this->canProductBeReindexed($product, $storeId);
+                $this->productHelper->canProductBeReindexed($product, $storeId);
             } catch (ProductReindexingException $e) {
                 $productsToRemove[$productId] = $productId;
                 continue;
@@ -529,53 +489,61 @@ class Data
     }
 
     /**
-     * Check if product can be index on Algolia
+     * @param int $storeId
+     * @param \Magento\Catalog\Model\ResourceModel\Category\Collection $collection
+     * @param array|null $potentiallyDeletedCategoriesIds
      *
-     * @param Product $product
-     * @param int     $storeId
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      *
-     * @throws ProductDisabledException
-     * @throws ProductDeletedException
-     * @throws ProductNotVisibleException
-     * @throws ProductOutOfStockException
-     *
-     * @return bool
-     *
+     * @return array
      */
-    public function canProductBeReindexed($product, $storeId)
+    private function getCategoryRecords($storeId, $collection, $potentiallyDeletedCategoriesIds = null)
     {
-        if ($product->isDeleted() === true) {
-            throw (new ProductDeletedException())
-                ->withProduct($product)
-                ->withStoreId($storeId);
+        $categoriesToIndex = [];
+        $categoriesToRemove = [];
+
+        // In $potentiallyDeletedCategoriesIds there might be IDs of deleted products which will not be in a collection
+        if (is_array($potentiallyDeletedCategoriesIds)) {
+            $potentiallyDeletedCategoriesIds = array_combine(
+                $potentiallyDeletedCategoriesIds,
+                $potentiallyDeletedCategoriesIds
+            );
         }
 
-        if ($product->getStatus() == Status::STATUS_DISABLED) {
-            throw (new ProductDisabledException())
-                ->withProduct($product)
-                ->withStoreId($storeId);
-        }
+        /** @var Category $category */
+        foreach ($collection as $category) {
+            $category->setStoreId($storeId);
 
-        if (!in_array($product->getVisibility(), [
-            Visibility::VISIBILITY_BOTH,
-            Visibility::VISIBILITY_IN_SEARCH,
-            Visibility::VISIBILITY_IN_CATALOG,
-        ])) {
-            throw (new ProductNotVisibleException())
-                ->withProduct($product)
-                ->withStoreId($storeId);
-        }
+            $categoryId = $category->getId();
 
-        if (!$this->configHelper->getShowOutOfStock($storeId)) {
-            $stockItem = $this->stockRegistry->getStockItem($product->getId());
-            if (! $product->isSalable() || ! $stockItem->getIsInStock()) {
-                throw (new ProductOutOfStockException())
-                    ->withProduct($product)
-                    ->withStoreId($storeId);
+            // If $categoryId is in the collection, remove it from $potentiallyDeletedProductsIds
+            // so it's not removed without check
+            if (isset($potentiallyDeletedCategoriesIds[$categoryId])) {
+                unset($potentiallyDeletedCategoriesIds[$categoryId]);
             }
+
+            if (isset($categorysToIndex[$categoryId]) || isset($categorysToRemove[$categoryId])) {
+                continue;
+            }
+
+            try {
+                $this->categoryHelper->canCategoryBeReindexed($category, $storeId);
+            } catch (CategoryReindexingException $e) {
+                $categoriesToRemove[$categoryId] = $categoryId;
+                continue;
+            }
+
+            $categoriesToIndex[$categoryId] = $this->categoryHelper->getObject($category);
         }
 
-        return true;
+        if (is_array($potentiallyDeletedCategoriesIds)) {
+            $categoriesToRemove = array_merge($categoriesToRemove, $potentiallyDeletedCategoriesIds);
+        }
+
+        return [
+            'toIndex' => $categoriesToIndex,
+            'toRemove' => array_unique($categoriesToRemove),
+        ];
     }
 
     public function rebuildStoreProductIndexPage(
@@ -729,50 +697,6 @@ class Data
         return $toRealRemove;
     }
 
-    private function setExtraSettings($storeId, $saveToTmpIndicesToo)
-    {
-        $additionalSectionsSuffix = $this->additionalSectionHelper->getIndexNameSuffix();
-
-        $sections = [
-            'products' => $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId),
-            'categories' => $this->getIndexName($this->categoryHelper->getIndexNameSuffix(), $storeId),
-            'pages' => $this->getIndexName($this->pageHelper->getIndexNameSuffix(), $storeId),
-            'suggestions' => $this->getIndexName($this->suggestionHelper->getIndexNameSuffix(), $storeId),
-            'additional_sections' => $this->getIndexName($additionalSectionsSuffix, $storeId),
-        ];
-
-        $error = [];
-        foreach ($sections as $section => $indexName) {
-            try {
-                $extraSettings = $this->configHelper->getExtraSettings($section, $storeId);
-
-                if ($extraSettings) {
-                    $extraSettings = json_decode($extraSettings, true);
-
-                    $this->algoliaHelper->setSettings($indexName, $extraSettings, true);
-
-                    if ($section === 'products' && $saveToTmpIndicesToo === true) {
-                        $this->algoliaHelper->setSettings($indexName . '_tmp', $extraSettings, true);
-                    }
-                }
-            } catch (AlgoliaException $e) {
-                if (mb_strpos($e->getMessage(), 'Invalid object attributes:') === 0) {
-                    $error[] = '
-                        Extra settings for "' . $section . '" indices were not saved. 
-                        Error message: "' . $e->getMessage() . '"';
-
-                    continue;
-                }
-
-                throw $e;
-            }
-        }
-
-        if ($error) {
-            throw new AlgoliaException('<br>' . implode('<br> ', $error));
-        }
-    }
-
     private function getSalesData($storeId, Collection $collection)
     {
         $additionalAttributes = $this->configHelper->getProductAdditionalAttributes($storeId);
@@ -835,6 +759,24 @@ class Data
     public function getBaseIndexName($storeId = null)
     {
         return $this->configHelper->getIndexPrefix($storeId) . $this->storeManager->getStore($storeId)->getCode();
+    }
+
+    public function getIndexDataByStoreIds()
+    {
+        $indexNames = [];
+
+        $indexNames[0] = [
+            'indexName' => $this->getBaseIndexName(),
+            'priceKey' => '.' . $this->configHelper->getCurrencyCode() . '.default',
+        ];
+        foreach ($this->storeManager->getStores() as $store) {
+            $indexNames[$store->getId()] = [
+                'indexName' => $this->getBaseIndexName($store->getId()),
+                'priceKey' => '.' . $store->getCurrentCurrencyCode($store->getId()) . '.default',
+            ];
+        }
+
+        return $indexNames;
     }
 
     private function deleteInactiveIds($storeId, $objectIds, $indexName)

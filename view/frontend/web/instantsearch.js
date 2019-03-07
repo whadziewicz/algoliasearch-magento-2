@@ -74,6 +74,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		if (algoliaConfig.request.categoryId.length > 0) {
 			ruleContexts.push('magento-category-' + algoliaConfig.request.categoryId);
 		}
+
+		if (algoliaConfig.request.landingPageId.length > 0) {
+			ruleContexts.push('magento-landingpage-' + algoliaConfig.request.landingPageId);
+		}
 		
 		var instantsearchOptions = {
 			appId: algoliaConfig.applicationId,
@@ -95,13 +99,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			},
 			routing : window.routing,
 		};
-		
+
 		if (algoliaConfig.request.path.length > 0 && window.location.hash.indexOf('categories.level0') === -1) {
 			if (algoliaConfig.areCategoriesInFacets === false) {
-				instantsearchOptions.searchParameters = {
-					facetsRefinements: { }
-				};
-				
+				instantsearchOptions.searchParameters['facetsRefinements'] = { };
 				instantsearchOptions.searchParameters['facetsRefinements']['categories.level' + algoliaConfig.request.level] = [algoliaConfig.request.path];
 			} else {
 				instantsearchOptions.searchParameters['hierarchicalFacetsRefinements'] = {

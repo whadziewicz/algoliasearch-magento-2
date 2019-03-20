@@ -64,6 +64,15 @@
             resource="Algolia_AlgoliaSearch::manage"
         />
         <add
+            id="Algolia_AlgoliaSearch::query"
+            title="Query Merchandiser"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="98"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/query/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
             id="Algolia_AlgoliaSearch::analytics"
             title="Analytics Overview"
             module="Algolia_AlgoliaSearch"

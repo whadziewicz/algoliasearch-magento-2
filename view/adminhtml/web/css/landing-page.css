@@ -1221,3 +1221,33 @@ a.ais-current-refined-values--link:hover {
 .form-inline .algolia-suggestions-header {
     width : auto;
 }
+
+/* QUERY MERCH */
+.admin__fieldset .admin__field-merch {
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.admin__fieldset .admin__field-merch > .admin__field-label {
+    width: calc( (100%) * 0.25 - 30px );
+    float: left;
+    margin-left: 30px;
+}
+
+.admin__fieldset .admin__field-merch > .admin__field-label label {
+    margin-right: 20px;
+}
+
+.admin__fieldset .admin__field-merch > .admin__field-control {
+    width: calc( (100%) * 0.5 );
+    float: left;
+    margin-left: 7px;
+}
+
+.admin__fieldset .admin__field-merch > .admin__field-control #algolia-stats {
+    margin-top : 9px;
+}
+
+.admin__fieldset .admin__field-merch #algolia_hit_per_page {
+    margin-top : 17px;
+}

@@ -2,10 +2,13 @@
 
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Query;
 
+use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
+use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\QueryFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Save extends AbstractAction
 {
@@ -20,6 +23,8 @@ class Save extends AbstractAction
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param QueryFactory $queryFactory
+     * @param MerchandisingHelper $merchandisingHelper
+     * @param StoreManagerInterface $storeManager
      * @param DataPersistorInterface $dataPersistor
      *
      * @return Save
@@ -28,6 +33,8 @@ class Save extends AbstractAction
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
         QueryFactory $queryFactory,
+        MerchandisingHelper $merchandisingHelper,
+        StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor
     ) {
         $this->dataPersistor = $dataPersistor;
@@ -35,7 +42,9 @@ class Save extends AbstractAction
         parent::__construct(
             $context,
             $coreRegistry,
-            $queryFactory
+            $queryFactory,
+            $merchandisingHelper,
+            $storeManager
         );
     }
 
@@ -75,6 +84,10 @@ class Save extends AbstractAction
             try {
                 $query->getResource()->save($query);
 
+                if (isset($data['algolia_merchandising_positions']) && $data['algolia_merchandising_positions'] != '') {
+                    $this->manageQueryRules($query->getId(), $data);
+                }
+
                 $this->messageManager->addSuccessMessage(__('The query has been saved.'));
                 $this->dataPersistor->clear('algolia_algoliasearch_query');
 
@@ -98,5 +111,39 @@ class Save extends AbstractAction
         }
 
         return $resultRedirect->setPath('*/*/');
+    }
+
+    private function manageQueryRules($queryId, $data)
+    {
+        $positions = json_decode($data['algolia_merchandising_positions'], true);
+        $stores = [];
+        if ($data['store_id'] == 0) {
+            foreach ($this->storeManager->getStores() as $store) {
+                if ($store->getIsActive()) {
+                    $stores[] = $store->getId();
+                }
+            }
+        } else {
+            $stores[] = $data['store_id'];
+        }
+
+        foreach ($stores as $storeId) {
+            if (!$positions) {
+                $this->merchandisingHelper->deleteQueryRule(
+                    $storeId,
+                    $queryId,
+                    'query'
+                );
+            } else {
+                $this->merchandisingHelper->saveQueryRule(
+                    $storeId,
+                    $queryId,
+                    $positions,
+                    'query',
+                    $data['query_text'],
+                    $data['banner_content']
+                );
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace Algolia\AlgoliaSearch\Helper;
 
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use AlgoliaSearch\AlgoliaException;
+use Magento\Cms\Model\Template\FilterProvider;
 
 class MerchandisingHelper
 {
@@ -16,17 +17,22 @@ class MerchandisingHelper
     /** @var AlgoliaHelper */
     private $algoliaHelper;
 
+    /** @var FilterProvider */
+    protected $filterProvider;
+
     public function __construct(
         Data $coreHelper,
         ProductHelper $productHelper,
-        AlgoliaHelper $algoliaHelper
+        AlgoliaHelper $algoliaHelper,
+        FilterProvider $filterProvider
     ) {
         $this->coreHelper = $coreHelper;
         $this->productHelper = $productHelper;
         $this->algoliaHelper = $algoliaHelper;
+        $this->filterProvider = $filterProvider;
     }
 
-    public function saveQueryRule($storeId, $entityId, $rawPositions, $entityType, $query = null)
+    public function saveQueryRule($storeId, $entityId, $rawPositions, $entityType, $query = null, $banner = null)
     {
         if ($this->coreHelper->isIndexingEnabled($storeId) === false) {
             return;
@@ -51,6 +57,15 @@ class MerchandisingHelper
 
         if (!is_null($query) && $query != '') {
             $rule['condition']['pattern'] = $query;
+        }
+
+        if (! is_null($banner)) {
+            $rule['consequence']['userData']['banner'] =
+                $this->filterProvider->getBlockFilter()->filter($banner);
+        }
+
+        if ($entityType == 'query') {
+            unset($rule['condition']['context']);
         }
 
         // Not catching AlgoliaSearchException for disabled query rules on purpose

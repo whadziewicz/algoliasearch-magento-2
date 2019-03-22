@@ -231,30 +231,58 @@ document.addEventListener("DOMContentLoaded", function(event) {
         $(this).parent().hide();
       });
 
-		validator.addRule(
-			'validate-url-unicity',
-			function (value) {
-				var isValid = false;
-				var storeId = $('select[name="store_id"]').val();
-				var landingPageId = $('input[name="landing_page_id"]').val();
-				var url = ajaxCheckUrl;
+      validator.addRule(
+        'validate-query-usage',
+        function (value) {
+          var isValid = true;
+          var storeId = $('select[name="store_id"]').val();
+          var queryText = $('input[name="query_text"]').val();
 
-				new Ajax.Request(
-					url,
-					{
-						parameters: {'store_id': storeId, 'url_key': value, 'landing_page_id': landingPageId},
-						method: 'post',
-						asynchronous: false,
-						onComplete: function (transport) {
-							var response = JSON.parse(transport.responseText);
-							isValid = response.isValid;
-						}
-					}
-				);
-				return isValid;
-			},
-			$.mage.__('This URL key is already in use. Please find another one.')
-		);
+          window.algoliaSearch.helper.setQuery(queryText).search();
+
+          return isValid;
+        },
+        $.mage.__('This query is already connected to another query rule. Please enter a different query or edit the existing one.')
+      );
+
+      validator.addRule(
+        'validate-algolia-index',
+        function (value) {
+
+          if (typeof window.algoliaSearchConfig.indexDataByStoreIds[value]== "undefined") {
+            return false;
+          }
+
+          window.algoliaSearch.helper.setIndex(window.algoliaSearchConfig.indexDataByStoreIds[value].indexName + '_products').search();
+          return true;
+        },
+        $.mage.__('The index corresponding to the store you selected doesn\'t exist.')
+      );
+
+        validator.addRule(
+            'validate-url-unicity',
+            function (value) {
+                var isValid = false;
+                var storeId = $('select[name="store_id"]').val();
+                var landingPageId = $('input[name="landing_page_id"]').val();
+                var url = ajaxCheckUrl;
+
+                new Ajax.Request(
+                    url,
+                    {
+                        parameters: {'store_id': storeId, 'url_key': value, 'landing_page_id': landingPageId},
+                        method: 'post',
+                        asynchronous: false,
+                        onComplete: function (transport) {
+                            var response = JSON.parse(transport.responseText);
+                            isValid = response.isValid;
+                        }
+                    }
+                );
+                return isValid;
+            },
+            $.mage.__('This URL key is already in use. Please find another one.')
+        );
 	});
 });
 </script>

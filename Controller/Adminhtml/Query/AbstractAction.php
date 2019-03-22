@@ -2,9 +2,11 @@
 
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Query;
 
+use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
 use Algolia\AlgoliaSearch\Model\QueryFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
+use Magento\Store\Model\StoreManagerInterface;
 
 abstract class AbstractAction extends \Magento\Backend\App\Action
 {
@@ -14,20 +16,29 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /** @var QueryFactory */
     protected $queryFactory;
 
+    /** @var MerchandisingHelper */
+    protected $merchandisingHelper;
+
     /**
      * @param Context $context
      * @param Registry $coreRegistry
      * @param QueryFactory $queryFactory
+     * @param MerchandisingHelper $merchandisingHelper
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
-        QueryFactory $queryFactory
+        QueryFactory $queryFactory,
+        MerchandisingHelper $merchandisingHelper,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
 
         $this->coreRegistry = $coreRegistry;
         $this->queryFactory = $queryFactory;
+        $this->merchandisingHelper = $merchandisingHelper;
+        $this->storeManager = $storeManager;
     }
 
     /** @return bool */

@@ -19,6 +19,7 @@ class Delete extends AbstractAction
                 $query = $this->queryFactory->create();
                 $query->getResource()->load($query, $queryId);
                 $query->getResource()->delete($query);
+                $this->deleteQueryRules($query);
 
                 $this->messageManager->addSuccessMessage(__('The query has been deleted.'));
 
@@ -32,5 +33,27 @@ class Delete extends AbstractAction
         $this->messageManager->addErrorMessage(__('The query to delete does not exist.'));
 
         return $resultRedirect->setPath('*/*/');
+    }
+
+    private function deleteQueryRules($query)
+    {
+        $stores = [];
+        if ($query->getStoreId() == 0) {
+            foreach ($this->storeManager->getStores() as $store) {
+                if ($store->getIsActive()) {
+                    $stores[] = $store->getId();
+                }
+            }
+        } else {
+            $stores[] = $query->getStoreId();
+        }
+
+        foreach ($stores as $storeId) {
+            $this->merchandisingHelper->deleteQueryRule(
+                $storeId,
+                $query->getId(),
+                'query'
+            );
+        }
     }
 }

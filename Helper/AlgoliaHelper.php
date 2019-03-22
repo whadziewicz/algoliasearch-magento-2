@@ -80,8 +80,8 @@ class AlgoliaHelper extends AbstractHelper
     {
         if ($this->config->getApplicationID() && $this->config->getAPIKey()) {
             $this->client = $this->clientFactory->create([
-                "applicationID" => $this->config->getApplicationID(),
-                "apiKey" => $this->config->getAPIKey()
+                'applicationID' => $this->config->getApplicationID(),
+                'apiKey' => $this->config->getAPIKey(),
             ]);
         }
     }

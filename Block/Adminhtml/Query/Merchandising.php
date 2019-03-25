@@ -7,7 +7,6 @@ use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\Query;
 use Magento\Backend\Block\Template\Context;
-use Magento\Catalog\Model\Category;
 use Magento\Framework\Registry;
 
 class Merchandising extends \Magento\Backend\Block\Template

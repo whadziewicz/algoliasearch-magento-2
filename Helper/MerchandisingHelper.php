@@ -4,7 +4,6 @@ namespace Algolia\AlgoliaSearch\Helper;
 
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use AlgoliaSearch\AlgoliaException;
-use Magento\Cms\Model\Template\FilterProvider;
 
 class MerchandisingHelper
 {
@@ -17,19 +16,14 @@ class MerchandisingHelper
     /** @var AlgoliaHelper */
     private $algoliaHelper;
 
-    /** @var FilterProvider */
-    protected $filterProvider;
-
     public function __construct(
         Data $coreHelper,
         ProductHelper $productHelper,
-        AlgoliaHelper $algoliaHelper,
-        FilterProvider $filterProvider
+        AlgoliaHelper $algoliaHelper
     ) {
         $this->coreHelper = $coreHelper;
         $this->productHelper = $productHelper;
         $this->algoliaHelper = $algoliaHelper;
-        $this->filterProvider = $filterProvider;
     }
 
     public function saveQueryRule($storeId, $entityId, $rawPositions, $entityType, $query = null, $banner = null)
@@ -60,8 +54,7 @@ class MerchandisingHelper
         }
 
         if (! is_null($banner)) {
-            $rule['consequence']['userData']['banner'] =
-                $this->filterProvider->getBlockFilter()->filter($banner);
+            $rule['consequence']['userData']['banner'] = $banner;
         }
 
         if ($entityType == 'query') {

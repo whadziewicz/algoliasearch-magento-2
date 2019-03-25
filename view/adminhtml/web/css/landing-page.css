@@ -1251,3 +1251,7 @@ a.ais-current-refined-values--link:hover {
 .admin__fieldset .admin__field-merch #algolia_hit_per_page {
     margin-top : 17px;
 }
+
+.admin__fieldset .file-uploader-area label:last-of-type {
+    display : none;
+}

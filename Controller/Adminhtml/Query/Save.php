@@ -3,7 +3,6 @@
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Query;
 
 use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
-use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\QueryFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
@@ -79,6 +78,18 @@ class Save extends AbstractAction
                 }
             }
 
+            if (isset($data['banner_image'][0]['name']) && isset($data['banner_image'][0]['tmp_name'])) {
+                $data['banner_image'] = $data['banner_image'][0]['name'];
+                $this->imageUploader = \Magento\Framework\App\ObjectManager::getInstance()->get(
+                    'Algolia\AlgoliaSearch\QueryImageUpload'
+                );
+                $this->imageUploader->moveFileFromTmp($data['banner_image']);
+            } elseif (isset($data['banner_image'][0]['image']) && !isset($data['banner_image'][0]['tmp_name'])) {
+                $data['banner_image'] = $data['banner_image'][0]['image'];
+            } else {
+                $data['banner_image'] = null;
+            }
+
             $query->setData($data);
 
             try {
@@ -127,6 +138,8 @@ class Save extends AbstractAction
             $stores[] = $data['store_id'];
         }
 
+        $bannerContent = $this->prepareBannerContent($data);
+
         foreach ($stores as $storeId) {
             if (!$positions) {
                 $this->merchandisingHelper->deleteQueryRule(
@@ -141,9 +154,36 @@ class Save extends AbstractAction
                     $positions,
                     'query',
                     $data['query_text'],
-                    $data['banner_content']
+                    $bannerContent
                 );
             }
         }
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return string|null
+     */
+    private function prepareBannerContent($data)
+    {
+        $content = null;
+
+        if ($data['banner_image']) {
+            $baseurl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
+            $bannerUrl = $baseurl . 'algolia_img/' . $data['banner_image'];
+            $banner = '<img src="' . $bannerUrl . '" alt="' . $data['banner_alt'] . '" />';
+            if ($data['banner_url']) {
+                $content = '<a href="' . $data['banner_url'] . '" target="_blank" />' . $banner . '</a>';
+            } else {
+                $content = $banner;
+            }
+        }
+
+        if ($data['banner_content']) {
+            $content .= '<p>' . $data['banner_content'] . '</p>';
+        }
+
+        return $content;
     }
 }

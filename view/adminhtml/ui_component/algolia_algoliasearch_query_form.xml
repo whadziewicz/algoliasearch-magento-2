@@ -105,60 +105,64 @@
                 <item name="label" xsi:type="string" translate="true">Banner</item>
             </item>
         </argument>
-        <!--<field name="banner_image">-->
-            <!--<argument name="data" xsi:type="array">-->
-                <!--<item name="config" xsi:type="array">-->
-                    <!--<item name="source" xsi:type="string">query</item>-->
-                    <!--<item name="label" xsi:type="string" translate="true">Image</item>-->
-                    <!--<item name="dataType" xsi:type="string">text</item>-->
-                    <!--<item name="formElement" xsi:type="string">input</item>-->
-                    <!--<item name="dataScope" xsi:type="string">banner_image</item>-->
-                    <!--<item name="tooltip" xsi:type="array">-->
-                        <!--<item name="description" xsi:type="string">TBD</item>-->
-                    <!--</item>-->
-                <!--</item>-->
-            <!--</argument>-->
-        <!--</field>-->
-        <!--<field name="banner_alt">-->
-            <!--<argument name="data" xsi:type="array">-->
-                <!--<item name="config" xsi:type="array">-->
-                    <!--<item name="source" xsi:type="string">query</item>-->
-                    <!--<item name="label" xsi:type="string" translate="true">Alt text</item>-->
-                    <!--<item name="dataType" xsi:type="string">text</item>-->
-                    <!--<item name="formElement" xsi:type="string">input</item>-->
-                    <!--<item name="dataScope" xsi:type="string">banner_alt</item>-->
-                    <!--<item name="placeholder" xsi:type="string" translate="true">Alternative description for the image</item>-->
-                    <!--<item name="tooltip" xsi:type="array">-->
-                        <!--<item name="description" xsi:type="string">TBD</item>-->
-                    <!--</item>-->
-                <!--</item>-->
-            <!--</argument>-->
-        <!--</field>-->
-        <!--<field name="banner_url">-->
-            <!--<argument name="data" xsi:type="array">-->
-                <!--<item name="config" xsi:type="array">-->
-                    <!--<item name="source" xsi:type="string">query</item>-->
-                    <!--<item name="label" xsi:type="string" translate="true">URL</item>-->
-                    <!--<item name="dataType" xsi:type="string">text</item>-->
-                    <!--<item name="formElement" xsi:type="string">input</item>-->
-                    <!--<item name="dataScope" xsi:type="string">banner_url</item>-->
-                    <!--<item name="placeholder" xsi:type="string" translate="true">Add a link to your banner</item>-->
-                    <!--<item name="tooltip" xsi:type="array">-->
-                        <!--<item name="description" xsi:type="string">TBD</item>-->
-                    <!--</item>-->
-                <!--</item>-->
-            <!--</argument>-->
-        <!--</field>-->
+        <field name="banner_image">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="source" xsi:type="string">banner_image</item>
+                    <item name="label" xsi:type="string" translate="true">Image</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">imageUploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/image</item>
+                    <item name="previewTmpl" xsi:type="string">Algolia_AlgoliaSearch/image-preview</item>
+                    <item name="required" xsi:type="boolean">false</item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="url" path="algolia_algoliasearch/query/imageupload"/>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="banner_alt">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">query</item>
+                    <item name="label" xsi:type="string" translate="true">Alt text</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">banner_alt</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Alternative description for the image</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">TBD</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="banner_url">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">query</item>
+                    <item name="label" xsi:type="string" translate="true">URL</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="dataScope" xsi:type="string">banner_url</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Add a link to your banner</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">TBD</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
         <field name="banner_content">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">query</item>
                     <item name="label" xsi:type="string" translate="true">Content</item>
                     <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">wysiwyg</item>
+                    <item name="formElement" xsi:type="string">textarea</item>
                     <item name="template" xsi:type="string">ui/form/field</item>
-                    <item name="wysiwyg" xsi:type="boolean">true</item>
+                    <item name="wysiwyg" xsi:type="boolean">false</item>
                     <item name="dataScope" xsi:type="string">banner_content</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Additional text displayed below the banner</item>
                 </item>
             </argument>
         </field>

@@ -185,6 +185,7 @@
 
 .algolia_merchandising_items_table .actions {
     text-align: center;
+    min-width: 190px;
 }
 
 .algolia_merchandising_items_table .actions a {

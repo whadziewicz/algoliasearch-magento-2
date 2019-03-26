@@ -238,8 +238,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
           var storeId = $('select[name="store_id"]').val();
           var queryText = $('input[name="query_text"]').val();
 
-          window.algoliaSearch.helper.setQuery(queryText).search();
-
           return isValid;
         },
         $.mage.__('This query is already connected to another query rule. Please enter a different query or edit the existing one.')
@@ -253,7 +251,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             return false;
           }
 
-          window.algoliaSearch.helper.setIndex(window.algoliaSearchConfig.indexDataByStoreIds[value].indexName + '_products').search();
           return true;
         },
         $.mage.__('The index corresponding to the store you selected doesn\'t exist.')

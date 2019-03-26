@@ -35,7 +35,7 @@ $isConfig = [
 <div class="admin__field admin__field-merch">
     <div class="admin__field-label">
         <label>
-            <span>Product shown</span>
+            <span>Products shown</span>
         </label>
     </div>
     <div class="admin__field-control">
@@ -77,7 +77,7 @@ $isConfig = [
                         </td>
                         <td class="image_cell"><img src="{{ image_url }}" width="57" /></td>
                         <td>{{ objectID }}</td>
-                        <td>{{{ _highlightResult.sku.value }}}</td>
+                        <td>{{{ _highlightResult.sku.0.value }}}</td>
                         <td>{{{ _highlightResult.name.value }}}</td>
                         <td>{{ price.USD.default_formated }}</td>
                         <td class="actions">
@@ -120,7 +120,7 @@ $isConfig = [
         </td>
         <td class="image_cell"><img src="{{ image_url }}" width="60" /></td>
         <td>{{ objectID }}</td>
-        <td>{{{ sku }}}</td>
+        <td>{{{ sku.0 }}}</td>
         <td>{{{ name }}}</td>
         <td>{{ price.USD.default_formated }}</td>
         <td class="actions">

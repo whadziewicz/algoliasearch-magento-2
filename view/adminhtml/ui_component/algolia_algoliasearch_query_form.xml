@@ -67,7 +67,6 @@
                         <item name="description" xsi:type="string">TBD</item>
                     </item>
                     <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
                         <item name="validate-query-usage" xsi:type="boolean">true</item>
                     </item>
                 </item>
@@ -87,7 +86,6 @@
                         <item name="description" xsi:type="string">Select the store where the merchandised query is available. "All Store Views" allows the query to be displayed in all your stores.</item>
                     </item>
                     <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
                         <item name="validate-algolia-index" xsi:type="boolean">true</item>
                     </item>
                 </item>

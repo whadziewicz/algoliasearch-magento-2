@@ -62,6 +62,7 @@
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">query_text</item>
                     <item name="placeholder" xsi:type="string" translate="true">unique query</item>
+                    <item name="elementTmpl" xsi:type="string">Algolia_AlgoliaSearch/query-text</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string">TBD</item>
                     </item>
@@ -96,6 +97,14 @@
             <htmlContent name="html_content">
                 <argument name="block" xsi:type="object">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Merchandising</argument>
             </htmlContent>
+        </container>
+        <container name="js_container">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">1</item>
+                    <item name="component" xsi:type="string">Algolia_AlgoliaSearch/js/components/query-merchandising</item>
+                </item>
+            </argument>
         </container>
     </fieldset>
     <fieldset name="banner">

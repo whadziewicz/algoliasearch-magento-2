@@ -120,9 +120,8 @@
                     <item name="source" xsi:type="string">banner_image</item>
                     <item name="label" xsi:type="string" translate="true">Image</item>
                     <item name="visible" xsi:type="boolean">true</item>
-                    <item name="formElement" xsi:type="string">imageUploader</item>
+                    <item name="formElement" xsi:type="string">fileUploader</item>
                     <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/image</item>
-                    <item name="previewTmpl" xsi:type="string">Algolia_AlgoliaSearch/image-preview</item>
                     <item name="required" xsi:type="boolean">false</item>
                     <item name="notice" xsi:type="string" translate="true">This banner will be displayed on top of the search results in the pages powered by Algolia. Please ensure that the dimensions of your banner respect the design of your website.</item>
                     <item name="uploaderConfig" xsi:type="array">

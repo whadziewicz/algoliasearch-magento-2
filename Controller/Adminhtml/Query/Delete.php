@@ -39,11 +39,7 @@ class Delete extends AbstractAction
     {
         $stores = [];
         if ($query->getStoreId() == 0) {
-            foreach ($this->storeManager->getStores() as $store) {
-                if ($store->getIsActive()) {
-                    $stores[] = $store->getId();
-                }
-            }
+            $stores = $this->getActiveStores();
         } else {
             $stores[] = $query->getStoreId();
         }

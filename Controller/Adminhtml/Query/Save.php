@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Query;
 
 use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
+use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\QueryFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultFactory;
@@ -23,6 +24,7 @@ class Save extends AbstractAction
      * @param \Magento\Framework\Registry $coreRegistry
      * @param QueryFactory $queryFactory
      * @param MerchandisingHelper $merchandisingHelper
+     * @param ProxyHelper $proxyHelper
      * @param StoreManagerInterface $storeManager
      * @param DataPersistorInterface $dataPersistor
      *
@@ -33,6 +35,7 @@ class Save extends AbstractAction
         \Magento\Framework\Registry $coreRegistry,
         QueryFactory $queryFactory,
         MerchandisingHelper $merchandisingHelper,
+        ProxyHelper $proxyHelper,
         StoreManagerInterface $storeManager,
         DataPersistorInterface $dataPersistor
     ) {
@@ -43,6 +46,7 @@ class Save extends AbstractAction
             $coreRegistry,
             $queryFactory,
             $merchandisingHelper,
+            $proxyHelper,
             $storeManager
         );
     }
@@ -129,11 +133,7 @@ class Save extends AbstractAction
         $positions = json_decode($data['algolia_merchandising_positions'], true);
         $stores = [];
         if ($data['store_id'] == 0) {
-            foreach ($this->storeManager->getStores() as $store) {
-                if ($store->getIsActive()) {
-                    $stores[] = $store->getId();
-                }
-            }
+            $stores = $this->getActiveStores();
         } else {
             $stores[] = $data['store_id'];
         }
@@ -174,7 +174,7 @@ class Save extends AbstractAction
             $bannerUrl = $baseurl . 'algolia_img/' . $data['banner_image'];
             $banner = '<img src="' . $bannerUrl . '" alt="' . $data['banner_alt'] . '" />';
             if ($data['banner_url']) {
-                $content = '<a href="' . $data['banner_url'] . '" target="_blank" />' . $banner . '</a>';
+                $content = '<a href="' . $data['banner_url'] . '" target="_blank" >' . $banner . '</a>';
             } else {
                 $content = $banner;
             }

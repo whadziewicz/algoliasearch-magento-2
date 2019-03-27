@@ -77,9 +77,16 @@ $isConfig = [
                         </td>
                         <td class="image_cell"><img src="{{ image_url }}" width="57" /></td>
                         <td>{{ objectID }}</td>
-                        <td>{{{ _highlightResult.sku.0.value }}}</td>
+                        <td>
+                            {{#_highlightResult.sku.0}}
+                                {{{ _highlightResult.sku.0.value }}}
+                            {{/_highlightResult.sku.0}}
+                            {{^_highlightResult.sku.0}}
+                                {{{ _highlightResult.sku.value }}}
+                            {{/_highlightResult.sku.0}}
+                        </td>
                         <td>{{{ _highlightResult.name.value }}}</td>
-                        <td>{{ price.USD.default_formated }}</td>
+                        <td>{{ price.<?php echo $configHelper->getCurrencyCode() ?>.default_formated }}</td>
                         <td class="actions">
                             <div class="pin_block">
                                 <a class="arrow up" href="#">
@@ -120,9 +127,16 @@ $isConfig = [
         </td>
         <td class="image_cell"><img src="{{ image_url }}" width="60" /></td>
         <td>{{ objectID }}</td>
-        <td>{{{ sku.0 }}}</td>
+        <td>
+            {{#sku.0}}
+                {{{ sku.0 }}}
+            {{/sku.0}}
+            {{^sku.0}}
+                {{{ sku }}}
+            {{/sku.0}}
+        </td>
         <td>{{{ name }}}</td>
-        <td>{{ price.USD.default_formated }}</td>
+        <td>{{ price.<?php echo $configHelper->getCurrencyCode() ?>.default_formated }}</td>
         <td class="actions">
             <div class="pin_block">
                 <a class="arrow up" href="#">
@@ -149,7 +163,7 @@ $isConfig = [
         <div class="info">
             {{{ _highlightResult.name.value }}}
             <div class="price">
-				{{ price.USD.default_formated }}
+				{{ price.<?php echo $configHelper->getCurrencyCode() ?>.default_formated }}
 			</div>
         </div>
 
@@ -371,7 +385,6 @@ $isConfig = [
 		            }
 	            });
 
-	            $('.algolia_merchandising_items_table tbody tr td').css('cursor', 'move');
             };
 
             var pinIt = function($row) {

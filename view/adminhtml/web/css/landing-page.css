@@ -307,6 +307,10 @@
     text-align: center;
 }
 
+.algolia_merchandising_items_table tbody tr td {
+    cursor : move;
+}
+
 /** SEARCH BOX */
 
 .ais-search-box--powered-by {
@@ -1251,8 +1255,4 @@ a.ais-current-refined-values--link:hover {
 
 .admin__fieldset .admin__field-merch #algolia_hit_per_page {
     margin-top : 17px;
-}
-
-.admin__fieldset .file-uploader-area label:last-of-type {
-    display : none;
 }

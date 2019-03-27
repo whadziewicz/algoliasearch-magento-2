@@ -521,7 +521,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			var widgetConfig = {
 				templates: {
 					allItems: function(config) {
-						if (config) {
+						if (config && config.userData) {
 							var userData = config.userData;
 							var banners = userData.map(function(userDataObj) {
 								return userDataObj.banner;

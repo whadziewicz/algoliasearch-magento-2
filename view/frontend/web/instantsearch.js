@@ -516,14 +516,15 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		}
 
 		// Banner from query rules
-		var wrapper = document.getElementById('algolia-banner');
-		if (wrapper !== null) {
+		var bannerWrapper = document.getElementById('algolia-banner');
+		if (bannerWrapper !== null) {
 			var widgetConfig = {
 				templates: {
-					allItems({userData}) {
-						if (userData) {
-							const banners = userData.map(({banner}) => {
-								return banner;
+					allItems: function(config) {
+						if (config) {
+							var userData = config.userData;
+							var banners = userData.map(function(userDataObj) {
+								return userDataObj.banner;
 							});
 							return banners.join('');
 						}
@@ -533,7 +534,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 						return '';
 			 		}
 				},
-				container: wrapper,
+				container: bannerWrapper,
 			};
 
 			if (typeof allWidgetConfiguration['hits'] === 'undefined') {

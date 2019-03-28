@@ -65,7 +65,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
         $planLevelInfo = $this->proxyHelper->getClientConfigurationData();
         $planLevel = isset($planLevelInfo['plan_level']) ? (int) $planLevelInfo['plan_level'] : 1;
 
-        if ($planLevel <= 1) {
+        if ($planLevel <= 3) {
             $this->_response->setStatusHeader(403, '1.1', 'Forbidden');
             if (!$this->_auth->isLoggedIn()) {
                 return $this->_redirect('*/auth/login');

@@ -99,7 +99,8 @@ class Save extends AbstractAction
             try {
                 $query->getResource()->save($query);
 
-                if (isset($data['algolia_merchandising_positions']) && $data['algolia_merchandising_positions'] != '') {
+                if (isset($data['algolia_merchandising_positions']) && $data['algolia_merchandising_positions'] != ''
+                    || !is_null($data['banner_image'])) {
                     $this->manageQueryRules($query->getId(), $data);
                 }
 
@@ -141,7 +142,7 @@ class Save extends AbstractAction
         $bannerContent = $this->prepareBannerContent($data);
 
         foreach ($stores as $storeId) {
-            if (!$positions) {
+            if (!$positions && is_null($bannerContent)) {
                 $this->merchandisingHelper->deleteQueryRule(
                     $storeId,
                     $queryId,
@@ -169,18 +170,18 @@ class Save extends AbstractAction
     {
         $content = null;
 
-        if ($data['banner_image']) {
+        if (isset($data['banner_image']) && $data['banner_image']) {
             $baseurl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
             $bannerUrl = $baseurl . 'algolia_img/' . $data['banner_image'];
             $banner = '<img src="' . $bannerUrl . '" alt="' . $data['banner_alt'] . '" />';
-            if ($data['banner_url']) {
+            if (isset($data['banner_url']) && $data['banner_url']) {
                 $content = '<a href="' . $data['banner_url'] . '" target="_blank" >' . $banner . '</a>';
             } else {
                 $content = $banner;
             }
         }
 
-        if ($data['banner_content']) {
+        if (isset($data['banner_content']) && $data['banner_content']) {
             $content .= '<p>' . $data['banner_content'] . '</p>';
         }
 

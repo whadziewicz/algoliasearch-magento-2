@@ -65,7 +65,7 @@
                     <item name="elementTmpl" xsi:type="string">Algolia_AlgoliaSearch/query-text</item>
                     <item name="notice" xsi:type="string" translate="true">Please ensure that this query has not already been merchandised on your store.</item>
                     <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">This is the query text that will be affected by the merchandising and the banner define in this page.</item>
+                        <item name="description" xsi:type="string">Results for this search term will be affected by the merchandising and the banner defined in this page.</item>
                     </item>
                     <item name="validation" xsi:type="array">
                         <item name="validate-query-usage" xsi:type="boolean">true</item>
@@ -113,6 +113,9 @@
                 <item name="label" xsi:type="string" translate="true">Banner</item>
             </item>
         </argument>
+        <htmlContent name="html_content">
+            <block class="Magento\Framework\View\Element\Template" name="algolia.banner.notice" template="Algolia_AlgoliaSearch::query/banner-notice.phtml"/>
+        </htmlContent>
         <field name="banner_image">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -154,26 +157,26 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">banner_url</item>
-                    <item name="placeholder" xsi:type="string" translate="true">Add a link to your banner</item>
+                    <item name="placeholder" xsi:type="string" translate="true">https://www.example.com</item>
                     <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">If you set this url, the user will be able to click on the banner and will open a new tab to access it.</item>
+                        <item name="description" xsi:type="string">The user will be redirected to this URL in a new tab.</item>
                     </item>
                 </item>
             </argument>
         </field>
-        <field name="banner_content">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">query</item>
-                    <item name="label" xsi:type="string" translate="true">Content</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">textarea</item>
-                    <item name="template" xsi:type="string">ui/form/field</item>
-                    <item name="wysiwyg" xsi:type="boolean">false</item>
-                    <item name="dataScope" xsi:type="string">banner_content</item>
-                    <item name="placeholder" xsi:type="string" translate="true">Additional text displayed below the banner</item>
-                </item>
-            </argument>
-        </field>
+        <!--<field name="banner_content">-->
+            <!--<argument name="data" xsi:type="array">-->
+                <!--<item name="config" xsi:type="array">-->
+                    <!--<item name="source" xsi:type="string">query</item>-->
+                    <!--<item name="label" xsi:type="string" translate="true">Content</item>-->
+                    <!--<item name="dataType" xsi:type="string">text</item>-->
+                    <!--<item name="formElement" xsi:type="string">textarea</item>-->
+                    <!--<item name="template" xsi:type="string">ui/form/field</item>-->
+                    <!--<item name="wysiwyg" xsi:type="boolean">false</item>-->
+                    <!--<item name="dataScope" xsi:type="string">banner_content</item>-->
+                    <!--<item name="placeholder" xsi:type="string" translate="true">Additional text displayed below the banner</item>-->
+                <!--</item>-->
+            <!--</argument>-->
+        <!--</field>-->
     </fieldset>
 </form>

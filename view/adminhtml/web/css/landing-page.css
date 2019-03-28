@@ -1256,3 +1256,20 @@ a.ais-current-refined-values--link:hover {
 .admin__fieldset .admin__field-merch #algolia_hit_per_page {
     margin-top : 17px;
 }
+
+.form-inline .algolia-banner-help {
+    width : calc(50% - 30px);
+    margin-left : 25%;
+}
+
+.form-inline .algolia-banner-help .book {
+    margin-top : 0px;
+}
+
+.form-inline .algolia-banner-help p {
+    margin-top : 7px;
+}
+
+.algolia-no-lp .algolia-suggestions-header .book {
+    margin: 5px 20px 40px 0;
+}

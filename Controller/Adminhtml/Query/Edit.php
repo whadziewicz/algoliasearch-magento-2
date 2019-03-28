@@ -38,7 +38,7 @@ class Edit extends AbstractAction
         $resultPage->getConfig()->getTitle()->prepend(
             $query->getId()
                 ? __('Edit query "%1"', $query->getQueryText())
-                : __('New query')
+                : __('New merchandised query')
         );
 
         return $resultPage;

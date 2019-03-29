@@ -27,7 +27,7 @@
         </div>
 
         <?php if ($viewModel->canAccessMerchandisingFeature()): ?>
-            <a href="<?php echo $block->getUrl('catalog/category') ?>" target="_blank" title="<?php echo __('Promote products within a category') ?>"><?php echo __('Promote products within a category') ?></a>
+            <a href="<?php echo $block->getUrl('catalog/category') ?>" title="<?php echo __('Promote products within a category') ?>"><?php echo __('Promote products within a category') ?></a>
         <?php else: ?>
             <?php echo $block->getChildHtml('upsell') ?>
         <?php endif ?>
@@ -42,7 +42,7 @@
         </div>
 
         <?php if ($viewModel->canAccessLandingPageBuilder()): ?>
-            <a href="<?php echo $block->getUrl('algolia_algoliasearch/landingpage') ?>" target="_blank" title="<?php echo __('Create a new landing page') ?>"><?php echo __('Create a new landing page') ?></a>
+            <a href="<?php echo $block->getUrl('algolia_algoliasearch/landingpage') ?>" title="<?php echo __('Create a new landing page') ?>"><?php echo __('Create a new landing page') ?></a>
         <?php else: ?>
             <?php echo $block->getChildHtml('upsell') ?>
         <?php endif ?>

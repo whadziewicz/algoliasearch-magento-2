@@ -14,6 +14,7 @@
         <item name="buttons" xsi:type="array">
             <item name="save_and_continue" xsi:type="string">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Edit\SaveAndContinueButton</item>
             <item name="save" xsi:type="string">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Edit\SaveButton</item>
+            <item name="view" xsi:type="string">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Edit\ViewButton</item>
             <item name="delete" xsi:type="string">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Edit\DeleteButton</item>
             <item name="back" xsi:type="string">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Edit\BackButton</item>
         </item>
@@ -39,7 +40,7 @@
     <fieldset name="main_information">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-                <item name="label" xsi:type="string" translate="true">Merchandised items</item>
+                <item name="label" xsi:type="string" translate="true">Merchandised products</item>
             </item>
         </argument>
         <field name="query_id">
@@ -61,12 +62,14 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">query_text</item>
-                    <item name="placeholder" xsi:type="string" translate="true">unique query</item>
+                    <item name="placeholder" xsi:type="string" translate="true">Search term</item>
+                    <item name="elementTmpl" xsi:type="string">Algolia_AlgoliaSearch/query-text</item>
+                    <item name="notice" xsi:type="string" translate="true">Please ensure that this query has not already been merchandised on your store.</item>
                     <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">TBD</item>
+                        <item name="description" xsi:type="string">Results for this search term will be affected by the merchandising and the banner defined in this page.</item>
                     </item>
                     <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
+                        <item name="validate-query-usage" xsi:type="boolean">true</item>
                     </item>
                 </item>
             </argument>
@@ -85,11 +88,24 @@
                         <item name="description" xsi:type="string">Select the store where the merchandised query is available. "All Store Views" allows the query to be displayed in all your stores.</item>
                     </item>
                     <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
+                        <item name="validate-algolia-index" xsi:type="boolean">true</item>
                     </item>
                 </item>
             </argument>
         </field>
+        <container name="algolia_merchandising_query" >
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">Algolia\AlgoliaSearch\Block\Adminhtml\Query\Merchandising</argument>
+            </htmlContent>
+        </container>
+        <container name="js_container">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">1</item>
+                    <item name="component" xsi:type="string">Algolia_AlgoliaSearch/js/components/query-merchandising</item>
+                </item>
+            </argument>
+        </container>
     </fieldset>
     <fieldset name="banner">
         <argument name="data" xsi:type="array">
@@ -98,16 +114,23 @@
                 <item name="label" xsi:type="string" translate="true">Banner</item>
             </item>
         </argument>
+        <htmlContent name="html_content">
+            <block class="Magento\Framework\View\Element\Template" name="algolia.banner.notice" template="Algolia_AlgoliaSearch::query/banner-notice.phtml"/>
+        </htmlContent>
         <field name="banner_image">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">query</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="source" xsi:type="string">banner_image</item>
                     <item name="label" xsi:type="string" translate="true">Image</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="dataScope" xsi:type="string">banner_image</item>
-                    <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">TBD</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">fileUploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/image</item>
+                    <item name="previewTmpl" xsi:type="string">Algolia_AlgoliaSearch/image-preview</item>
+                    <item name="required" xsi:type="boolean">false</item>
+                    <item name="notice" xsi:type="string" translate="true">This banner will be displayed on top of the search results in the pages powered by Algolia. Please ensure that the dimensions of your banner respect the design of your website.</item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="url" path="algolia_algoliasearch/query/imageupload"/>
                     </item>
                 </item>
             </argument>
@@ -122,7 +145,7 @@
                     <item name="dataScope" xsi:type="string">banner_alt</item>
                     <item name="placeholder" xsi:type="string" translate="true">Alternative description for the image</item>
                     <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">TBD</item>
+                        <item name="description" xsi:type="string">This is the "alt" attribute that will be applied on the img tag of the banner.</item>
                     </item>
                 </item>
             </argument>
@@ -135,26 +158,26 @@
                     <item name="dataType" xsi:type="string">text</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="dataScope" xsi:type="string">banner_url</item>
-                    <item name="placeholder" xsi:type="string" translate="true">Add a link to your banner</item>
+                    <item name="placeholder" xsi:type="string" translate="true">https://www.example.com</item>
                     <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">TBD</item>
+                        <item name="description" xsi:type="string">The user will be redirected to this URL in a new tab.</item>
                     </item>
                 </item>
             </argument>
         </field>
-        <field name="banner_content">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">query</item>
-                    <item name="label" xsi:type="string" translate="true">Content</item>
-                    <item name="dataType" xsi:type="string">text</item>
-                    <item name="formElement" xsi:type="string">textarea</item>
-                    <item name="dataScope" xsi:type="string">banner_content</item>
-                    <item name="tooltip" xsi:type="array">
-                        <item name="description" xsi:type="string">TBD</item>
-                    </item>
-                </item>
-            </argument>
-        </field>
+        <!--<field name="banner_content">-->
+            <!--<argument name="data" xsi:type="array">-->
+                <!--<item name="config" xsi:type="array">-->
+                    <!--<item name="source" xsi:type="string">query</item>-->
+                    <!--<item name="label" xsi:type="string" translate="true">Content</item>-->
+                    <!--<item name="dataType" xsi:type="string">text</item>-->
+                    <!--<item name="formElement" xsi:type="string">textarea</item>-->
+                    <!--<item name="template" xsi:type="string">ui/form/field</item>-->
+                    <!--<item name="wysiwyg" xsi:type="boolean">false</item>-->
+                    <!--<item name="dataScope" xsi:type="string">banner_content</item>-->
+                    <!--<item name="placeholder" xsi:type="string" translate="true">Additional text displayed below the banner</item>-->
+                <!--</item>-->
+            <!--</argument>-->
+        <!--</field>-->
     </fieldset>
 </form>

@@ -6,6 +6,7 @@
 .algoliasearch-merchandising-options {
     display: flex;
     justify-content: space-between;
+    margin: 5px auto 50px;
 }
 .algoliasearch-merchandising-options .merchandising-item {
     width: 33%;
@@ -25,10 +26,17 @@
 .merchandising-item h3 {
     margin-top: 1.5em;
 }
-.merchandising-item .std p {
+
+.merchandising-item .description {
+    min-height: 90px;
+    margin-bottom: 1.5em;
+}
+
+.merchandising-item .description p {
     line-height: 1.5;
     font-size: 1em;
-    margin-bottom: 1.5em;
+    margin-bottom: 0;
+
 }
 .merchandising-item a {
     font-weight: 600;

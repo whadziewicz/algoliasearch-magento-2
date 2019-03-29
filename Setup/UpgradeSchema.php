@@ -542,7 +542,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 QueryInterface::FIELD_CREATED_AT,
                 $table::TYPE_DATETIME,
                 null,
-                ['nullable' => false, 'default' => new \Zend_Db_Expr('CURRENT_TIMESTAMP')]
+                ['nullable' => true, 'default' => null]
             );
 
             $connection->createTable($table);

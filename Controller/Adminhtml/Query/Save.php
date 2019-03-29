@@ -95,6 +95,7 @@ class Save extends AbstractAction
             }
 
             $query->setData($data);
+            $query->setCreatedAt(time());
 
             try {
                 $query->getResource()->save($query);

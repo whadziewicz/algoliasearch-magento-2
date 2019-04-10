@@ -114,9 +114,11 @@
                 <item name="label" xsi:type="string" translate="true">Banner</item>
             </item>
         </argument>
-        <htmlContent name="html_content">
-            <block class="Magento\Framework\View\Element\Template" name="algolia.banner.notice" template="Algolia_AlgoliaSearch::query/banner-notice.phtml"/>
-        </htmlContent>
+        <container name="algolia_notice_container" >
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">Algolia\AlgoliaSearch\Block\Adminhtml\Query\BannerNotice</argument>
+            </htmlContent>
+        </container>
         <field name="banner_image">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

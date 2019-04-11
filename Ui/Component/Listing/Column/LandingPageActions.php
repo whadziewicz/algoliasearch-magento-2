@@ -59,7 +59,7 @@ class LandingPageActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 $title = $this->escaper->escapeHtml($item['title']);
-                if ($item['store_id_num'] && $item['store_id_num'] != 0) {
+                if (isset($item['store_id_num']) && $item['store_id_num'] != 0) {
                     $this->frontendUrlBuilder->setScope($item['store_id_num']);
                 }
                 $item[$this->getData('name')] = [

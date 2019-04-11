@@ -79,7 +79,7 @@
                 </item>
             </argument>
         </column>
-        <column name="store_id" class="Magento\Search\Ui\Component\Listing\Column\StoreView">
+        <column name="store_id" class="Algolia\AlgoliaSearch\Ui\Component\Listing\Column\StoreView">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>

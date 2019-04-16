@@ -560,13 +560,13 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		window.routing = {
 			router: algoliaBundle.instantsearch.routers.history({
 				parseURL: function (qsObject) {
-					let location = qsObject.location,
+					var location = qsObject.location,
 						qsModule = qsObject.qsModule;
 					const queryString = location.hash ? location.hash : location.search;
 					return qsModule.parse(queryString.slice(1))
 				},
 				createURL: function (qsObject) {
-					let qsModule = qsObject.qsModule,
+					var qsModule = qsObject.qsModule,
 						routeState = qsObject.routeState,
 						location = qsObject.location;
 					const protocol = location.protocol,
@@ -586,15 +586,15 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			}),
 			stateMapping: {
 				stateToRoute: function (uiState) {
-					let map = {};
+					var map = {};
 					if (algoliaConfig.isCategoryPage) {
 						map['q'] = uiState.query;
 					} else {
 						map['q'] = uiState.query || '__empty__';
 					}
 					if (algoliaConfig.facets) {
-						for(let i=0; i<algoliaConfig.facets.length; i++) {
-							let currentFacet = algoliaConfig.facets[i];
+						for(var i=0; i<algoliaConfig.facets.length; i++) {
+							var currentFacet = algoliaConfig.facets[i];
 							// Handle refinement facets
 							if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
 								map[currentFacet.attribute] = (uiState.refinementList &&
@@ -620,14 +620,14 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					return map;
 				},
 				routeToState: function (routeState) {
-					let map = {};
+					var map = {};
 					routeState = routingBc(routeState);
 					map['query'] = routeState.q == '__empty__' ? '' : routeState.q;
 					if (algoliaConfig.isLandingPage && typeof map['query'] === 'undefined' && algoliaConfig.landingPage.query != '') {
 						map['query'] = algoliaConfig.landingPage.query;
 					}
 
-					let landingPageConfig = algoliaConfig.isLandingPage && algoliaConfig.landingPage.configuration ? 
+					var landingPageConfig = algoliaConfig.isLandingPage && algoliaConfig.landingPage.configuration ?
 						JSON.parse(algoliaConfig.landingPage.configuration) : 
 						{};
 
@@ -635,8 +635,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					map['hierarchicalMenu'] = {};
 					map['range'] = {};
 					if (algoliaConfig.facets) {
-						for(let i=0; i<algoliaConfig.facets.length; i++) {
-							let currentFacet = algoliaConfig.facets[i];
+						for(var i=0; i<algoliaConfig.facets.length; i++) {
+							var currentFacet = algoliaConfig.facets[i];
 							// Handle refinement facets
 							if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
 								map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');

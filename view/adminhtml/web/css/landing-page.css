@@ -21,6 +21,10 @@
     margin-top: 5px;
 }
 
+.algolia-suggestions-header p{
+    margin-left : 70px;
+}
+
 .algolia-suggestions-header .close-box {
     position : absolute;
     right : 15px;
@@ -1244,7 +1248,6 @@ a.ais-current-refined-values--link:hover {
 }
 
 .admin__fieldset .admin__field-merch > .admin__field-control {
-    width: calc( (100%) * 0.5 );
     float: left;
     margin-left: 7px;
 }

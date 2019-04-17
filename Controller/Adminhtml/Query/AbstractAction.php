@@ -1,10 +1,10 @@
 <?php
 
-namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Landingpage;
+namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Query;
 
 use Algolia\AlgoliaSearch\Helper\MerchandisingHelper;
 use Algolia\AlgoliaSearch\Helper\ProxyHelper;
-use Algolia\AlgoliaSearch\Model\LandingPageFactory;
+use Algolia\AlgoliaSearch\Model\QueryFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
 use Magento\Store\Model\StoreManagerInterface;
@@ -14,8 +14,8 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /** @var Registry */
     protected $coreRegistry;
 
-    /** @var LandingPageFactory */
-    protected $landingPageFactory;
+    /** @var QueryFactory */
+    protected $queryFactory;
 
     /** @var MerchandisingHelper */
     protected $merchandisingHelper;
@@ -29,7 +29,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /**
      * @param Context $context
      * @param Registry $coreRegistry
-     * @param LandingPageFactory $landingPageFactory
+     * @param QueryFactory $queryFactory
      * @param MerchandisingHelper $merchandisingHelper
      * @param ProxyHelper $proxyHelper
      * @param StoreManagerInterface $storeManager
@@ -37,7 +37,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     public function __construct(
         Context $context,
         Registry $coreRegistry,
-        LandingPageFactory $landingPageFactory,
+        QueryFactory $queryFactory,
         MerchandisingHelper $merchandisingHelper,
         ProxyHelper $proxyHelper,
         StoreManagerInterface $storeManager
@@ -45,7 +45,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
         parent::__construct($context);
 
         $this->coreRegistry = $coreRegistry;
-        $this->landingPageFactory = $landingPageFactory;
+        $this->queryFactory = $queryFactory;
         $this->merchandisingHelper = $merchandisingHelper;
         $this->proxyHelper = $proxyHelper;
         $this->storeManager = $storeManager;
@@ -65,13 +65,13 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
         $planLevelInfo = $this->proxyHelper->getClientConfigurationData();
         $planLevel = isset($planLevelInfo['plan_level']) ? (int) $planLevelInfo['plan_level'] : 1;
 
-        if ($planLevel <= 1) {
+        if ($planLevel <= 3) {
             $this->_response->setStatusHeader(403, '1.1', 'Forbidden');
             if (!$this->_auth->isLoggedIn()) {
                 return $this->_redirect('*/auth/login');
             }
             $this->_view->loadLayout(
-                ['default', 'algolia_algoliasearch_handle_access_denied'],
+                ['default', 'algolia_algoliasearch_handle_query_access_denied'],
                 true,
                 true,
                 false
@@ -86,23 +86,36 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
         return parent::dispatch($request);
     }
 
-    /** @return Algolia\AlgoliaSearch\Model\LandingPage */
-    protected function initLandingPage()
+    /** @return Algolia\AlgoliaSearch\Model\Query */
+    protected function initQuery()
     {
-        $landingPageId = (int) $this->getRequest()->getParam('id');
+        $queryId = (int) $this->getRequest()->getParam('id');
 
-        /** @var \Algolia\AlgoliaSearch\Model\LandingPage $landingPage */
-        $landingPage = $this->landingPageFactory->create();
+        /** @var \Algolia\AlgoliaSearch\Model\Query $queryFactory */
+        $query = $this->queryFactory->create();
 
-        if ($landingPageId) {
-            $landingPage->getResource()->load($landingPage, $landingPageId);
-            if (!$landingPage->getId()) {
+        if ($queryId) {
+            $query->getResource()->load($query, $queryId);
+            if (!$query->getId()) {
                 return null;
             }
         }
 
-        $this->coreRegistry->register('algoliasearch_landing_page', $landingPage);
+        $this->coreRegistry->register('algoliasearch_query', $query);
 
-        return $landingPage;
+        return $query;
+    }
+
+    /** @return array */
+    protected function getActiveStores()
+    {
+        $stores = [];
+        foreach ($this->storeManager->getStores() as $store) {
+            if ($store->getIsActive()) {
+                $stores[] = $store->getId();
+            }
+        }
+
+        return $stores;
     }
 }

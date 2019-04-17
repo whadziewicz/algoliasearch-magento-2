@@ -1,14 +1,14 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">algolia_algoliasearch_landingpage_listing.algolia_algoliasearch_landingpage_listing_data_source</item>
-            <item name="deps" xsi:type="string">algolia_algoliasearch_landingpage_listing.algolia_algoliasearch_landingpage_listing_data_source</item>
+            <item name="provider" xsi:type="string">algolia_algoliasearch_query_listing.algolia_algoliasearch_query_listing_data_source</item>
+            <item name="deps" xsi:type="string">algolia_algoliasearch_query_listing.algolia_algoliasearch_query_listing_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">algolia_algoliasearch_landingpage_columns</item>
+        <item name="spinner" xsi:type="string">algolia_algoliasearch_query_columns</item>
         <item name="buttons" xsi:type="array">
             <item name="add" xsi:type="array">
                 <item name="name" xsi:type="string">clear</item>
-                <item name="label" xsi:type="string" translate="true">Create a new landing page</item>
+                <item name="label" xsi:type="string" translate="true">Merchandise a new query</item>
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">*/*/edit</item>
             </item>
@@ -18,15 +18,15 @@
     <dataSource name="nameOfDataSource">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Algolia\AlgoliaSearch\Ui\Component\Listing\DataProvider</argument>
-            <argument name="name" xsi:type="string">algolia_algoliasearch_landingpage_listing_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">landing_page_id</argument>
+            <argument name="name" xsi:type="string">algolia_algoliasearch_query_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">query_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
                     <item name="update_url" xsi:type="url" path="mui/index/render"/>
                     <item name="storageConfig" xsi:type="array">
-                        <item name="indexField" xsi:type="string">landing_page_id</item>
+                        <item name="indexField" xsi:type="string">query_id</item>
                     </item>
                 </item>
             </argument>
@@ -59,8 +59,8 @@
         <paging name="listing_paging"/>
     </listingToolbar>
 
-    <columns name="algolia_algoliasearch_landingpage_columns">
-        <column name="landing_page_id">
+    <columns name="algolia_algoliasearch_query_columns">
+        <column name="query_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
@@ -68,25 +68,14 @@
                 </item>
             </argument>
         </column>
-        <column name="title" >
+        <column name="query_text">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">text</item>
                     <item name="editor" xsi:type="array">
                         <item name="editorType" xsi:type="string">text</item>
                     </item>
-                    <item name="label" xsi:type="string" translate="true">Title</item>
-                </item>
-            </argument>
-        </column>
-        <column name="url_key" >
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="editor" xsi:type="array">
-                        <item name="editorType" xsi:type="string">text</item>
-                    </item>
-                    <item name="label" xsi:type="string" translate="true">URL key</item>
+                    <item name="label" xsi:type="string" translate="true">Query</item>
                 </item>
             </argument>
         </column>
@@ -99,44 +88,19 @@
                 </item>
             </argument>
         </column>
-        <!--<column name="date_from" >-->
-            <!--<argument name="data" xsi:type="array">-->
-                <!--<item name="config" xsi:type="array">-->
-                    <!--<item name="filter" xsi:type="string">dateRange</item>-->
-                    <!--<item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>-->
-                    <!--<item name="dataType" xsi:type="string">date</item>-->
-                    <!--<item name="dateFormat" xsi:type="string">MMM d, y</item>-->
-                    <!--<item name="label" xsi:type="string" translate="true">Timeframe (date from)</item>-->
-                <!--</item>-->
-            <!--</argument>-->
-        <!--</column>-->
-        <!--<column name="date_to" >-->
-            <!--<argument name="data" xsi:type="array">-->
-                <!--<item name="config" xsi:type="array">-->
-                    <!--<item name="filter" xsi:type="string">dateRange</item>-->
-                    <!--<item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>-->
-                    <!--<item name="dataType" xsi:type="string">date</item>-->
-                    <!--<item name="dateFormat" xsi:type="string">MMM d, y</item>-->
-                    <!--<item name="label" xsi:type="string" translate="true">Timeframe (date to)</item>-->
-                <!--</item>-->
-            <!--</argument>-->
-        <!--</column>-->
-        <column name="is_active">
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Algolia\AlgoliaSearch\Model\Source\LandingPageStatuses</item>
                 <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">select</item>
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
-                    <item name="editor" xsi:type="string">select</item>
-                    <item name="dataType" xsi:type="string">select</item>
-                    <item name="label" xsi:type="string" translate="true">Status</item>
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Date created</item>
                 </item>
             </argument>
         </column>
-        <actionsColumn name="actions" class="Algolia\AlgoliaSearch\Ui\Component\Listing\Column\LandingPageActions">
+        <actionsColumn name="actions" class="Algolia\AlgoliaSearch\Ui\Component\Listing\Column\QueryActions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">landing_page_id</item>
+                    <item name="indexField" xsi:type="string">query_id</item>
                 </item>
             </argument>
         </actionsColumn>

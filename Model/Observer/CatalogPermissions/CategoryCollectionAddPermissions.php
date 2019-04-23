@@ -50,12 +50,14 @@ class CategoryCollectionAddPermissions implements ObserverInterface
             return;
         }
 
+        $catalogPermissionsHelper = $this->permissionsFactory->getCatalogPermissionsHelper();
         foreach ($permissionsCollection as $categoryId => $permissions) {
             $permissions = explode(',', $permissions);
             foreach ($permissions as $permission) {
                 list($customerGroupId, $level) = explode('_', $permission);
                 if ($category = $collection->getItemById($categoryId)) {
-                    $category->setData('customer_group_permission_' . $customerGroupId, $level == -1 ? 1 : 0);
+                    $category->setData('customer_group_permission_' . $customerGroupId, (($level == -2 || $level != -1
+                        && !$catalogPermissionsHelper->isAllowedCategoryView()) ? 0 : 1));
                 }
             }
         }

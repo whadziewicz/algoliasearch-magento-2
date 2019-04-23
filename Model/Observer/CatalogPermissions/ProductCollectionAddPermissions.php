@@ -59,13 +59,16 @@ class ProductCollectionAddPermissions implements ObserverInterface
         }
 
         $permissionsCollection = array_intersect_key($productPermissionsCollection, $productIds);
+        $catalogPermissionsHelper = $this->permissionsFactory->getCatalogPermissionsHelper();
         foreach ($permissionsCollection as $productId => $permissions) {
             $permissions = explode(',', $permissions);
             foreach ($permissions as $permission) {
                 list($permissionStoreId, $customerGroupId, $level) = explode('_', $permission);
                 if ($permissionStoreId == $storeId) {
+
                     $additionalData->addProductData($productId, [
-                        'customer_group_permission_' . $customerGroupId => ($level == -1 ? 1 : 0),
+                        'customer_group_permission_' . $customerGroupId => (($level == -2 || $level != -1
+                        && !$catalogPermissionsHelper->isAllowedCategoryView()) ? 0 : 1),
                     ]);
                 }
             }

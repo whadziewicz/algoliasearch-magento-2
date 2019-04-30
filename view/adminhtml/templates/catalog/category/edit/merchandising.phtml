@@ -200,7 +200,9 @@ $isConfig = [
         algoliaAdminBundle.$(function ($) {
         	var config = <?php echo json_encode($isConfig); ?>;
 
-            var search = algoliaAdminBundle.instantsearch(<?php echo json_encode($isConfig); ?>);
+            var search = algoliaAdminBundle.instantsearch(config);
+
+            config.searchParameters.facetFilters = [];
 
             // // initialize SearchBox
             // search.addWidget(

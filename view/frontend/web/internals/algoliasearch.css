@@ -477,6 +477,11 @@ a.ais-current-refined-values--link:hover {
     display: inline-block;
     width: 50%;
   }
+
+  #algolia-autocomplete-container .other-section,
+  #algolia-autocomplete-container .aa-dataset-products {
+    min-height: 0;
+  }
 }
 
 

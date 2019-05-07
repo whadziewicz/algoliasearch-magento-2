@@ -99,13 +99,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			},
 			routing : window.routing,
 		};
-		
+
 		if (algoliaConfig.request.path.length > 0 && window.location.hash.indexOf('categories.level0') === -1) {
 			if (algoliaConfig.areCategoriesInFacets === false) {
-				instantsearchOptions.searchParameters = {
-					facetsRefinements: { }
-				};
-				
+				instantsearchOptions.searchParameters['facetsRefinements'] = { };
 				instantsearchOptions.searchParameters['facetsRefinements']['categories.level' + algoliaConfig.request.level] = [algoliaConfig.request.path];
 			} else {
 				instantsearchOptions.searchParameters['hierarchicalFacetsRefinements'] = {
@@ -114,7 +111,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			}
 		}
 		
-		instantsearchOptions = algolia.triggerHooks('beforeInstantsearchInit', instantsearchOptions);
+		instantsearchOptions = algolia.triggerHooks('beforeInstantsearchInit', instantsearchOptions, algoliaBundle);
 		
 		var search = algoliaBundle.instantsearch(instantsearchOptions);
 		
@@ -497,7 +494,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			}
 		});
     
-    if (algoliaConfig.analytics.enabled) {
+    	if (algoliaConfig.analytics.enabled) {
 			if (typeof algoliaAnalyticsPushFunction !== 'function') {
 				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
 					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
@@ -517,8 +514,38 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
 			};
 		}
+
+		// Banner from query rules
+		var bannerWrapper = document.getElementById('algolia-banner');
+		if (bannerWrapper !== null) {
+			var widgetConfig = {
+				templates: {
+					allItems: function(config) {
+						if (config && config.userData) {
+							var userData = config.userData;
+							var banners = userData.map(function(userDataObj) {
+								return userDataObj.banner;
+							});
+							return banners.join('');
+						}
+						return '';
+					},
+					empty: function(query) {
+						return '';
+			 		}
+				},
+				container: bannerWrapper,
+			};
+
+			if (typeof allWidgetConfiguration['hits'] === 'undefined') {
+				allWidgetConfiguration['hits'] = [widgetConfig];
+			} else {
+				var currentHits = allWidgetConfiguration['hits'];
+				allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
+			}
+		}
 		
-		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration);
+		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
 		
 		$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
 			if (Array.isArray(widgetConfig) === true) {
@@ -536,11 +563,11 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				return;
 			}
 			
-			search = algolia.triggerHooks('beforeInstantsearchStart', search);
+			search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
 			
 			search.start();
 			
-			search = algolia.triggerHooks('afterInstantsearchStart', search);
+			search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
 			
 			var instant_search_bar = $(instant_selector);
 			if (instant_search_bar.is(":focus") === false) {

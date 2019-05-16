@@ -1,614 +1,553 @@
-requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBundle, priceUtils) {
-	algoliaBundle.$(function ($) {
+define([
+    'algoliaBundle',
+], function (algoliaBundle) {
+    'use strict';
 
-		/** We have nothing to do here if instantsearch is not enabled **/
-		if (!algoliaConfig.instant.enabled || !(algoliaConfig.isSearchPage || !algoliaConfig.autocomplete.enabled)) {
-			return;
-		}
 
-		if (!algoliaConfig.autocomplete.enabled && $(algoliaConfig.autocomplete.selector).length == 0) {
-			return;
-		}
-		
-		if ($(algoliaConfig.instant.selector).length <= 0) {
-			throw '[Algolia] Invalid instant-search selector: ' + algoliaConfig.instant.selector;
-		}
-		
-		if (algoliaConfig.autocomplete.enabled && $(algoliaConfig.instant.selector).find(algoliaConfig.autocomplete.selector).length > 0) {
-			throw '[Algolia] You can\'t have a search input matching "' + algoliaConfig.autocomplete.selector +
-			'" inside you instant selector "' + algoliaConfig.instant.selector + '"';
-		}
-		
-		var findAutocomplete = algoliaConfig.autocomplete.enabled && $(algoliaConfig.instant.selector).find('#algolia-autocomplete-container').length > 0;
-		if (findAutocomplete) {
-			$(algoliaConfig.instant.selector).find('#algolia-autocomplete-container').remove();
-		}
-		
-		/** BC of old hooks **/
-		if (typeof algoliaHookBeforeInstantsearchInit === 'function') {
-			algolia.registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
-		}
-		
-		if (typeof algoliaHookBeforeWidgetInitialization === 'function') {
-			algolia.registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
-		}
-		
-		if (typeof algoliaHookBeforeInstantsearchStart === 'function') {
-			algolia.registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
-		}
-		
-		if (typeof algoliaHookAfterInstantsearchStart === 'function') {
-			algolia.registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
-		}
-		
-		/**
-		 * Setup wrapper
-		 *
-		 * For templating is used Hogan library
-		 * Docs: http://twitter.github.io/hogan.js/
-		 **/
-		var wrapperTemplate = algoliaBundle.Hogan.compile($('#instant_wrapper_template').html());
-		var instant_selector = !algoliaConfig.autocomplete.enabled ? algoliaConfig.autocomplete.selector : "#instant-search-bar";
-		
-		var div = document.createElement('div');
-		$(div).addClass('algolia-instant-results-wrapper');
-		
-		$(algoliaConfig.instant.selector).addClass('algolia-instant-replaced-content');
-		$(algoliaConfig.instant.selector).wrap(div);
-		
-		$('.algolia-instant-results-wrapper').append('<div class="algolia-instant-selector-results"></div>');
-		$('.algolia-instant-selector-results').html(wrapperTemplate.render({
-			second_bar: algoliaConfig.autocomplete.enabled,
-			findAutocomplete: findAutocomplete,
-			config: algoliaConfig.instant,
-			translations: algoliaConfig.translations
-		})).show();
-		
-		/**
-		 * Initialise instant search
-		 * For rendering instant search page is used Algolia's instantsearch.js library
-		 * Docs: https://community.algolia.com/instantsearch.js/
-		 **/
-		
-		var ruleContexts = ['']; // Empty context to keep BC for already create rules in dashboard
-		if (algoliaConfig.request.categoryId.length > 0) {
-			ruleContexts.push('magento-category-' + algoliaConfig.request.categoryId);
-		}
+	var algoliaInstantsearch = {
 
-		if (algoliaConfig.request.landingPageId.length > 0) {
-			ruleContexts.push('magento-landingpage-' + algoliaConfig.request.landingPageId);
-		}
-		
-		var instantsearchOptions = {
-			appId: algoliaConfig.applicationId,
-			apiKey: algoliaConfig.apiKey,
-			indexName: algoliaConfig.indexName + '_products',
-			searchParameters: {
-				hitsPerPage: algoliaConfig.hitsPerPage,
-				ruleContexts: ruleContexts
-			},
-			searchFunction: function(helper) {
-				if (helper.state.query === '' && !algoliaConfig.isSearchPage) {
-					$('.algolia-instant-replaced-content').show();
-					$('.algolia-instant-selector-results').hide();
-				} else {
-					helper.search();
-					$('.algolia-instant-replaced-content').hide();
-					$('.algolia-instant-selector-results').show();
-				}
-			},
-			routing : window.routing,
-		};
+	    isStarted: false,
+        refinementAttributes: [],
+        wrapperClasses: {
+            resultsWrapper: '.algolia-instant-results-wrapper',
+            replacedContent: '.algolia-instant-replaced-content',
+            selectorResults: '.algolia-instant-selector-results'
+        },
+	    selectors: {
+            instantsearchWrapper: '#instant_wrapper_template',
+            instantsearchSearchBar: '#instant-search-bar'
+        },
+        instantsearchSelector: null,
 
-		if (algoliaConfig.request.path.length > 0 && window.location.hash.indexOf('categories.level0') === -1) {
-			if (algoliaConfig.areCategoriesInFacets === false) {
-				instantsearchOptions.searchParameters['facetsRefinements'] = { };
-				instantsearchOptions.searchParameters['facetsRefinements']['categories.level' + algoliaConfig.request.level] = [algoliaConfig.request.path];
-			} else {
-				instantsearchOptions.searchParameters['hierarchicalFacetsRefinements'] = {
-					'categories.level0': [algoliaConfig.request.path]
-				}
-			}
-		}
-		
-		instantsearchOptions = algolia.triggerHooks('beforeInstantsearchInit', instantsearchOptions, algoliaBundle);
-		
-		var search = algoliaBundle.instantsearch(instantsearchOptions);
-		
-		search.client.addAlgoliaAgent('Magento2 integration (' + algoliaConfig.extensionVersion + ')');
-		
-		/** Prepare sorting indicies data */
-		algoliaConfig.sortingIndices.unshift({
-			name: algoliaConfig.indexName + '_products',
-			label: algoliaConfig.translations.relevance
-		});
-		
-		/** Setup attributes for current refinements widget **/
-		var attributes = [];
-		$.each(algoliaConfig.facets, function (i, facet) {
-			var name = facet.attribute;
-			
-			if (name === 'categories') {
-				name = 'categories.level0';
-			}
-			
-			if (name === 'price') {
-				name = facet.attribute + algoliaConfig.priceKey
-			}
-			
-			attributes.push({
-				name: name,
-				label: facet.label ? facet.label : facet.attribute
-			});
-		});
-		
-		var allWidgetConfiguration = {
-			infiniteHits: {},
-			hits: {},
-			custom: [
-				/**
-				 * Custom widget - this widget is used to refine results for search page or catalog page
-				 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
-				 **/
-				{
-					getConfiguration: function () {
-						if (algoliaConfig.request.query.length > 0 && location.hash.length < 1) {
-							return {query: algoliaConfig.request.query}
-						}
-						return {};
-					},
-					init: function (data) {
-						var page = data.helper.state.page;
-						
-						if (algoliaConfig.request.refinementKey.length > 0) {
-							data.helper.toggleRefine(algoliaConfig.request.refinementKey, algoliaConfig.request.refinementValue);
-						}
-						
-						if (algoliaConfig.isCategoryPage) {
-							data.helper.addNumericRefinement('visibility_catalog', '=', 1);
-						}
-						else {
-							data.helper.addNumericRefinement('visibility_search', '=', 1);
-						}
-						
-						data.helper.setPage(page);
-					},
-					render: function (data) {
-						if (!algoliaConfig.isSearchPage) {
-							if (data.results.query.length === 0) {
-								$('.algolia-instant-replaced-content').show();
-								$('.algolia-instant-selector-results').hide();
-							}
-							else {
-								$('.algolia-instant-replaced-content').hide();
-								$('.algolia-instant-selector-results').show();
-							}
-						}
-					}
-				},
-				/**
-				 * Custom widget - Suggestions
-				 * This widget renders suggestion queries which might be interesting for your customer
-				 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
-				 **/
-				{
-					suggestions: [],
-					init: function () {
-						if (algoliaConfig.showSuggestionsOnNoResultsPage) {
-							var $this = this;
-							$.each(algoliaConfig.popularQueries.slice(0, Math.min(4, algoliaConfig.popularQueries.length)), function (i, query) {
-								query = $('<div>').html(query).text(); //xss
-								$this.suggestions.push('<a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=' + encodeURIComponent(query) + '">' + query + '</a>');
-							});
-						}
-					},
-					render: function (data) {
-						if (data.results.hits.length === 0) {
-							var content = '<div class="no-results">';
-							content += '<div><b>' + algoliaConfig.translations.noProducts + ' "' + $("<div>").text(data.results.query).html() + '</b>"</div>';
-							content += '<div class="popular-searches">';
-							
-							if (algoliaConfig.showSuggestionsOnNoResultsPage && this.suggestions.length > 0) {
-								content += '<div>' + algoliaConfig.translations.popularQueries + '</div>' + this.suggestions.join(', ');
-							}
-							
-							content += '</div>';
-							content += algoliaConfig.translations.or + ' <a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=__empty__">' + algoliaConfig.translations.seeAll + '</a>'
-							
-							content += '</div>';
-							
-							$('#instant-search-results-container').html(content);
-						}
-					}
-				}
-			],
-			/**
-			 * Search box
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/searchBox.html
-			 **/
-			searchBox: {
-				container: instant_selector,
-				placeholder: algoliaConfig.translations.searchFor
-			},
-			/**
-			 * Stats
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/stats.html
-			 **/
-			stats: {
-				container: '#algolia-stats',
-				templates: {
-					body: $('#instant-stats-template').html()
-				},
-				transformData: function (data) {
-					data.first = data.page * data.hitsPerPage + 1;
-					data.last = Math.min(data.page * data.hitsPerPage + data.hitsPerPage, data.nbHits);
-					data.seconds = data.processingTimeMS / 1000;
-					
-					data.translations = window.algoliaConfig.translations;
-					
-					return data;
-				}
-			},
-			/**
-			 * Sorting
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/sortBySelector.html
-			 **/
-			sortBySelector: {
-				container: '#algolia-sorts',
-				indices: algoliaConfig.sortingIndices,
-				cssClass: 'form-control'
-			},
-			/**
-			 * Widget name: Current refinements
-			 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
-			 **/
-			currentRefinedValues: {
-				container: '#current-refinements',
-				cssClasses: {
-					root: 'facet'
-				},
-				templates: {
-					header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
-					clearAll: algoliaConfig.translations.clearAll,
-					item: $('#current-refinements-template').html()
-				},
-				attributes: attributes,
-				onlyListedAttributes: true
-			}
-		};
-		
-		if (algoliaConfig.instant.infiniteScrollEnabled === true) {
-			/**
-			 * Products' infinite hits
-			 * This widget renders all products into result page
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/infiniteHits.html
-			 **/
-			allWidgetConfiguration.infiniteHits = {
-				container: '#instant-search-results-container',
-				templates: {
-					item: $('#instant-hit-template').html()
-				},
-				transformData: {
-					item: function (hit) {
-						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
-						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						
-						hit.algoliaConfig = window.algoliaConfig;
-						
-						hit.__position = hit.__hitIndex + 1;
-						
-						return hit;
-					}
-				},
-				showMoreLabel: algoliaConfig.translations.showMore,
-				escapeHits: true
-			};
-			
-			delete allWidgetConfiguration.hits;
-		} else {
-			/**
-			 * Products' hits
-			 * This widget renders all products into result page
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/hits.html
-			 **/
-			allWidgetConfiguration.hits = {
-				container: '#instant-search-results-container',
-				templates: {
-					item: $('#instant-hit-template').html()
-				},
-				transformData: {
-					item: function (hit) {
-						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
-						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						
-						hit.algoliaConfig = window.algoliaConfig;
-						
-						var state = search.helper.state;
-						hit.__position = (state.page * state.hitsPerPage) + hit.__hitIndex + 1;
-						
-						return hit;
-					}
-				}
-			};
-			
-			/**
-			 * Pagination
-			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/pagination.html
-			 **/
-			allWidgetConfiguration.pagination = {
-				container: '#instant-search-pagination-container',
-				cssClass: 'algolia-pagination',
-				showFirstLast: false,
-				maxPages: 1000,
-				labels: {
-					previous: algoliaConfig.translations.previousPage,
-					next: algoliaConfig.translations.nextPage
-				},
-				scrollTo: 'body'
-			};
-			
-			delete allWidgetConfiguration.infiniteHits;
-		}
-		
-		/**
-		 * Here are specified custom attributes widgets which require special code to run properly
-		 * Custom widgets can be added to this object like [attributeName]: function(facet, templates)
-		 * Function must return instantsearch.widget object
-		 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets.html
-		 **/
-		var customAttributeFacet = {
-			categories: function (facet, templates) {
-				var hierarchical_levels = [];
-				for (var l = 0; l < 10; l++)
-					hierarchical_levels.push('categories.level' + l.toString());
-				
-				var hierarchicalMenuParams = {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributes: hierarchical_levels,
-					separator: ' /// ',
-					alwaysGetRootLevel: true,
-					limit: algoliaConfig.maxValuesPerFacet,
-					templates: templates,
-					sortBy: ['name:asc'],
-					cssClasses: {
-						list: 'hierarchical',
-						root: 'facet hierarchical'
-					}
-				};
-				
-				hierarchicalMenuParams.templates.item = '' +
-					'<div class="ais-hierearchical-link-wrapper">' +
-					'<a class="{{cssClasses.link}}" href="{{url}}">{{label}}' +
-					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
-					'<span class="{{cssClasses.count}}">{{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}}</span></a>' +
-					'</div>';
-				
-				return ['hierarchicalMenu', hierarchicalMenuParams];
-			}
-		};
-		
-		/** Add all facet widgets to instantsearch object **/
-		
-		window.getFacetWidget = function (facet, templates) {
-			
-			if (facet.type === 'priceRanges') {
-				delete templates.item;
-				
-				return ['priceRanges', {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					labels: {
-						currency: algoliaConfig.currencySymbol,
-						separator: algoliaConfig.translations.to,
-						button: algoliaConfig.translations.go
-					},
-					templates: templates,
-					cssClasses: {
-						root: 'facet conjunctive'
-					}
-				}];
-			}
-			
-			if (facet.type === 'conjunctive') {
-				var refinementListOptions = {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					limit: algoliaConfig.maxValuesPerFacet,
-					operator: 'and',
-					templates: templates,
-					sortBy: ['count:desc', 'name:asc'],
-					cssClasses: {
-						root: 'facet conjunctive'
-					}
-				};
-				
-				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-				
-				return ['refinementList', refinementListOptions];
-			}
-			
-			if (facet.type === 'disjunctive') {
-				var refinementListOptions = {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					limit: algoliaConfig.maxValuesPerFacet,
-					operator: 'or',
-					templates: templates,
-					sortBy: ['count:desc', 'name:asc'],
-					cssClasses: {
-						root: 'facet disjunctive'
-					}
-				};
-				
-				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-				
-				return ['refinementList', refinementListOptions];
-			}
-			
-			if (facet.type === 'slider') {
-				delete templates.item;
+        init: function(options, configuration, helper)
+        {
+            this.options = options;
+            this.config = configuration;
+            this.helper = helper;
 
-				return ['rangeSlider', {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					templates: templates,
-					cssClasses: {
-						root: 'facet slider'
-					},
-					tooltips: {
-						format: function (formattedValue) {
-							return facet.attribute.match(/price/) === null ?
-								parseInt(formattedValue) :
-								priceUtils.formatPrice(formattedValue, algoliaConfig.priceFormat);
-						}
-					}
-				}];
-			}
-		};
-		
-		var wrapper = document.getElementById('instant-search-facets-container');
-		$.each(algoliaConfig.facets, function (i, facet) {
-			
-			if (facet.attribute.indexOf("price") !== -1)
-				facet.attribute = facet.attribute + algoliaConfig.priceKey;
-			
-			facet.wrapper = wrapper;
-			
-			var templates = {
-				header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
-				item: $('#refinements-lists-item-template').html()
-			};
-			
-			var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
-				customAttributeFacet[facet.attribute](facet, templates) :
-				getFacetWidget(facet, templates);
-			
-			var widgetType = widgetInfo[0],
-				widgetConfig = widgetInfo[1];
-			
-			if (typeof allWidgetConfiguration[widgetType] === 'undefined') {
-				allWidgetConfiguration[widgetType] = [widgetConfig];
-			} else {
-				allWidgetConfiguration[widgetType].push(widgetConfig);
-			}
-		});
-    
-    	if (algoliaConfig.analytics.enabled) {
-			if (typeof algoliaAnalyticsPushFunction !== 'function') {
-				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
-					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
-
-					// Universal Analytics
-					if (typeof window.ga !== 'undefined') {
-						window.ga('set', 'page', trackedUrl);
-						window.ga('send', 'pageView');
-					}
-				};
-			}
-
-			allWidgetConfiguration['analytics'] = {
-				pushFunction: algoliaAnalyticsPushFunction,
-				delay: algoliaConfig.analytics.delay,
-				triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
-				pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
-			};
-		}
-
-		// Banner from query rules
-		var bannerWrapper = document.getElementById('algolia-banner');
-		if (bannerWrapper !== null) {
-			var widgetConfig = {
-				templates: {
-					allItems: function(config) {
-						if (config && config.userData) {
-							var userData = config.userData;
-							var banners = userData.map(function(userDataObj) {
-								return userDataObj.banner;
-							});
-							return banners.join('');
-						}
-						return '';
-					},
-					empty: function(query) {
-						return '';
-			 		}
-				},
-				container: bannerWrapper,
-			};
-
-			if (typeof allWidgetConfiguration['hits'] === 'undefined') {
-				allWidgetConfiguration['hits'] = [widgetConfig];
-			} else {
-				var currentHits = allWidgetConfiguration['hits'];
-				allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
-			}
-		}
-		
-		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
-		
-		$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
-			if (Array.isArray(widgetConfig) === true) {
-				$.each (widgetConfig, function (i, widgetConfig) {
-					addWidget(search, widgetType, widgetConfig);
-				});
-			} else {
-				addWidget(search, widgetType, widgetConfig);
-			}
-		});
-		
-		var isStarted = false;
-		function startInstantSearch() {
-			if(isStarted === true) {
+			if (!this.enableInstantSearch()) {
 				return;
 			}
-			
-			search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
-			
-			search.start();
-			
-			search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
-			
-			var instant_search_bar = $(instant_selector);
-			if (instant_search_bar.is(":focus") === false) {
-				focusInstantSearchBar(search, instant_search_bar);
-			}
-			
-			if (algoliaConfig.autocomplete.enabled) {
-				$('#search_mini_form').addClass('search-page');
-			}
-			
-			$(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
-				focusInstantSearchBar(search, instant_search_bar);
-			});
-			
-			isStarted = true;
-		}
-		
-		/** Initialise searching **/
-		startInstantSearch();
-	});
-	
-	function addWidget(search, type, config) {
-		if (type === 'custom') {
-			search.addWidget(config);
-			
-			return;
-		}
-		
-		search.addWidget(algoliaBundle.instantsearch.widgets[type](config));
-	}
-	
-	function addSearchForFacetValues(facet, options) {
-		if (facet.searchable === '1') {
-			options['searchForFacetValues'] = {
-				placeholder: algoliaConfig.translations.searchForFacetValuesPlaceholder,
-				templates: {
-					noResults: '<div class="sffv-no-results">' + algoliaConfig.translations.noResults + '</div>'
-				}
-			};
-		}
-		
-		return options;
-	}
+
+			this.setupHooks();
+			this.setupWrapper();
+
+			this.initializeInstantSearch();
+
+            return this;
+        },
+
+        enableInstantSearch: function()
+		{
+		    var config = this.config;
+
+			if (!config.instant.enabled) {
+			    return false;
+            }
+
+            if (!(config.isSearchPage || !config.autocomplete.enabled)) {
+                return false;
+            }
+
+            this.autocompleteInput = document.querySelector(config.autocomplete.selector);
+            this.instantsearchInput = document.querySelector(config.instant.selector);
+
+            if (!config.autocomplete.enabled && this.autocompleteInput.length == 0) {
+                return flase;
+            }
+
+            if (this.instantsearchInput.length <= 0) {
+                throw '[Algolia] Invalid instant-search selector: ' + config.instant.selector;
+            }
+
+            if (config.autocomplete.enabled && this.instantsearchInput.querySelector(config.autocomplete.selector)) {
+                throw '[Algolia] You can\'t have a search input matching "' + config.autocomplete.selector +
+                '" inside you instant selector "' + config.instant.selector + '"';
+            }
+
+            var findAutocomplete = config.autocomplete.enabled
+                && this.instantsearchInput.querySelector('#algolia-autocomplete-container');
+            if (findAutocomplete) {
+                var autocompleteContainer = this.instantsearchInput.querySelector('#algolia-autocomplete-container');
+                autocompleteContainer.parentNode.removeChild(autocompleteContainer);
+            }
+
+            this.findAutocomplete = findAutocomplete;
+
+			return true;
+		},
+
+        setupHooks: function()
+        {
+            /** BC of old hooks **/
+            if (typeof algoliaHookBeforeInstantsearchInit === 'function') {
+                this.helper.registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
+            }
+
+            if (typeof algoliaHookBeforeWidgetInitialization === 'function') {
+                this.helper.registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
+            }
+
+            if (typeof algoliaHookBeforeInstantsearchStart === 'function') {
+                this.helper.registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
+            }
+
+            if (typeof algoliaHookAfterInstantsearchStart === 'function') {
+                this.helper.registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
+            }
+        },
+
+        setupWrapper: function()
+        {
+            var self = this;
+
+            var wrapperTemplate = algoliaBundle.Hogan.compile(document.getElementById(this.selectors.instantsearchWrapper.replace('#', '')).innerHTML);
+            var instantSelector = !this.config.autocomplete.enabled ? this.config.autocomplete.selector : this.selectors.instantsearchSearchBar;
+            
+            var resultsWrapper = document.createElement('div');
+            resultsWrapper.classList.add(this.wrapperClasses.resultsWrapper.replace('.', ''));
+
+            var selectorResults = document.createElement('div');
+            selectorResults.classList.add(this.wrapperClasses.selectorResults.replace('.', ''));
+
+            this.instantsearchInput.classList.add(this.wrapperClasses.replacedContent.replace('.', ''));
+
+            selectorResults.innerHTML = wrapperTemplate.render({
+                second_bar: self.config.autocomplete.enabled,
+                findAutocomplete: self.findAutocomplete,
+                config: self.config.instant,
+                translations: self.config.translations
+            });
+
+            selectorResults.style.display = 'block';
+            resultsWrapper.appendChild(selectorResults);
+
+
+            this.instantsearchSelector = instantSelector;
+        },
+
+        initializeInstantSearch: function()
+        {
+            var self = this;
+            var ruleContexts = this.addRuleContexts();
+
+            var instantsearchOptions = {
+                appId: this.config.applicationId,
+                apiKey: this.config.apiKey,
+                indexName: this.config.indexName + '_products',
+                searchParameters: {
+                    hitsPerPage: this.config.hitsPerPage,
+                    ruleContexts: ruleContexts
+                },
+                searchFunction: function(helper) {
+                    if (helper.state.query === '' && !self.config.isSearchPage) {
+                        document.querySelector(self.wrapperClasses.replacedContent).style.display = 'block';
+                        document.querySelector(self.wrapperClasses.selectorResults).style.display = 'none';
+                    } else {
+                        helper.search();
+                        document.querySelector(self.wrapperClasses.replacedContent).style.display = 'none';
+                        document.querySelector(self.wrapperClasses.selectorResults).style.display = 'block';
+                    }
+                },
+                routing : window.routing,
+            };
+
+            if (this.config.request.path.length > 0 && window.location.hash.indexOf('categories.level0') === -1) {
+                if (this.config.areCategoriesInFacets === false) {
+                    instantsearchOptions.searchParameters['facetsRefinements'] = { };
+                    instantsearchOptions.searchParameters['facetsRefinements']['categories.level' + this.config.request.level] =
+                        [algoliaConfig.request.path];
+                } else {
+                    instantsearchOptions.searchParameters['hierarchicalFacetsRefinements'] = {
+                        'categories.level0': [this.config.request.path]
+                    }
+                }
+            }
+
+            instantsearchOptions = this.helper.triggerHooks('beforeInstantsearchInit', instantsearchOptions, algoliaBundle);
+
+            this.instantsearch = algoliaBundle.instantsearch(instantsearchOptions);
+            this.instantsearch.client.addAlgoliaAgent('Magento2 integration (' + this.config.extensionVersion + ')');
+            this.instantsearchOptions = instantsearchOptions;
+
+            this.prepareSorting();
+            this.setupFacets();
+
+            this.configureWidgets();
+
+
+            // this.startInstantSearch();
+
+        },
+
+        addRuleContexts: function()
+        {
+            var ruleContexts = ['']; // Empty context to keep BC for already create rules in dashboard
+            if (this.config.request.categoryId.length > 0) {
+                ruleContexts.push('magento-category-' + this.config.request.categoryId);
+            }
+
+            if (this.config.request.landingPageId.length > 0) {
+                ruleContexts.push('magento-landingpage-' + this.config.request.landingPageId);
+            }
+
+            return ruleContexts;
+        },
+
+        prepareSorting: function()
+        {
+            /** Prepare sorting indicies data */
+            this.config.sortingIndices.unshift({
+                name: this.config.indexName + '_products',
+                label: this.config.translations.relevance
+            });
+        },
+
+        setupFacets: function()
+        {
+            /** Setup attributes for current refinements widget **/
+            var attributes = [];
+
+            for (var i = 0; i < this.config.facets.length; i++) {
+                var facet = this.config.facets[i];
+                var name = facet.attribute;
+
+                if (name === 'categories') {
+                    name = 'categories.level0';
+                }
+
+                if (name === 'price') {
+                    name = facet.attribute + this.config.priceKey
+                }
+
+                attributes.push({
+                    name: name,
+                    label: facet.label ? facet.label : facet.attribute
+                });
+
+            }
+
+            this.refinementAttributes = attributes;
+        },
+
+        configureWidgets: function()
+        {
+
+            var self = this;
+            var widgetConfiguration = {
+                // infiniteHits: {},
+                // hits: {},
+                /**
+                 * Search box
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/searchBox.html
+                 **/
+                searchBox: {
+                    container: this.instantsearchSelector,
+                    placeholder: this.config.translations.searchFor
+                },
+                /**
+                 * Stats
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/stats.html
+                 **/
+                stats: {
+                    container: '#algolia-stats',
+                    templates: {
+                        body: document.getElementById('instant-stats-template').innerHTML
+                    },
+                    transformData: function (data) {
+                        data.first = data.page * data.hitsPerPage + 1;
+                        data.last = Math.min(data.page * data.hitsPerPage + data.hitsPerPage, data.nbHits);
+                        data.seconds = data.processingTimeMS / 1000;
+
+                        data.translations = window.algoliaConfig.translations;
+
+                        return data;
+                    }
+                },
+                /**
+                 * Sorting
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/sortBySelector.html
+                 **/
+                sortBySelector: {
+                    container: '#algolia-sorts',
+                    indices: this.config.sortingIndices,
+                    cssClass: 'form-control'
+                },
+                /**
+                 * Widget name: Current refinements
+                 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
+                 **/
+                currentRefinedValues: {
+                    container: '#current-refinements',
+                    cssClasses: {
+                        root: 'facet'
+                    },
+                    templates: {
+                        header: '<div class="name">' + this.config.translations.selectedFilters + '</div>',
+                        clearAll: this.config.translations.clearAll,
+                        item: document.getElementById('current-refinements-template').innerHTML
+                    },
+                    attributes: this.refinementAttributes,
+                    onlyListedAttributes: true
+                }
+            };
+
+            this.widgetConfiguration = widgetConfiguration;
+
+            this.addCustomWidgets();
+            // this.handleHits();
+
+            this.buildFacets();
+
+            // this.initializeWidgets();
+
+        },
+
+        addCustomWidgets: function()
+        {
+            var self = this;
+            this.widgetConfiguration['custom'] = [
+                /**
+                 * Custom widget - this widget is used to refine results for search page or catalog page
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
+                 **/
+                {
+                    getConfiguration: function () {
+                        if (self.config.request.query.length > 0 && location.hash.length < 1) {
+                            return {query: self.config.request.query}
+                        }
+                        return {};
+                    },
+                    init: function (data) {
+                        var page = data.helper.state.page;
+
+                        if (self.config.request.refinementKey.length > 0) {
+                            data.helper.toggleRefine(self.config.request.refinementKey, self.config.request.refinementValue);
+                        }
+
+                        data.helper.addNumericRefinement((self.config.isCategoryPage ? 'visibility_catalog' : 'visibility_search'), '=', 1);
+                        data.helper.setPage(page);
+                    },
+                    render: function (data) {
+                        if (!self.config.isSearchPage) {
+                            if (data.results.query.length === 0) {
+                                document.querySelector(self.wrapperClasses.replacedContent).style.display = 'block';
+                                document.querySelector(self.wrapperClasses.selectorResults).style.display = 'none';
+                            }
+                            else {
+                                document.querySelector(self.wrapperClasses.replacedContent).style.display = 'none';
+                                document.querySelector(self.wrapperClasses.selectorResults).style.display = 'block';
+                            }
+                        }
+                    }
+                },
+                /**
+                 * Custom widget - Suggestions
+                 * This widget renders suggestion queries which might be interesting for your customer
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/guides/custom-widget.html
+                 **/
+                {
+                    suggestions: [],
+                    init: function () {
+                        if (self.config.showSuggestionsOnNoResultsPage) {
+                            var $this = this;
+                            var popularQueries = self.config.popularQueries.slice(0, Math.min(4, self.config.popularQueries.length));
+
+                            for (var i = 0; i < popularQueries.length; i++) {
+                                var query = self.helper.sanitizeQueryHtml(popularQueries[i]);
+                                $this.suggestions.push('<a href="' + self.config.baseUrl + '/catalogsearch/result/?q=' + encodeURIComponent(query) + '">' + query + '</a>');
+                            }
+                        }
+                    },
+                    render: function (data) {
+                        if (data.results.hits.length === 0) {
+                            var content = '<div class="no-results">';
+                            content += '<div><b>' + self.config.translations.noProducts + ' "' + self.helper.sanitizeQueryHtml(data.results.query) + '</b>"</div>';
+                            content += '<div class="popular-searches">';
+
+                            if (self.config.showSuggestionsOnNoResultsPage && this.suggestions.length > 0) {
+                                content += '<div>' + self.config.translations.popularQueries + '</div>' + this.suggestions.join(', ');
+                            }
+
+                            content += '</div>';
+                            content += self.config.translations.or + ' <a href="' + self.config.baseUrl + '/catalogsearch/result/?q=__empty__">' + self.config.translations.seeAll + '</a>'
+
+                            content += '</div>';
+
+                            document.getElementById('instant-search-results-container').innerHTML = content;
+                        }
+                    }
+                }
+            ];
+        },
+
+        handleHits: function()
+        {
+            var self = this;
+
+            if (this.config.instant.infiniteScrollEnabled === true) {
+
+                /**
+                 * Products' infinite hits
+                 * This widget renders all products into result page
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/infiniteHits.html
+                 **/
+                this.widgetConfiguration.infiniteHits = {
+                    container: '#instant-search-results-container',
+                    templates: {
+                        item: document.getElementById('instant-hit-template').innerHTML
+                    },
+                    transformData: {
+                        item: function (hit) {
+                            hit = transformHit(hit, self.config.priceKey, search.helper);
+                            hit.isAddToCartEnabled = self.config.instant.isAddToCartEnabled;
+
+                            hit.algoliaConfig = self.config;
+
+                            hit.__position = hit.__hitIndex + 1;
+
+                            return hit;
+                        }
+                    },
+                    showMoreLabel: self.config.translations.showMore,
+                    escapeHits: true
+                };
+
+                delete this.widgetConfiguration.hits;
+
+            } else {
+
+                /**
+                 * Products' hits
+                 * This widget renders all products into result page
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/hits.html
+                 **/
+                this.widgetConfiguration.hits = {
+                    container: '#instant-search-results-container',
+                    templates: {
+                        item: document.getElementById('instant-hit-template').innerHTML
+                    },
+                    transformData: {
+                        item: function (hit) {
+                            hit = transformHit(hit, self.config.priceKey, search.helper);
+                            hit.isAddToCartEnabled = self.config.instant.isAddToCartEnabled;
+
+                            hit.algoliaConfig = self.config;
+
+                            var state = search.helper.state;
+                            hit.__position = (state.page * state.hitsPerPage) + hit.__hitIndex + 1;
+
+                            return hit;
+                        }
+                    }
+                };
+
+                /**
+                 * Pagination
+                 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/pagination.html
+                 **/
+                this.widgetConfiguration.pagination = {
+                    container: '#instant-search-pagination-container',
+                    cssClass: 'algolia-pagination',
+                    showFirstLast: false,
+                    maxPages: 1000,
+                    labels: {
+                        previous: this.config.translations.previousPage,
+                        next: this.config.translations.nextPage
+                    },
+                    scrollTo: 'body'
+                };
+
+                delete this.widgetConfiguration.infiniteHits;
+            }
+        },
+
+        buildFacets: function()
+        {
+
+            var facetWrapper = document.getElementById('instant-search-facets-container');
+            var facets = this.config.facets;
+
+            for (var i = 0; i < facets.length; i++) {
+                var facet = facets[i];
+
+                if (facet.attribute.indexOf("price") !== -1)
+                    facet.attribute = facet.attribute + this.config.priceKey;
+
+                facet.wrapper = facetWrapper;
+
+
+
+
+            }
+
+        },
+
+        initializeWidgets: function() {
+
+	        this.widgetConfiguration = this.helper.triggerHooks('beforeWidgetInitialization', this.widgetConfiguration, algoliaBundle);
+
+	        var widgetKeys = Object.keys(this.widgetConfiguration);
+	        for (var i = 0; i < widgetKeys.length; i++) {
+	            var widgetType = widgetKeys[i];
+	            var widgetConfig = this.widgetConfiguration[widgetType];
+
+                if (Array.isArray(widgetConfig) === true) {
+                    for (var w = 0; w < widgetConfig.length; w++) {
+                        this.addWidget(widgetType, widgetConfig[w]);
+                    }
+                } else {
+                    this.addWidget(widgetType, widgetConfig);
+                }
+            }
+        },
+
+        addWidget: function(type, config)
+        {
+            if (type === 'custom') {
+                this.instantsearch.addWidget(config);
+                return;
+            }
+
+            this.instantsearch.addWidget(algoliaBundle.instantsearch.widgets[type](config));
+        },
+
+        startInstantSearch: function()
+        {
+            if (this.isStarted === true) {
+                return;
+            }
+
+            this.instantsearch = this.helper.triggerHooks('beforeInstantsearchStart', this.instantsearch, algoliaBundle)
+
+            this.instantsearch.start();
+
+            this.instantsearch = this.helper.triggerHooks('afterInstantsearchStart', this.instantsearch, algoliaBundle);
+
+
+            /* var instant_search_bar = $(instant_selector);
+            if (instant_search_bar.is(":focus") === false) {
+                focusInstantSearchBar(search, instant_search_bar);
+            }
+
+            if (algoliaConfig.autocomplete.enabled) {
+                $('#search_mini_form').addClass('search-page');
+            }
+
+            $(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
+                focusInstantSearchBar(search, instant_search_bar);
+            }); */
+
+            this.isStarted = true;
+        }
+
+
+	};
+
+
+	return function AlgoliaInstantsearch(options, config, helper) {
+	    return algoliaInstantsearch.init(options, config, helper)
+    };
+
 });

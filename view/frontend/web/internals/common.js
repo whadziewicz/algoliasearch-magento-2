@@ -45,7 +45,17 @@ var algolia = {
 		}, originalData);
 
 		return data;
-	}
+	},
+
+    // To prevent XSS issues with querys in tags
+    sanitizeQueryHtml: function(query)
+    {
+        var html = document.createElement('div');
+        html.textContent = query;
+        return html.innerHTML;
+    },
+
+
 };
 
 requirejs(['algoliaBundle'], function(algoliaBundle) {
@@ -183,32 +193,6 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			return hit;
 		};
 
-		$(algoliaConfig.autocomplete.selector).each(function () {
-			$(this).closest('form').submit(function (e) {
-				var query = $(this).find(algoliaConfig.autocomplete.selector).val();
-
-				query = encodeURIComponent(query);
-
-				if (algoliaConfig.instant.enabled && query === '')
-					query = '__empty__';
-
-				window.location = $(this).attr('action') + '?q=' + query;
-
-				return false;
-			});
-		});
-
-		function handleInputCrossAutocomplete(input) {
-			if (input.val().length > 0) {
-				input.closest('#algolia-searchbox').find('.clear-query-autocomplete').show();
-				input.closest('#algolia-searchbox').find('.magnifying-glass').hide();
-			}
-			else {
-				input.closest('#algolia-searchbox').find('.clear-query-autocomplete').hide();
-				input.closest('#algolia-searchbox').find('.magnifying-glass').show();
-			}
-		}
-
 		window.focusInstantSearchBar = function (search, instant_search_bar) {
 			if ($(window).width() > 992) {
 				instant_search_bar.focusWithoutScrolling();
@@ -226,14 +210,6 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			return div;
 		};
 
-		$(document).on('click', '.clear-query-autocomplete', function () {
-			var input = $(this).closest('#algolia-searchbox').find('input');
-
-			input.val('');
-			input.get(0).dispatchEvent(new Event('input'));
-
-			handleInputCrossAutocomplete(input);
-		});
 
 		/** Handle small screen **/
 		$('body').on('click', '#refine-toggle', function () {

@@ -2,9 +2,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <script src="Algolia_AlgoliaSearch::internals/common.js"/>
-
-        <script src="Algolia_AlgoliaSearch::instantsearch.js"/>
-
         <css src="Algolia_AlgoliaSearch::internals/algoliasearch.css" />
     </head>
     <body>
@@ -31,6 +28,7 @@
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.stats" template="Algolia_AlgoliaSearch::instant/stats.phtml"/>
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.facet" template="Algolia_AlgoliaSearch::instant/facet.phtml"/>
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.refinements" template="Algolia_AlgoliaSearch::instant/refinements.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="algolia.instant.initialization" template="Algolia_AlgoliaSearch::instant/initialization.phtml"/>
         </referenceBlock>
     </body>
 </page>

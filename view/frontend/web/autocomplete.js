@@ -8,19 +8,21 @@ define([
         options: {},
         config: {},
         client: null,
-        hooks: null,
+        helper: null,
 		sources: [],
         selectors: {
             dropdownMenu: '#menu-template',
             dropdownMenuContainer: '.aa-dropdown-menu',
-            autocompleteContainer: '#algolia-autocomplete-container'
+            autocompleteContainer: '#algolia-autocomplete-container',
+            clearQueryToggle: '.clear-query-autocomplete',
+            magnifyingGlass: '.magnifying-glass'
         },
 
-        init: function(options, configuration, hooks)
+        init: function(options, configuration, helper)
         {
             this.options = options;
             this.config = configuration;
-            this.hooks = hooks;
+            this.helper = helper;
 
             if (!this.config.autocomplete.enabled) {
                 return false;
@@ -32,24 +34,20 @@ define([
             this.addRequiredSections();
             this.setupAutocompleteSearch();
 
+            this.observeInputEvents();
+
             return this;
         },
 
         setTemplates: function()
         {
             this.config.autocomplete.templates = {
-                suggestions: algoliaBundle.Hogan.compile(this.getTemplateHtml(this.options.suggestionsTemplate)),
-                products: algoliaBundle.Hogan.compile(this.getTemplateHtml(this.options.productsTemplate)),
-                categories: algoliaBundle.Hogan.compile(this.getTemplateHtml(this.options.categoriesTemplate)),
-                pages: algoliaBundle.Hogan.compile(this.getTemplateHtml(this.options.pagesTemplate)),
-                additionalSection: algoliaBundle.Hogan.compile(this.getTemplateHtml(this.options.additionalSectionTemplate))
+                suggestions: algoliaBundle.Hogan.compile(this._getTemplateHtml(this.options.suggestionsTemplate)),
+                products: algoliaBundle.Hogan.compile(this._getTemplateHtml(this.options.productsTemplate)),
+                categories: algoliaBundle.Hogan.compile(this._getTemplateHtml(this.options.categoriesTemplate)),
+                pages: algoliaBundle.Hogan.compile(this._getTemplateHtml(this.options.pagesTemplate)),
+                additionalSection: algoliaBundle.Hogan.compile(this._getTemplateHtml(this.options.additionalSectionTemplate))
             };
-        },
-
-        getTemplateHtml: function(templateId)
-        {
-            var element = document.getElementById(templateId.replace('#', ''));
-            return element.innerHTML;
         },
 
         initClient: function()
@@ -253,7 +251,7 @@ define([
 
                     var template = '<div class="aa-no-results-products">';
                     template += '<div class="title">' + self.config.translations.noProducts
-                        + ' "' + self.sanitizeQueryHtml(query.query) + '"'
+                        + ' "' + self.helper.sanitizeQueryHtml(query.query) + '"'
                         + '</div>';
 
 
@@ -263,7 +261,7 @@ define([
                         var popularQueries = algoliaConfig.popularQueries.slice(0, Math.min(3, algoliaConfig.popularQueries.length));
                         for (var pq = 0; pq < popularQueries.length; popularQueries++) {
 
-                            var query = self.sanitizeQueryHtml(popularQueries[pq]);
+                            var query = self.helper.sanitizeQueryHtml(popularQueries[pq]);
                             suggestions.push('<a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=' + encodeURIComponent(query) + '">' + query + '</a>');
 
                         }
@@ -388,14 +386,6 @@ define([
 
         },
 
-        // To prevent XSS issues with querys in tags
-        sanitizeQueryHtml: function(query)
-        {
-            var html = document.createElement('div');
-            html.textContent = query;
-            return html.innerHTML;
-        },
-
         setupAutocompleteSearch: function()
         {
             var self = this,
@@ -417,8 +407,8 @@ define([
                 options.templates.footer = '<div class="footer_algolia"><a href="https://www.algolia.com/?utm_source=magento&utm_medium=link&utm_campaign=magento_autocompletion_menu" title="Search by Algolia" target="_blank"><img src="'  +algoliaConfig.urls.logo + '"  alt="Search by Algolia" /></a></div>';
             }
 
-            var sources = self.hooks.triggerHooks('beforeAutocompleteSources', this.sources, self.client, algoliaBundle);
-            options = self.hooks.triggerHooks('beforeAutocompleteOptions', options);
+            var sources = self.helper.triggerHooks('beforeAutocompleteSources', this.sources, self.client, algoliaBundle);
+            options = self.helper.triggerHooks('beforeAutocompleteOptions', options);
 
             // Keep for backward compatibility
             if (typeof algoliaHookBeforeAutocompleteStart === 'function') {
@@ -533,13 +523,84 @@ define([
 
                 productSection.style.minHeight = height + 'px';
             }
+        },
+
+        observeInputEvents: function()
+        {
+            var self = this,
+                autocompleteInputs = document.getElementsByClassName(this.config.autocomplete.selector.replace('.', ''));
+
+            for (var i = 0; i < autocompleteInputs.length; i++) {
+                var input = autocompleteInputs[i];
+                var searchForm = this._closeParentTag(input, 'form');
+
+                searchForm.addEventListener('submit', function(e) {
+
+                    var searchInput = this.querySelector(self.config.autocomplete.selector);
+                    var query  = searchInput.value;
+
+                    query = encodeURIComponent(query);
+
+                    if (self.config.instant.enabled && query === '')
+                        query = '__empty__';
+
+                    window.location = this.getAttribute('action') + '?q=' + query;
+                    return false;
+                });
+
+                input.addEventListener('input', function(e) {
+                    self._handleInputCrossAutocomplete(this);
+                });
+
+            }
+
+            var clearToggle = document.querySelector(this.selectors.clearQueryToggle);
+            clearToggle.addEventListener('click', function(e) {
+                var searchInput = self._closeParentTag(this, 'form').querySelector('input');
+
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+
+                self._handleInputCrossAutocomplete(searchInput);
+            });
+
+        },
+
+        _getTemplateHtml: function(templateId)
+        {
+            var element = document.getElementById(templateId.replace('#', ''));
+            return element.innerHTML;
+        },
+
+        _handleInputCrossAutocomplete: function(input)
+        {
+            var searchForm = this._closeParentTag(input, 'form');
+            if (input.value.length > 0) {
+                searchForm.querySelector(this.selectors.clearQueryToggle).style.display = 'block';
+                searchForm.querySelector(this.selectors.magnifyingGlass).style.display = 'none';
+            } else {
+                searchForm.querySelector(this.selectors.clearQueryToggle).style.display = 'none';
+                searchForm.querySelector(this.selectors.magnifyingGlass).style.display = 'block';
+            }
+        },
+
+        _closeParentTag: function(element, tag)
+        {
+            while (element.tagName.toLowerCase() != tag) {
+                element = element.parentNode;
+                if (!element) {
+                    return null;
+                }
+            }
+
+            return element;
         }
 
     };
 
-    return function AlgoliaAutocomplete(options, configuration, hooks)
-    {
-        return algoliaAutocomplete.init(options, configuration, hooks);
+    return function AlgoliaAutocomplete(options, config, helper) {
+        return algoliaAutocomplete.init(options, config, helper);
     };
+
 
 });

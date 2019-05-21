@@ -2,10 +2,9 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use AlgoliaSearch\AlgoliaException;
-use AlgoliaSearch\Client;
-use AlgoliaSearch\ClientFactory;
-use AlgoliaSearch\Version;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\SearchClient;
+use Algolia\AlgoliaSearch\Support\UserAgent;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Message\ManagerInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class AlgoliaHelper extends AbstractHelper
 {
-    /** @var Client */
+    /** @var SearchClient */
     private $client;
 
     /** @var ConfigHelper */
@@ -24,9 +23,6 @@ class AlgoliaHelper extends AbstractHelper
 
     /** @var ConsoleOutput */
     private $consoleOutput;
-
-    /** @var ClientFactory */
-    private $clientFactory;
 
     /** @var int */
     private $maxRecordSize;
@@ -47,15 +43,13 @@ class AlgoliaHelper extends AbstractHelper
         Context $context,
         ConfigHelper $configHelper,
         ManagerInterface $messageManager,
-        ConsoleOutput $consoleOutput,
-        ClientFactory $clientFactory
+        ConsoleOutput $consoleOutput
     ) {
         parent::__construct($context);
 
         $this->config = $configHelper;
         $this->messageManager = $messageManager;
         $this->consoleOutput = $consoleOutput;
-        $this->clientFactory = $clientFactory;
 
         $this->resetCredentialsFromConfig();
 
@@ -65,10 +59,10 @@ class AlgoliaHelper extends AbstractHelper
             $this->config->getNonCastableAttributes()
         );
 
-        Version::addPrefixUserAgentSegment('Magento2 integration', $this->config->getExtensionVersion());
-        Version::addSuffixUserAgentSegment('PHP', phpversion());
-        Version::addSuffixUserAgentSegment('Magento', $this->config->getMagentoVersion());
-        Version::addSuffixUserAgentSegment('Edition', $this->config->getMagentoEdition());
+        UserAgent::addCustomUserAgent('Magento2 integration', $this->config->getExtensionVersion());
+        UserAgent::addCustomUserAgent('PHP', phpversion());
+        UserAgent::addCustomUserAgent('Magento', $this->config->getMagentoVersion());
+        UserAgent::addCustomUserAgent('Edition', $this->config->getMagentoEdition());
     }
 
     public function getRequest()
@@ -79,10 +73,10 @@ class AlgoliaHelper extends AbstractHelper
     public function resetCredentialsFromConfig()
     {
         if ($this->config->getApplicationID() && $this->config->getAPIKey()) {
-            $this->client = $this->clientFactory->create([
-                'applicationID' => $this->config->getApplicationID(),
-                'apiKey' => $this->config->getAPIKey(),
-            ]);
+            $this->client = SearchClient::create(
+                $this->config->getApplicationID(),
+                $this->config->getAPIKey()
+            );
         }
     }
 
@@ -104,7 +98,7 @@ class AlgoliaHelper extends AbstractHelper
     {
         $this->checkClient(__FUNCTION__);
 
-        return $this->client->listIndexes();
+        return $this->client->listIndices();
     }
 
     public function query($indexName, $q, $params)
@@ -139,7 +133,9 @@ class AlgoliaHelper extends AbstractHelper
             $settings = $this->mergeSettings($indexName, $settings);
         }
 
-        $res = $index->setSettings($settings, $forwardToReplicas);
+        $res = $index->setSettings($settings, [
+            'forwardToReplicas' => $forwardToReplicas,
+        ]);
 
         self::$lastUsedIndexName = $indexName;
         self::$lastTaskId = $res['taskID'];
@@ -148,7 +144,7 @@ class AlgoliaHelper extends AbstractHelper
     public function deleteIndex($indexName)
     {
         $this->checkClient(__FUNCTION__);
-        $res = $this->client->deleteIndex($indexName);
+        $res = $this->client->initIndex($indexName)->delete();
 
         self::$lastUsedIndexName = $indexName;
         self::$lastTaskId = $res['taskID'];
@@ -228,17 +224,17 @@ class AlgoliaHelper extends AbstractHelper
         if ($this->config->isPartialUpdateEnabled()) {
             $res = $index->partialUpdateObjects($objects);
         } else {
-            $res = $index->addObjects($objects);
+            $res = $index->saveObjects($objects);
         }
 
         self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::$lastTaskId = $res->taskID;
     }
 
     public function saveRule($rule, $indexName, $forwardToReplicas = false)
     {
         $index = $this->getIndex($indexName);
-        $res = $index->saveRule($rule['objectID'], $rule, $forwardToReplicas);
+        $res = $index->saveRule($rule, ['forwardToReplicas' => $forwardToReplicas]);
 
         self::$lastUsedIndexName = $indexName;
         self::$lastTaskId = $res['taskID'];
@@ -247,7 +243,10 @@ class AlgoliaHelper extends AbstractHelper
     public function batchRules($rules, $indexName)
     {
         $index = $this->getIndex($indexName);
-        $res = $index->batchRules($rules, false, false);
+        $res = $index->saveRules($rules, [
+            'forwardToReplicas' => false,
+            'clearExistingRules' => false,
+        ]);
 
         self::$lastUsedIndexName = $indexName;
         self::$lastTaskId = $res['taskID'];
@@ -280,12 +279,11 @@ class AlgoliaHelper extends AbstractHelper
         $hitsPerPage = 100;
         $page = 0;
         do {
-            $complexSynonyms = $index->searchSynonyms(
-                '',
-                ['altCorrection1', 'altCorrection2', 'placeholder'],
-                $page,
-                $hitsPerPage
-            );
+            $complexSynonyms = $index->searchSynonyms('', [
+                'type' => 'altCorrection1, altCorrection2, placeholder',
+                'page' => $page,
+                'hitsPerPage' => $hitsPerPage,
+            ]);
 
             foreach ($complexSynonyms['hits'] as $hit) {
                 unset($hit['_highlightResult']);
@@ -297,9 +295,14 @@ class AlgoliaHelper extends AbstractHelper
         } while (($page * $hitsPerPage) < $complexSynonyms['nbHits']);
 
         if (!$synonyms) {
-            $res = $index->clearSynonyms(true);
+            $res = $index->clearSynonyms([
+                'forwardToReplicas' => true,
+            ]);
         } else {
-            $res = $index->batchSynonyms($synonyms, true, true);
+            $res = $index->saveSynonyms($synonyms, [
+                'forwardToReplicas' => true,
+                'replaceExistingSynonyms' => true,
+            ]);
         }
 
         self::$lastUsedIndexName = $indexName;
@@ -316,7 +319,12 @@ class AlgoliaHelper extends AbstractHelper
         $hitsPerPage = 100;
         $page = 0;
         do {
-            $fetchedSynonyms = $fromIndex->searchSynonyms('', [], $page, $hitsPerPage);
+            $fetchedSynonyms = $fromIndex->searchSynonyms('', [
+                'type' => '',
+                'page' => $page,
+                'hitsPerPage' => $hitsPerPage,
+            ]);
+
             foreach ($fetchedSynonyms['hits'] as $hit) {
                 unset($hit['_highlightResult']);
 
@@ -329,7 +337,10 @@ class AlgoliaHelper extends AbstractHelper
         if (!$synonymsToSet) {
             $res = $toIndex->clearSynonyms(true);
         } else {
-            $res = $toIndex->batchSynonyms($synonymsToSet, true, true);
+            $res = $toIndex->saveSynonyms($synonymsToSet, [
+                'forwardToReplicas' => true,
+                'replaceExistingSynonyms' => true,
+            ]);
         }
 
         self::$lastUsedIndexName= $toIndex;
@@ -339,8 +350,6 @@ class AlgoliaHelper extends AbstractHelper
     /**
      * @param $fromIndexName
      * @param $toIndexName
-     *
-     * @throws AlgoliaException
      */
     public function copyQueryRules($fromIndexName, $toIndexName)
     {
@@ -369,7 +378,10 @@ class AlgoliaHelper extends AbstractHelper
         if (!$queryRulesToSet) {
             $res = $toIndex->clearRules(true);
         } else {
-            $res = $toIndex->batchRules($queryRulesToSet, true, true);
+            $res = $toIndex->saveRules($queryRulesToSet, [
+                'forwardToReplicas' => true,
+                'clearExistingRules' => true,
+            ]);
         }
 
         self::$lastUsedIndexName= $toIndex;
@@ -392,7 +404,7 @@ class AlgoliaHelper extends AbstractHelper
 
     public function clearIndex($indexName)
     {
-        $res = $this->getIndex($indexName)->clearIndex();
+        $res = $this->getIndex($indexName)->clearObjects();
 
         self::$lastUsedIndexName = $indexName;
         self::$lastTaskId = $res['taskID'];

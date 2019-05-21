@@ -2,18 +2,18 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use Algolia\AlgoliaSearch\AnalyticsClient;
 use Algolia\AlgoliaSearch\DataProvider\Analytics\IndexEntityDataProvider;
-use AlgoliaSearch\Analytics;
 
-class AnalyticsHelper extends Analytics
+class AnalyticsHelper
 {
     const ANALYTICS_SEARCH_PATH = '/2/searches';
     const ANALYTICS_HITS_PATH = '/2/hits';
     const ANALYTICS_FILTER_PATH = '/2/filters';
     const ANALYTICS_CLICKS_PATH = '/2/clicks';
 
-    /** @var AlgoliaHelper */
-    private $algoliaHelper;
+    /** @var AnalyticsClient */
+    private $analyticsClient;
 
     /** @var ConfigHelper */
     private $configHelper;
@@ -44,20 +44,17 @@ class AnalyticsHelper extends Analytics
     /**
      * AnalyticsHelper constructor.
      *
-     * @param AlgoliaHelper $algoliaHelper
      * @param ConfigHelper $configHelper
      * @param IndexEntityDataProvider $entityHelper
      * @param ProxyHelper $proxyHelper
      * @param Logger $logger
      */
     public function __construct(
-        AlgoliaHelper $algoliaHelper,
         ConfigHelper $configHelper,
         IndexEntityDataProvider $entityHelper,
         ProxyHelper $proxyHelper,
         Logger $logger
     ) {
-        $this->algoliaHelper = $algoliaHelper;
         $this->configHelper = $configHelper;
 
         $this->entityHelper = $entityHelper;
@@ -65,7 +62,7 @@ class AnalyticsHelper extends Analytics
 
         $this->logger = $logger;
 
-        parent::__construct($algoliaHelper->getClient());
+        $this->analyticsClient = AnalyticsClient::create($configHelper->getApplicationID(), $configHelper->getAPIKey());
     }
 
     /**
@@ -334,7 +331,7 @@ class AnalyticsHelper extends Analytics
                 throw new \Magento\Framework\Exception\LocalizedException($msg);
             }
 
-            $response = $this->request('GET', $path, $params);
+            $response = $this->analyticsClient->custom('GET', $path, $params);
         } catch (\Exception $e) {
             $this->errors[] = $e->getMessage();
             $this->logger->log($e->getMessage());

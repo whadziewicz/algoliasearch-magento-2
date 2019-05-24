@@ -3,7 +3,7 @@
 namespace Algolia\AlgoliaSearch\Model\Indexer;
 
 use Algolia\AlgoliaSearch\Model\Indexer\Category as CategoryIndexer;
-use Magento\Catalog\Model\Category as Category;
+use Magento\Catalog\Model\Category as CategoryModel;
 use Magento\Catalog\Model\ResourceModel\Category as CategoryResourceModel;
 use Magento\Framework\Indexer\IndexerRegistry;
 
@@ -19,7 +19,7 @@ class CategoryObserver
     public function afterSave(
         CategoryResourceModel $categoryResource,
         $result,
-        Category $category
+        CategoryModel $category
     ) {
         if (!$this->indexer->isScheduled()) {
             /** @var Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
@@ -32,7 +32,7 @@ class CategoryObserver
 
     public function beforeDelete(
         CategoryResourceModel $categoryResource,
-        Category $category
+        CategoryModel $category
     ) {
         if (!$this->indexer->isScheduled()) {
             /* we are using products position because getProductCollection() does use correct store */

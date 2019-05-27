@@ -16,4 +16,22 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Backend rendering / START -->
+    <virtualType name="categoryFilterList" type="Magento\Catalog\Model\Layer\FilterList">
+        <arguments>
+            <argument name="filterableAttributes" xsi:type="object">Algolia\AlgoliaSearch\Model\Layer\Category\FilterableAttributeList</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Algolia\AlgoliaSearch\Block\Navigation\Category" type="Algolia\AlgoliaSearch\Block\Navigation">
+        <arguments>
+            <argument name="filterList" xsi:type="object">categoryFilterList</argument>
+        </arguments>
+    </virtualType>
+
+    <preference for="Magento\LayeredNavigation\Block\Navigation\Category" type="Algolia\AlgoliaSearch\Block\Navigation\Category" />
+
+    <!-- Backend rendering / END -->
+
 </config>

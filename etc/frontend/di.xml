@@ -18,11 +18,23 @@
     </type>
 
     <!-- Backend rendering / START -->
+    <virtualType name="Algolia\AlgoliaSearch\Model\Layer\Filter\Item\AttributeFactory" type="Magento\Catalog\Model\Layer\Filter\ItemFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Item\Attribute</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Algolia\AlgoliaSearch\Model\Layer\Filter\Attribute">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">Algolia\AlgoliaSearch\Model\Layer\Filter\Item\AttributeFactory</argument>
+        </arguments>
+    </type>
+
     <virtualType name="categoryFilterList" type="Magento\Catalog\Model\Layer\FilterList">
         <arguments>
             <argument name="filterableAttributes" xsi:type="object">Algolia\AlgoliaSearch\Model\Layer\Category\FilterableAttributeList</argument>
             <argument name="filters" xsi:type="array">
-                <item name="attribute" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Attribute</item>
+                <item name="attribute" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Attribute</item>
                 <item name="price" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Price</item>
                 <item name="decimal" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Decimal</item>
                 <item name="category" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Category</item>

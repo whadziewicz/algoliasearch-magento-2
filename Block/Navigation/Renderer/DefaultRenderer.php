@@ -61,11 +61,10 @@ class DefaultRenderer extends Template implements FilterRendererInterface
         ];
 
         foreach ($filterItems as $item) {
-//            $jsLayoutConfig['items'][] = $item->toArray(['label', 'count', 'url', 'is_selected']);
             $jsLayoutConfig['items'][] = [
                 'label' => $item->getLabel(),
                 'count' => $item->getCount(),
-                'url' => $this->escapeUrl($item->getUrl()),
+                'url' => $item->getUrl(),
                 'is_selected' => $item->getData('is_selected')
             ];
         }

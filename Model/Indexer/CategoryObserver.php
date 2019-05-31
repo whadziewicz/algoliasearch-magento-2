@@ -21,10 +21,16 @@ class CategoryObserver
         $result,
         CategoryModel $category
     ) {
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: category afterSave triggered');
         if (!$this->indexer->isScheduled()) {
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: indexer is not in "On schedule" mode, proceeding with indexing');
+
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: reindexing category id "' . $category->getId() .'"');
+
             /** @var Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
             $productCollection = $category->getProductCollection();
             CategoryIndexer::$affectedProductIds = (array) $productCollection->getColumnValues('entity_id');
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: affected product ids by category save: ' . implode(', ', CategoryIndexer::$affectedProductIds));
 
             $this->indexer->reindexRow($category->getId());
         }

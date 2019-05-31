@@ -44,11 +44,14 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
 
     public function execute($categoryIds)
     {
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: in execute method of indexer');
         if (!$this->configHelper->getApplicationID()
             || !$this->configHelper->getAPIKey()
             || !$this->configHelper->getSearchOnlyAPIKey()) {
             $errorMessage = 'Algolia reindexing failed: 
                 You need to configure your Algolia credentials in Stores > Configuration > Algolia Search.';
+
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: no indexing: ' . $errorMessage);
 
             if (php_sapi_name() === 'cli') {
                 $this->output->writeln($errorMessage);
@@ -63,21 +66,25 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
 
         $storeIds = array_keys($this->storeManager->getStores());
 
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: reindexing category to store ids: ' . implode(', ', $storeIds));
+
         foreach ($storeIds as $storeId) {
             if ($this->fullAction->isIndexingEnabled($storeId) === false) {
+                \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: store id "'.$storeId.'" has disabled indexing, skipping');
                 continue;
             }
-
-            $this->rebuildAffectedProducts($storeId);
 
             $categoriesPerPage = $this->configHelper->getNumberOfElementByPage();
 
             if (is_array($categoryIds) && count($categoryIds) > 0) {
+                \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: processing specific categories indexing');
                 $this->processSpecificCategories($categoryIds, $categoriesPerPage, $storeId);
-                continue;
+            } else {
+                $this->processFullReindex($storeId, $categoriesPerPage);
             }
 
-            $this->processFullReindex($storeId, $categoriesPerPage);
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: about to process affected products');
+            $this->rebuildAffectedProducts($storeId);
         }
     }
 
@@ -102,7 +109,9 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
     private function rebuildAffectedProducts($storeId)
     {
         $affectedProductsCount = count(self::$affectedProductIds);
+        \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: number of affected products: ' . $affectedProductsCount);
         if ($affectedProductsCount > 0 && $this->configHelper->indexProductOnCategoryProductsUpdate($storeId)) {
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: adding product to queue, store id: "'.$storeId.'", product ids: ' . implode(', ', self::$affectedProductIds));
             /** @uses Data::rebuildStoreProductIndex() */
             $this->queue->addToQueue(
                 Data::class,
@@ -113,6 +122,8 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
                 ],
                 $affectedProductsCount
             );
+        } else {
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: no affected products found or indexing affected products is disabled in configuration');
         }
     }
 
@@ -124,6 +135,7 @@ class Category implements Magento\Framework\Indexer\ActionInterface, Magento\Fra
     private function processSpecificCategories($categoryIds, $categoriesPerPage, $storeId)
     {
         foreach (array_chunk($categoryIds, $categoriesPerPage) as $chunk) {
+            \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class)->info('ALGOLIA: adding to queue chunk of categories, store id: "'.$storeId.'", category ids: ' . implode(', ', $chunk));
             /** @uses Data::rebuildStoreCategoryIndex */
             $this->queue->addToQueue(
                 Data::class,

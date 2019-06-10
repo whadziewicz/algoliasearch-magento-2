@@ -82,4 +82,18 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 
         return $this;
     }
+
+    protected function _initItems()
+    {
+        parent::_initItems();
+
+        foreach ($this->_items as $item) {
+            $applyValue = $item->getValue();
+            if (($valuePos = array_search($applyValue, $this->currentFilterValue)) !== false) {
+                $item->setIsSelected(true);
+            }
+
+        }
+        return $this;
+    }
 }

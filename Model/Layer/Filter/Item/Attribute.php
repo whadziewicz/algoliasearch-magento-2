@@ -102,7 +102,20 @@ class Attribute extends \Magento\Catalog\Model\Layer\Filter\Item
 
             foreach ($paramsToAdd as $key => $value) {
                 if (isset($existingParams[$key])) {
-                    $paramsToAdd[$key] =  $existingParams[$key] . '~' . $paramsToAdd[$key];
+                    $existingParamsArray = explode("~", $existingParams[$key]);
+                    // check if the value is already in the applied filter, if it is, this means we have to remove it
+                    if (in_array($paramsToAdd[$key], $existingParamsArray) && $this->getIsSelected()) {
+                        foreach ($existingParamsArray as $arrayParamKey => $arrayParam) {
+                            if ($arrayParam == $paramsToAdd[$key]) {
+                                unset($existingParamsArray[$arrayParamKey]);
+                            }
+                        }
+                        $paramsToAdd[$key] = !empty($existingParamsArray) ?
+                            implode('~', $existingParamsArray) :
+                            null;
+                    } else {
+                        $paramsToAdd[$key] =  $existingParams[$key] . '~' . $paramsToAdd[$key];
+                    }
                 }
             }
 

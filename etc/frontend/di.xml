@@ -51,7 +51,7 @@
     <preference for="Magento\LayeredNavigation\Block\Navigation\Category" type="Algolia\AlgoliaSearch\Block\Navigation\Category" />
 
     <type name="Magento\LayeredNavigation\Block\Navigation\FilterRenderer">
-        <plugin name="algolia_layered_renderer" type="Algolia\AlgoliaSearch\Plugin\BackendFilterRenderer" sortOrder="1" />
+        <plugin name="algolia_layered_renderer" type="Algolia\AlgoliaSearch\Plugin\BackendFilterRenderer" sortOrder="0" />
     </type>
 
     <!-- Backend rendering / END -->

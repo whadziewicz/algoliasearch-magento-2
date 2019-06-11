@@ -96,4 +96,22 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
         }
         return $this;
     }
+
+    protected function _getItemsData()
+    {
+        return $this->sortItemsData(parent::_getItemsData());
+    }
+
+    private function sortItemsData(array $items)
+    {
+        usort($items, function ($item1, $item2) {
+            if (!isset($item1['count']) or !isset($item2['count'])) {
+                return 0;
+            }
+
+            return $item1['count'] > $item2['count'] ? -1 : 1;
+        });
+
+        return $items;
+    }
 }

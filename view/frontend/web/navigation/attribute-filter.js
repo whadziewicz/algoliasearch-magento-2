@@ -120,7 +120,6 @@ define([
         }.bind(this))
       }
 
-      console.log(items);
       return items;
     },
 

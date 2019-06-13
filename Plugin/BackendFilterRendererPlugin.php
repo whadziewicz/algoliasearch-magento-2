@@ -6,7 +6,7 @@ use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-class BackendFilterRenderer
+class BackendFilterRendererPlugin
 {
     /** @var LayoutInterface */
     protected $layout;

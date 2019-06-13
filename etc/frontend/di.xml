@@ -51,7 +51,15 @@
     <preference for="Magento\LayeredNavigation\Block\Navigation\Category" type="Algolia\AlgoliaSearch\Block\Navigation\Category" />
 
     <type name="Magento\LayeredNavigation\Block\Navigation\FilterRenderer">
-        <plugin name="algolia_layered_renderer" type="Algolia\AlgoliaSearch\Plugin\BackendFilterRenderer" sortOrder="0" />
+        <plugin name="algolia_layered_renderer" type="Algolia\AlgoliaSearch\Plugin\BackendFilterRendererPlugin" sortOrder="0" />
+    </type>
+
+    <type name="Magento\Catalog\Block\Product\ProductList\Toolbar">
+        <plugin name="algolia_toolbar" type="Algolia\AlgoliaSearch\Plugin\ToolbarPlugin" />
+    </type>
+
+    <type name="Magento\Catalog\Model\Layer">
+        <plugin name="algolia_collection_ordering" type="Algolia\AlgoliaSearch\Plugin\LayerPlugin" />
     </type>
 
     <!-- Backend rendering / END -->

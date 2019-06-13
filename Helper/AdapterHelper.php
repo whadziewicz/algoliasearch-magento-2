@@ -8,6 +8,9 @@ use Magento\CatalogSearch\Helper\Data as CatalogSearchDataHelper;
 
 class AdapterHelper
 {
+    const INSTANTSEARCH_ORDER_PARAM = 'sortBy';
+    const BACKEND_ORDER_PARAM = 'product_list_order';
+
     /** @var CatalogSearchDataHelper */
     private $catalogSearchHelper;
 
@@ -62,12 +65,28 @@ class AdapterHelper
                 $algoliaQuery = $this->filtersHelper->getLandingPageQuery();
             }
 
-            if (!is_null($this->filtersHelper->getRequest()->getParam('sortBy'))) {
-                $targetedIndex = $this->filtersHelper->getRequest()->getParam('sortBy');
+            $orderParam = $this->getOrderParam($storeId);
+            if (!is_null($this->filtersHelper->getRequest()->getParam($orderParam))) {
+                $targetedIndex = $this->filtersHelper->getRequest()->getParam($orderParam);
             }
         }
 
         return $this->algoliaHelper->getSearchResult($algoliaQuery, $storeId, $searchParams, $targetedIndex);
+    }
+
+    /**
+     * Get the sort order parameter
+     *
+     * @param int $storeId
+     *
+     * @return string
+     */
+    private function getOrderParam($storeId)
+    {
+        return !$this->configHelper->isInstantEnabled($storeId)
+            && $this->configHelper->isBackendRenderingEnabled($storeId) ?
+            self::BACKEND_ORDER_PARAM :
+            self::INSTANTSEARCH_ORDER_PARAM;
     }
 
     /**

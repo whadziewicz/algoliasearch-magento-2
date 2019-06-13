@@ -100,6 +100,13 @@ class AdapterHelper
             $this->filtersHelper->getFacetFilters($storeId)
         );
 
+        // Handle disjunctive facets
+        $searchParams = array_merge(
+            $searchParams,
+            $this->filtersHelper->getDisjunctiveFacets($storeId)
+        );
+
+
         // Handle price filtering
         $searchParams = array_merge(
             $searchParams,
@@ -153,7 +160,8 @@ class AdapterHelper
         return
             $this->filtersHelper->getRequest()->getControllerName() === 'category'
             && $this->configHelper->replaceCategories($storeId) === true
-            && $this->configHelper->isInstantEnabled($storeId) === true;
+            && ($this->configHelper->isInstantEnabled($storeId) === true
+                || $this->configHelper->isBackendRenderingEnabled($storeId) === true);
     }
 
     /**

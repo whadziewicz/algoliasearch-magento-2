@@ -185,6 +185,31 @@ class FiltersHelper
     }
 
     /**
+     * Get the disjunctive facets
+     *
+     * @param int $storeId
+     * @param string[] $parameters
+     *
+     * @return array
+     */
+    public function getDisjunctiveFacets($storeId, $parameters = null)
+    {
+        $disjunctiveFacets = [];
+        // If the parameters variable is null, fetch them from the request
+        if (is_null($parameters)) {
+            $parameters = $this->request->getParams();
+        }
+
+        foreach ($this->config->getFacets($storeId) as $facet) {
+            if (isset($parameters[$facet['attribute']]) && $facet['type'] == 'disjunctive') {
+                $disjunctiveFacets['disjunctiveFacets'][] = $facet['attribute'];
+            }
+        }
+
+        return $disjunctiveFacets;
+    }
+
+    /**
      * Get the price filters from the url
      *
      * @param int $storeId

@@ -45,9 +45,13 @@ class BackendFilterRendererPlugin
         \Closure $proceed,
         \Magento\Catalog\Model\Layer\Filter\FilterInterface $filter
     ) {
-        $attributeCode = $filter->getAttributeModel()->getAttributeCode();
+
+        if ($filter instanceof \Magento\CatalogSearch\Model\Layer\Filter\Category) {
+            return $proceed($filter);
+        }
 
         if ($this->configHelper->isBackendRenderingEnabled()) {
+            $attributeCode = $filter->getAttributeModel()->getAttributeCode();
             $facets = $this->configHelper->getFacets($this->storeManager->getStore()->getId());
 
             foreach ($facets as $facet) {

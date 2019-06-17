@@ -110,7 +110,7 @@ class AdapterHelper
         // Handle category context
         $searchParams = array_merge(
             $searchParams,
-            $this->filtersHelper->getCategoryFilters()
+            $this->filtersHelper->getCategoryFilters($storeId)
         );
 
         // Handle facet filtering

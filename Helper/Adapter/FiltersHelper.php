@@ -72,12 +72,22 @@ class FiltersHelper
      *
      * @return array
      */
-    public function getCategoryFilters()
+    public function getCategoryFilters($storeId)
     {
         $categoryFilter = [];
+        $categoryId = null;
         $category = $this->registry->registry('current_category');
+
         if ($category) {
-            $categoryFilter['facetFilters'][] = 'categoryIds:' . $category->getEntityId();
+            $categoryId = $category->getEntityId();
+        }
+
+        if (!is_null($this->request->getParam('cat')) && $this->config->isBackendRenderingEnabled($storeId)) {
+            $categoryId = $this->request->getParam('cat');
+        }
+
+        if (!is_null($categoryId)) {
+            $categoryFilter['facetFilters'][] = 'categoryIds:' . $categoryId;
         }
 
         return $categoryFilter;

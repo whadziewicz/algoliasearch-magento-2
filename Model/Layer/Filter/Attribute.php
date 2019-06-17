@@ -2,6 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Model\Layer\Filter;
 
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+
 class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 {
     /** @var array */
@@ -13,6 +15,9 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
     /** @var \Magento\Framework\Filter\StripTags */
     private $tagFilter;
 
+    /** @var ConfigHelper */
+    private $configHelper;
+
     /**
      * Constructor.
      *
@@ -22,6 +27,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
      * @param \Magento\Catalog\Model\Layer\Filter\Item\DataBuilder $itemDataBuilder
      * @param \Magento\Framework\Filter\StripTags $tagFilter
      * @param \Magento\Framework\Escaper $escaper
+     * @param ConfigHelper $configHelper
      * @param array $data
      */
     public function __construct(
@@ -31,6 +37,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
         \Magento\Catalog\Model\Layer\Filter\Item\DataBuilder $itemDataBuilder,
         \Magento\Framework\Filter\StripTags $tagFilter,
         \Magento\Framework\Escaper $escaper,
+        ConfigHelper $configHelper,
         array $data = []
     ) {
         parent::__construct(
@@ -44,6 +51,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 
         $this->tagFilter = $tagFilter;
         $this->escaper = $escaper;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -51,6 +59,11 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
      */
     public function apply(\Magento\Framework\App\RequestInterface $request)
     {
+        $storeId = $this->configHelper->getStoreId();
+        if (!$this->configHelper->isBackendRenderingEnabled($storeId)) {
+            return parent::apply($request);
+        }
+
         $attribute = $this->getAttributeModel();
         $attributeValue = $request->getParam($this->_requestVar);
         if (!is_null($attributeValue)) {

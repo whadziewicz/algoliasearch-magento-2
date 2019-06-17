@@ -5,6 +5,7 @@ namespace Algolia\AlgoliaSearch\Helper;
 use AlgoliaSearch\AlgoliaException;
 use AlgoliaSearch\Client;
 use AlgoliaSearch\ClientFactory;
+use AlgoliaSearch\Index;
 use AlgoliaSearch\Version;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -126,17 +127,23 @@ class AlgoliaHelper extends AbstractHelper
      * @param $settings
      * @param bool $forwardToReplicas
      * @param bool $mergeSettings
+     * @param string $mergeSettingsFrom
      *
      * @throws AlgoliaException
      */
-    public function setSettings($indexName, $settings, $forwardToReplicas = false, $mergeSettings = false)
-    {
+    public function setSettings(
+        $indexName,
+        $settings,
+        $forwardToReplicas = false,
+        $mergeSettings = false,
+        $mergeSettingsFrom = ''
+    ) {
         $this->checkClient(__FUNCTION__);
 
         $index = $this->getIndex($indexName);
 
         if ($mergeSettings === true) {
-            $settings = $this->mergeSettings($indexName, $settings);
+            $settings = $this->mergeSettings($indexName, $settings, $mergeSettingsFrom);
         }
 
         $res = $index->setSettings($settings, $forwardToReplicas);
@@ -185,12 +192,17 @@ class AlgoliaHelper extends AbstractHelper
         return $this->getIndex($indexName)->getSettings();
     }
 
-    public function mergeSettings($indexName, $settings)
+    public function mergeSettings($indexName, $settings, $mergeSettingsFrom = '')
     {
         $onlineSettings = [];
 
         try {
-            $onlineSettings = $this->getSettings($indexName);
+            $sourceIndex = $indexName;
+            if ($mergeSettingsFrom !== '') {
+                $sourceIndex = $mergeSettingsFrom;
+            }
+
+            $onlineSettings = $this->getSettings($sourceIndex);
         } catch (\Exception $e) {
         }
 
@@ -402,6 +414,9 @@ class AlgoliaHelper extends AbstractHelper
     {
         if ($lastUsedIndexName === null && isset(self::$lastUsedIndexName)) {
             $lastUsedIndexName = self::$lastUsedIndexName;
+            if ($lastUsedIndexName instanceof Index) {
+                $lastUsedIndexName = $lastUsedIndexName->indexName;
+            }
         }
 
         if ($lastTaskId === null && isset(self::$lastTaskId)) {

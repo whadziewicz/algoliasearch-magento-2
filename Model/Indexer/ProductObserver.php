@@ -2,71 +2,98 @@
 
 namespace Algolia\AlgoliaSearch\Model\Indexer;
 
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Magento\Catalog\Model\Product as ProductModel;
 use Magento\Catalog\Model\Product\Action;
+use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
 use Magento\Framework\Indexer\IndexerRegistry;
-use Magento\Framework\Model\AbstractModel;
 
 class ProductObserver
 {
+    /** @var Product */
     private $indexer;
 
-    public function __construct(IndexerRegistry $indexerRegistry)
+    /** @var ConfigHelper */
+    private $configHelper;
+
+    /**
+     * @param IndexerRegistry $indexerRegistry
+     * @param ConfigHelper $configHelper
+     */
+    public function __construct(IndexerRegistry $indexerRegistry, ConfigHelper $configHelper)
     {
         $this->indexer = $indexerRegistry->get('algolia_products');
+        $this->configHelper = $configHelper;
     }
 
-    public function aroundSave(
-        \Magento\Catalog\Model\ResourceModel\Product $productResource,
-        \Closure $proceed,
-        AbstractModel $product
-    ) {
+    /**
+     * Using "before" method here instead of "after", because M2.1 doesn't pass "$product" argument
+     * to "after" methods. When M2.1 support will be removed, this method can be rewriten to:
+     * afterSave(ProductResource $productResource, ProductResource $result, ProductModel $product)
+     *
+     * @param ProductResource $productResource
+     * @param ProductModel $product
+     *
+     * @return ProductModel[]
+     */
+    public function beforeSave(ProductResource $productResource, ProductModel $product)
+    {
         $productResource->addCommitCallback(function () use ($product) {
-            if (!$this->indexer->isScheduled()) {
+            if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
                 $this->indexer->reindexRow($product->getId());
             }
         });
 
-        return $proceed($product);
+        return [$product];
     }
 
-    public function aroundDelete(
-        \Magento\Catalog\Model\ResourceModel\Product $productResource,
-        \Closure $proceed,
-        AbstractModel $product
-    ) {
+    /**
+     * Using "before" method here instead of "after", because M2.1 doesn't pass "$product" argument
+     * to "after" methods. When M2.1 support will be removed, this method can be rewriten to:
+     * public function afterDelete(ProductResource $productResource, ProductResource $result, ProductModel $product)
+     *
+     * @param ProductResource $productResource
+     * @param ProductModel $product
+     *
+     * @return ProductModel[]
+     */
+    public function beforeDelete(ProductResource $productResource, ProductModel $product)
+    {
         $productResource->addCommitCallback(function () use ($product) {
-            if (!$this->indexer->isScheduled()) {
+            if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
                 $this->indexer->reindexRow($product->getId());
             }
         });
 
-        return $proceed($product);
+        return [$product];
     }
 
-    public function aroundUpdateAttributes(
-        Action $subject,
-        \Closure $closure,
-        array $productIds,
-        array $attrData,
-        $storeId
-    ) {
-        $result = $closure($productIds, $attrData, $storeId);
-        if (!$this->indexer->isScheduled()) {
+    /**
+     * @param Action $subject
+     * @param Action|null $result
+     * @param array $productIds
+     *
+     * @return Action
+     */
+    public function afterUpdateAttributes(Action $subject, Action $result = null, $productIds)
+    {
+        if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
             $this->indexer->reindexList(array_unique($productIds));
         }
 
         return $result;
     }
 
-    public function aroundUpdateWebsites(
-        Action $subject,
-        \Closure $closure,
-        array $productIds,
-        array $websiteIds,
-        $type
-    ) {
-        $result = $closure($productIds, $websiteIds, $type);
-        if (!$this->indexer->isScheduled()) {
+    /**
+     * @param Action $subject
+     * @param Action|null $result
+     * @param array $productIds
+     *
+     * @return mixed
+     */
+    public function afterUpdateWebsites(Action $subject, Action $result = null, array $productIds)
+    {
+        if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
             $this->indexer->reindexList(array_unique($productIds));
         }
 

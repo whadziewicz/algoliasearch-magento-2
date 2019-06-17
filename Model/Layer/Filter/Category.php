@@ -76,4 +76,37 @@ class Category extends \Magento\CatalogSearch\Model\Layer\Filter\Category
 
         return $this;
     }
+
+    /**
+     * Get data array for building category filter items
+     *
+     * @return array
+     */
+    protected function _getItemsData()
+    {
+        /** @var \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection $productCollection */
+        $productCollection = $this->getLayer()->getProductCollection();
+        $optionsFacetedData = $productCollection->getFacetedData('category');
+        $category = $this->dataProvider->getCategory();
+
+        $categories = $category->getChildrenCategories();
+
+        $collectionSize = $productCollection->getSize();
+
+        if ($category->getIsActive()) {
+            foreach ($categories as $category) {
+                if ($category->getIsActive()
+                    && isset($optionsFacetedData[$category->getId()])
+                    && $this->isOptionReducesResults($optionsFacetedData[$category->getId()]['count'], $collectionSize)
+                ) {
+                    $this->itemDataBuilder->addItemData(
+                        $this->escaper->escapeHtml($category->getName()),
+                        $category->getId(),
+                        $optionsFacetedData[$category->getId()]['count']
+                    );
+                }
+            }
+        }
+        return $this->itemDataBuilder->build();
+    }
 }

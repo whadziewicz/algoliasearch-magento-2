@@ -12,7 +12,10 @@ class BackendFilterRendererPlugin
     protected $layout;
 
     /** @var string */
-    protected $block = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\DefaultRenderer::class;
+    protected $defaultBlock = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\DefaultRenderer::class;
+
+    /** @var string */
+    protected $categoryBlock = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\CategoryRenderer::class;
 
     /** @var ConfigHelper */
     private $configHelper;
@@ -46,18 +49,21 @@ class BackendFilterRendererPlugin
         \Magento\Catalog\Model\Layer\Filter\FilterInterface $filter
     ) {
 
-        if ($filter instanceof \Magento\CatalogSearch\Model\Layer\Filter\Category) {
-            return $proceed($filter);
-        }
-
         if ($this->configHelper->isBackendRenderingEnabled()) {
+
+            if ($filter instanceof \Magento\CatalogSearch\Model\Layer\Filter\Category) {
+                return $this->layout
+                    ->createBlock($this->categoryBlock)
+                    ->render($filter);
+            }
+
             $attributeCode = $filter->getAttributeModel()->getAttributeCode();
             $facets = $this->configHelper->getFacets($this->storeManager->getStore()->getId());
 
             foreach ($facets as $facet) {
                 if ($facet['attribute'] == $attributeCode) {
                     return $this->layout
-                        ->createBlock($this->block)
+                        ->createBlock($this->defaultBlock)
                         ->render($filter);
                 }
             }

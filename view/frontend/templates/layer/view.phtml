@@ -1,18 +1,18 @@
 <?php if ($block->canShowBlock()) : ?>
-    <div class="block filter" id="layered-filter-block" data-mage-init='{"collapsible":{"openedState": "active", "collapsible": true, "active": false, "collateral": { "openedState": "filter-active", "element": "body" } }}'>
+    <div class="block filter algolia-filter-list" id="layered-filter-block" data-mage-init='{"collapsible":{"openedState": "active", "collapsible": true, "active": false, "collateral": { "openedState": "filter-active", "element": "body" } }}'>
         <?php $filtered = count($block->getLayer()->getState()->getFilters()) ?>
         <div class="block-title filter-title" data-count="<?= /* @escapeNotVerified */ $filtered ?>">
             <strong data-role="title"><?php /* @escapeNotVerified */ echo __('Shop By') ?></strong>
         </div>
 
         <div class="block-content filter-content">
-            <?php echo $block->getChildHtml('state') ?>
-
             <?php if ($block->getLayer()->getState()->getFilters()) : ?>
                 <div class="block-actions filter-actions">
                     <a href="<?php /* @escapeNotVerified */ echo $block->getClearUrl() ?>" class="action clear filter-clear"><span><?php /* @escapeNotVerified */ echo __('Clear All') ?></span></a>
                 </div>
             <?php endif; ?>
+            <?php echo $block->getChildHtml('state') ?>
+
             <?php $wrapOptions = false; ?>
             <?php foreach ($block->getFilters() as $filter) : ?>
                 <?php if ($filter->getItemsCount()) : ?>

@@ -186,7 +186,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             'maxValuesPerFacet' => (int) $config->getMaxValuesPerFacet(),
             'autofocus' => true,
             'request' => [
-                'query' => html_entity_decode($query),
+                'query' => htmlspecialchars(html_entity_decode($query)),
                 'refinementKey' => $refinementKey,
                 'refinementValue' => $refinementValue,
                 'categoryId' => $categoryId,

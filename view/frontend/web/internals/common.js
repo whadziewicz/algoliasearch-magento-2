@@ -834,3 +834,20 @@ var AlgoliaBase64 = {
 		return string;
 	}
 };
+
+var htmlspecialchars_decode = function(string) {
+	var unescapedString = string,
+		specialchars = [
+			[ '"', '&quot;' ],
+			[ '>', '&gt;' ],
+			[ '<', '&lt;' ],
+			[ '&', '&amp;' ]
+		];
+	
+	var len = specialchars.length;
+	for (var i=0; i<len; i++) {
+		unescapedString = unescapedString.replace(new RegExp(specialchars[i][1], 'g'), specialchars[i][0]);
+	}
+	
+	return unescapedString;
+};

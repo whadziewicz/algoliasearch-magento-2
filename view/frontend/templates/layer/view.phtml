@@ -14,10 +14,10 @@
             <?php echo $block->getChildHtml('state') ?>
 
             <?php $wrapOptions = false; ?>
+            <?php $range = implode(' ', range(0, count($block->getFilters()))); ?>
             <?php foreach ($block->getFilters() as $filter) : ?>
                 <?php if ($filter->getItemsCount()) : ?>
                     <?php if (!$wrapOptions) : ?>
-                        <?php $range = implode(' ', range(0, $filter->getItemsCount())); ?>
                         <div class="filter-options" id="narrow-by-list" data-role="content" data-mage-init='{"accordion":{"openedState": "active","active" : "<?php echo $range; ?>", "collapsible": "true", "multipleCollapsible": "false"}}'>
                             <?php $wrapOptions = true;?>
                     <?php endif; ?>

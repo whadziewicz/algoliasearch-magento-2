@@ -5,7 +5,7 @@ namespace Algolia\AlgoliaSearch\Model\Layer\Filter\Item;
 class Attribute extends \Magento\Catalog\Model\Layer\Filter\Item
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getUrl()
     {
@@ -16,11 +16,13 @@ class Attribute extends \Magento\Catalog\Model\Layer\Filter\Item
 
         $qsParams =  $this->getAdditionalParams($qsParams);
 
-        return $this->_url->getUrl('*/*/*', [
+        return $this->_url->getUrl(
+            '*/*/*',
+            [
                 '_current' => true,
                 '_use_rewrite' => true,
                 '_escape' => false,
-                '_query' => $qsParams
+                '_query' => $qsParams,
             ]
         );
     }
@@ -96,13 +98,12 @@ class Attribute extends \Magento\Catalog\Model\Layer\Filter\Item
         $paramsToAdd = $qsParser->toArray();
 
         if (count($baseUrlParts) > 1) {
-
             $qsParser->fromString($baseUrlParts[1]);
             $existingParams = $qsParser->toArray();
 
             foreach ($paramsToAdd as $key => $value) {
                 if (isset($existingParams[$key])) {
-                    $existingParamsArray = explode("~", $existingParams[$key]);
+                    $existingParamsArray = explode('~', $existingParams[$key]);
                     // check if the value is already in the applied filter, if it is, this means we have to remove it
                     if (in_array($paramsToAdd[$key], $existingParamsArray) && $this->getIsSelected()) {
                         foreach ($existingParamsArray as $arrayParamKey => $arrayParam) {

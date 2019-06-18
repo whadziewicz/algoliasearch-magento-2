@@ -4,7 +4,6 @@ namespace Algolia\AlgoliaSearch\Adapter\Aggregation;
 
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Search\Adapter\Aggregation\AggregationResolverInterface;
 use Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder\Container as AggregationContainer;
@@ -50,7 +49,7 @@ class Builder
         $this->productFactory = $productFactory;
     }
 
-    public function build(RequestInterface $request, Table $documentsTable, array $documents = [], array $facets)
+    public function build(RequestInterface $request, Table $documentsTable, array $documents, array $facets)
     {
         return $this->processAggregations($request, $documentsTable, $documents, $facets);
     }
@@ -88,7 +87,7 @@ class Builder
             $optionId = $this->getOptionIdByLabel($attribute, $value);
             $aggregation[$optionId] = [
                 'value' => (string) $optionId,
-                'count' => (string) $count
+                'count' => (string) $count,
             ];
         }
 
@@ -103,6 +102,7 @@ class Builder
         if ($isAttributeExist && $isAttributeExist->usesSource()) {
             $optionId = $isAttributeExist->getSource()->getOptionId($optionLabel);
         }
+
         return $optionId;
     }
 
@@ -111,12 +111,12 @@ class Builder
         return $documents ? array_keys($documents) : [];
     }
 
-
     private function getDocumentIds(Table $documentsTable)
     {
         $select = $this->getConnection()
             ->select()
             ->from($documentsTable->getName(), TemporaryStorage::FIELD_ENTITY_ID);
+
         return $this->getConnection()->fetchCol($select);
     }
 

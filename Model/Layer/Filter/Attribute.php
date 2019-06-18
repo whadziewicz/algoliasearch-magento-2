@@ -55,7 +55,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function apply(\Magento\Framework\App\RequestInterface $request)
     {
@@ -67,7 +67,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
         $attribute = $this->getAttributeModel();
         $attributeValue = $request->getParam($this->_requestVar);
         if (!is_null($attributeValue)) {
-            $attributeValue = explode("~", $request->getParam($this->_requestVar));
+            $attributeValue = explode('~', $request->getParam($this->_requestVar));
         }
 
         if (empty($attributeValue)) {
@@ -86,8 +86,10 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
         $layerState = $this->getLayer()->getState();
 
         foreach ($this->currentFilterValue as $currentFilter) {
-            $filter = $this->_createItem($this->escaper->escapeHtml(
-                $this->getOptionText($currentFilter)),
+            $filter = $this->_createItem(
+                $this->escaper->escapeHtml(
+                $this->getOptionText($currentFilter)
+            ),
                 $this->currentFilterValue
             );
             $layerState->addFilter($filter);
@@ -105,8 +107,8 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
             if (($valuePos = array_search($applyValue, $this->currentFilterValue)) !== false) {
                 $item->setIsSelected(true);
             }
-
         }
+
         return $this;
     }
 

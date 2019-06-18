@@ -125,7 +125,6 @@ class AdapterHelper
             $this->filtersHelper->getDisjunctiveFacets($storeId)
         );
 
-
         // Handle price filtering
         $searchParams = array_merge(
             $searchParams,

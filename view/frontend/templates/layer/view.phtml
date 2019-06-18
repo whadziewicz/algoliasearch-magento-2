@@ -1,7 +1,7 @@
 <?php if ($block->canShowBlock()) : ?>
     <div class="block filter algolia-filter-list" id="layered-filter-block" data-mage-init='{"collapsible":{"openedState": "active", "collapsible": true, "active": false, "collateral": { "openedState": "filter-active", "element": "body" } }}'>
         <?php $filtered = count($block->getLayer()->getState()->getFilters()) ?>
-        <div class="block-title filter-title" data-count="<?= /* @escapeNotVerified */ $filtered ?>">
+        <div class="block-title filter-title" data-count="<?php echo /* @escapeNotVerified */ $filtered ?>">
             <strong data-role="title"><?php /* @escapeNotVerified */ echo __('Shop By') ?></strong>
         </div>
 
@@ -19,11 +19,11 @@
                 <?php if ($filter->getItemsCount()) : ?>
                     <?php if (!$wrapOptions) : ?>
                         <div class="filter-options" id="narrow-by-list" data-role="content" data-mage-init='{"accordion":{"openedState": "active","active" : "<?php echo $range; ?>", "collapsible": "true", "multipleCollapsible": "false"}}'>
-                            <?php $wrapOptions = true;?>
+                            <?php $wrapOptions = true; ?>
                     <?php endif; ?>
                     <div data-role="collapsible" class="filter-options-item">
-                        <div data-role="title" class="filter-options-title"><?= /* @escapeNotVerified */ __($filter->getName()) ?></div>
-                        <div data-role="content" class="filter-options-content"><?= /* @escapeNotVerified */ $block->getChildBlock('renderer')->render($filter) ?></div>
+                        <div data-role="title" class="filter-options-title"><?php echo /* @escapeNotVerified */ __($filter->getName()) ?></div>
+                        <div data-role="content" class="filter-options-content"><?php echo /* @escapeNotVerified */ $block->getChildBlock('renderer')->render($filter) ?></div>
                     </div>
                 <?php endif; ?>
             <?php endforeach; ?>

@@ -9,7 +9,7 @@ use Magento\LayeredNavigation\Block\Navigation\FilterRendererInterface;
 
 class DefaultRenderer extends Template implements FilterRendererInterface
 {
-    /** @var bool  */
+    /** @var bool */
     private $isSearchable = true;
 
     const JS_COMPONENT = 'Algolia_AlgoliaSearch/navigation/attribute-filter';
@@ -40,7 +40,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
     /**
      * Returns true if checkox have to be enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public function isMultipleSelectEnabled()
     {
@@ -50,6 +50,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
     public function setIsSearchable($value)
     {
         $this->isSearchable = $value;
+
         return $this;
     }
 
@@ -59,7 +60,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function render(FilterInterface $filter)
     {
@@ -76,7 +77,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getJsLayout()
     {
@@ -97,7 +98,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
                 'label' => $item->getLabel(),
                 'count' => $item->getCount(),
                 'url' => $item->getUrl(),
-                'is_selected' => $item->getData('is_selected')
+                'is_selected' => $item->getData('is_selected'),
             ];
         }
 
@@ -105,7 +106,7 @@ class DefaultRenderer extends Template implements FilterRendererInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function canRenderFilter()
     {

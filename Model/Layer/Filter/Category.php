@@ -27,6 +27,7 @@ class Category extends \Magento\CatalogSearch\Model\Layer\Filter\Category
      * @param \Magento\Catalog\Model\Layer\Filter\DataProvider\CategoryFactory $categoryDataProviderFactory
      * @param ConfigHelper $configHelper
      * @param array $data
+     *
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function __construct(
@@ -107,6 +108,7 @@ class Category extends \Magento\CatalogSearch\Model\Layer\Filter\Category
                 }
             }
         }
+
         return $this->itemDataBuilder->build();
     }
 }

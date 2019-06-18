@@ -111,7 +111,7 @@ class Data
             'removeWordsIfNoResults' => $this->configHelper->getRemoveWordsIfNoResult($storeId),
             'analyticsTags'          => 'backend-search',
             'facets'                 => $facetsToRetrieve,
-            'maxValuesPerFacet'      => 100
+            'maxValuesPerFacet'      => 100,
         ];
 
         if (is_array($searchParams)) {

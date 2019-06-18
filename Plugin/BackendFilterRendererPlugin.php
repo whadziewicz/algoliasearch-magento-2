@@ -37,20 +37,21 @@ class BackendFilterRendererPlugin
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param \Magento\LayeredNavigation\Block\Navigation\FilterRenderer $subject
      * @param \Closure $proceed
      * @param \Magento\Catalog\Model\Layer\Filter\FilterInterface $filter
-     * @return mixed
+     *
      * @throws \Magento\Framework\Exception\LocalizedException
+     *
+     * @return mixed
      */
     public function aroundRender(
         \Magento\LayeredNavigation\Block\Navigation\FilterRenderer $subject,
         \Closure $proceed,
         \Magento\Catalog\Model\Layer\Filter\FilterInterface $filter
     ) {
-
         if ($this->configHelper->isBackendRenderingEnabled()) {
-
             if ($filter instanceof \Magento\CatalogSearch\Model\Layer\Filter\Category) {
                 return $this->layout
                     ->createBlock($this->categoryBlock)
@@ -64,7 +65,7 @@ class BackendFilterRendererPlugin
                 if ($facet['attribute'] == $attributeCode) {
                     return $this->layout
                         ->createBlock($this->defaultBlock)
-                        ->setIsSearchable($facet['searchable'] == "1")
+                        ->setIsSearchable($facet['searchable'] == '1')
                         ->render($filter);
                 }
             }

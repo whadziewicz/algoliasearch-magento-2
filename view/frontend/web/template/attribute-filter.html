@@ -3,7 +3,7 @@
         <input class="filter-search"
                type="text"
                autocomplete="off"
-               data-bind="attr: {placeholder: searchPlaceholder}, event: {keyup: onSearchChange.bind(this), focusout: onSearchFocusOut}" />
+               data-bind="enable: searchActive, attr: {placeholder: searchPlaceholder}, event: {keyup: onSearchChange.bind(this), focusout: onSearchFocusOut}" />
     </div>
 </div>
 
@@ -27,12 +27,5 @@
 </ol>
 
 <div class="no-results-message" data-bind="if: fulltextSearch() && !hasSearchResult()" class="empty">
-    <p data-bind="html: getSearchResultMessage()"></p>
-</div>
-
-<div class="actions" data-bind="visible: enableExpansion()">
-    <div class="secondary">
-        <a class="action show-more" data-bind="visible: displayShowMore(), event: {click: onShowMore}"><span data-bind="text: showMoreLabel"></span></a>
-        <a class="action show-less" data-bind="visible: displayShowLess(), event: {click: onShowLess}"><span data-bind="text: showLessLabel"></span></a>
-    </div>
+    <p data-bind="html: getNoResultMessage()"></p>
 </div>

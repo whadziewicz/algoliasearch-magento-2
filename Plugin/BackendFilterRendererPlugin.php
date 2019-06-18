@@ -64,6 +64,7 @@ class BackendFilterRendererPlugin
                 if ($facet['attribute'] == $attributeCode) {
                     return $this->layout
                         ->createBlock($this->defaultBlock)
+                        ->setIsSearchable($facet['searchable'] == "1")
                         ->render($filter);
                 }
             }

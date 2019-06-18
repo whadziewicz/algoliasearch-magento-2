@@ -9,14 +9,10 @@ define([
   return Component.extend({
     defaults: {
       template: "Algolia_AlgoliaSearch/attribute-filter",
-      showMoreLabel       : $.mage.__("Show more"),
-      showLessLabel       : $.mage.__("Show less"),
-      noSearchResultLabel : $.mage.__("No value matching the search <b>%s</b>.")
+      noResultLabel : $.mage.__("No results.")
     },
 
-    /**
-     * Component initialization
-     */
+    /* Initialization */
     initialize: function () {
       this._super();
       this.expanded = false;
@@ -28,27 +24,17 @@ define([
       );
       this.maxSize = Math.max(this.maxSize, lastSelectedIndex + 1);
 
-      this.initSearchPlaceholder();
+      this.initPlaceholder();
       this.onShowLess();
-      this.displaySearch = this.displayShowMore();
-
+      this.searchActive = this.items.length > this.maxSize;
     },
 
-    /**
-     * Init the place holder
-     */
-    initSearchPlaceholder: function () {
-      var examples = this.items.slice(0, 2).map(function (item) {return item.label});
-
-      if (this.items.length > 2) {
-        examples.push('...');
-      }
-      this.searchPlaceholder = $('<div/>').html($.mage.__('Search (%s)').replace('%s', examples.join(', '))).text();
+    /* Placeholder initialization */
+    initPlaceholder: function () {
+      this.searchPlaceholder = $('<div/>').html($.mage.__('Search for other ...')).text();
     },
 
-    /**
-     * Triggered when typing on the search input
-     */
+    /* Behaviour while typing in the search input */
     onSearchChange: function (component, ev) {
       var text = ev.target.value;
       if (text.trim() === "") {
@@ -61,9 +47,7 @@ define([
       return true;
     },
 
-    /**
-     * Triggered when leaving the search field.
-     */
+    /* Reset value on focus if search is considered as empty */
     onSearchFocusOut: function(component, ev) {
       var text = ev.target.value;
       if (text.trim() === "") {
@@ -72,11 +56,7 @@ define([
       }
     },
 
-    /**
-     * Retrieve additional Results
-     *
-     * @param callback
-     */
+    /* Get additional results */
     loadAdditionalItems: function (callback) {
       $.get(this.ajaxLoadUrl, function (data) {
         this.items = data.map(this.addItemId.bind(this));
@@ -88,11 +68,7 @@ define([
       }.bind(this));
     },
 
-    /**
-     * Retrieve items to display
-     *
-     * @returns {*}
-     */
+    /* Get items list */
     getDisplayedItems: function () {
       var items = this.items;
 
@@ -123,23 +99,17 @@ define([
       return items;
     },
 
-    /**
-     * Does the search have a result
-     */
+    /* Check if search has results */
     hasSearchResult: function () {
       return this.getDisplayedItems().length > 0
     },
 
-    /**
-     * Search result message
-     */
-    getSearchResultMessage : function() {
-      return this.noSearchResultLabel.replace("%s", '"' + this.fulltextSearch() + '"')
+    /* Get No Search result message */
+    getNoResultMessage : function() {
+      return this.noResultLabel;
     },
 
-    /**
-     * Callback for the "Show more" button
-     */
+    /* Callback when list is being populated */
     onShowMore: function () {
       if (this.hasMoreItems) {
         this.loadAdditionalItems(this.onShowMore.bind(this));
@@ -148,54 +118,17 @@ define([
       }
     },
 
-    /**
-     * Index the text to be searched.
-     */
-    slugify: function(text) {
-      return text.toString().toLowerCase()
-        .replace(/\s+/g, '-')           // Replace spaces with -
-        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-        .replace(/^-+/, '')             // Trim - from start of text
-    },
-
-    /**
-     * Callback for the "Show less" button
-     */
+    /* Callback when list is refined */
     onShowLess: function () {
       this.expanded(false);
     },
 
-    /**
-     * Check if the filter can be expanded
-     *
-     * @returns {boolean}
-     */
-    enableExpansion : function () {
-      return this.hasMoreItems || this.items.length > this.maxSize;
+    /* Slugify search */
+    slugify: function(text) {
+      return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '')
     },
 
-    /**
-     * Displays the "Show More" link
-     *
-     * @returns {*|boolean}
-     */
-    displayShowMore: function () {
-      return this.enableExpansion() && this.expanded() === false && !this.fulltextSearch();
-    },
-
-    /**
-     * Displays the "Show Less" link
-     *
-     * @returns {*|boolean}
-     */
-    displayShowLess: function () {
-      return this.enableExpansion() && this.expanded() === true && !this.fulltextSearch();
-    },
-
-    /**
-     * Add an id to items.
-     */
+    /* Add id to item list. */
     addItemId: function (item) {
       item.id = _.uniqueId(this.index + "_option_");
       item.displayProductCount = this.displayProductCount && (item.count >= 1)

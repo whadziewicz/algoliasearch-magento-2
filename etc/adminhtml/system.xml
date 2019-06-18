@@ -301,9 +301,6 @@
                             The number of values each facet can display. Default value is 10.
                         ]]>
                     </comment>
-                    <depends>
-                        <field id="is_instant_enabled">1</field>
-                    </depends>
                 </field>
                 <field id="sorts" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sorts</label>

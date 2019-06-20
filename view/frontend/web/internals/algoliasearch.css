@@ -1390,3 +1390,56 @@ a.ais-current-refined-values--link:hover {
 .algolia-filter-list .items .item a .count::after {
   content : '';
 }
+
+/* SLIDER */
+.algolia-filter-list .algolia-range-slider [data-role=from-label] {
+  display: block;
+  float: left;
+  padding: 5px 0 10px;
+  font-size: .8em;
+  min-width: 20px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.algolia-filter-list .algolia-range-slider [data-role=to-label] {
+  display: block;
+  float: right;
+  padding: 5px 0 10px;
+  font-size: .8em;
+  min-width: 20px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.algolia-filter-list .algolia-range-slider .actions-toolbar {
+  margin: 17px 8px 5px;
+  display: block;
+}
+
+.algolia-filter-list .algolia-range-slider .actions-primary {
+  float: right;
+}
+
+.algolia-filter-list .algolia-range-slider .actions-primary .primary {
+  padding: 5px;
+}
+
+.algolia-filter-list .algolia-range-slider .ui-slider {
+  height: 2px;
+  margin: 10px;
+  clear: both;
+  background-color: #F3F4F7;
+  border: 1px solid #DDD;
+}
+
+.algolia-filter-list .algolia-range-slider .ui-slider-handle {
+  background-color: grey;
+  padding: 0;
+  margin: -8px 0 0 -10px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  background-color: #FFFFFF;
+  border: 1px solid #c8c8c8;
+}

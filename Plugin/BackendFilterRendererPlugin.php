@@ -17,6 +17,12 @@ class BackendFilterRendererPlugin
     /** @var string */
     protected $categoryBlock = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\CategoryRenderer::class;
 
+    /** @var string */
+    protected $priceBlock = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\PriceRenderer::class;
+
+    /** @var string */
+    protected $sliderBlock = \Algolia\AlgoliaSearch\Block\Navigation\Renderer\SliderRenderer::class;
+
     /** @var ConfigHelper */
     private $configHelper;
 
@@ -63,8 +69,16 @@ class BackendFilterRendererPlugin
 
             foreach ($facets as $facet) {
                 if ($facet['attribute'] == $attributeCode) {
+                    $block = $this->defaultBlock;
+                    if ($facet['type'] == 'slider') {
+                        $block = $this->sliderBlock;
+                    }
+                    if ($facet['attribute'] == 'price') {
+                        $block = $this->priceBlock;
+                    }
+
                     return $this->layout
-                        ->createBlock($this->defaultBlock)
+                        ->createBlock($block)
                         ->setIsSearchable($facet['searchable'] == '1')
                         ->render($filter);
                 }

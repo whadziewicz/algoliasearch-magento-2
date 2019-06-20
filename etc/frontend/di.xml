@@ -35,8 +35,8 @@
             <argument name="filterableAttributes" xsi:type="object">Algolia\AlgoliaSearch\Model\Layer\Category\FilterableAttributeList</argument>
             <argument name="filters" xsi:type="array">
                 <item name="attribute" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Attribute</item>
-                <item name="price" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Price</item>
-                <item name="decimal" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Decimal</item>
+                <item name="price" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Price</item>
+                <item name="decimal" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Decimal</item>
                 <item name="category" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Category</item>
             </argument>
         </arguments>
@@ -47,8 +47,8 @@
             <argument name="filterableAttributes" xsi:type="object">Algolia\AlgoliaSearch\Model\Layer\Search\FilterableAttributeList</argument>
             <argument name="filters" xsi:type="array">
                 <item name="attribute" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Attribute</item>
-                <item name="price" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Price</item>
-                <item name="decimal" xsi:type="string">Magento\CatalogSearch\Model\Layer\Filter\Decimal</item>
+                <item name="price" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Price</item>
+                <item name="decimal" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Decimal</item>
                 <item name="category" xsi:type="string">Algolia\AlgoliaSearch\Model\Layer\Filter\Category</item>
             </argument>
         </arguments>

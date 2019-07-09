@@ -86,9 +86,17 @@ class Data
         $this->algoliaHelper->deleteObjects($ids, $indexName);
     }
 
+    /**
+     * @param string $query
+     * @param int $storeId
+     * @param array|null $searchParams
+     * @param string|null $targetedIndex
+     *
+     * @return array
+     */
     public function getSearchResult($query, $storeId, $searchParams = null, $targetedIndex = null)
     {
-        $indexName = !is_null($targetedIndex) ?
+        $indexName = $targetedIndex !== null ?
             $targetedIndex :
             $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
 
@@ -133,10 +141,7 @@ class Data
             }
         }
 
-        return [
-            'results' => $data,
-            'facets' => $answer['facets'],
-        ];
+        return [$data, $answer['nbHits'], $answer['facets']];
     }
 
     public function rebuildStoreAdditionalSectionsIndex($storeId)

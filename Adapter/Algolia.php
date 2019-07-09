@@ -7,6 +7,7 @@ use Algolia\AlgoliaSearch\Helper\AdapterHelper;
 use AlgoliaSearch\AlgoliaConnectionException;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
+use Magento\Framework\DB\Select;
 use Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder as AggregationBuilder;
 use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
 use Magento\Framework\Search\Adapter\Mysql\Mapper;
@@ -43,6 +44,11 @@ class Algolia implements AdapterInterface
 
     /** @var DocumentFactory */
     private $documentFactory;
+
+    private $countSqlSkipParts = [
+        Select::LIMIT_COUNT => true,
+        Select::LIMIT_OFFSET => true,
+    ];
 
     /**
      * @param Mapper $mapper
@@ -92,15 +98,14 @@ class Algolia implements AdapterInterface
 
         $temporaryStorage = $this->temporaryStorageFactory->create();
         $documents = [];
+        $totalHits = 0;
         $table = null;
         $facetsFromAlgolia = null;
 
         try {
             // If instant search is on, do not make a search query unless SEO request is set to 'Yes'
             if (!$this->adapterHelper->isInstantEnabled() || $this->adapterHelper->makeSeoRequest()) {
-                $answerFromAlgolia = $this->adapterHelper->getDocumentsFromAlgolia();
-                $documents = $answerFromAlgolia['results'];
-                $facetsFromAlgolia = $answerFromAlgolia['facets'];
+                list($documents, $totalHits, $facetsFromAlgolia) = $this->adapterHelper->getDocumentsFromAlgolia();
             }
 
             $apiDocuments = array_map([$this, 'getApiDocument'], $documents);
@@ -114,6 +119,7 @@ class Algolia implements AdapterInterface
         $response = [
             'documents' => $documents,
             'aggregations' => $aggregations,
+            'total' => $totalHits,
         ];
 
         return $this->responseFactory->create($response);
@@ -131,6 +137,7 @@ class Algolia implements AdapterInterface
         $response = [
             'documents' => $documents,
             'aggregations' => $aggregations,
+            'total' => $this->getSize($query),
         ];
 
         return $this->responseFactory->create($response);
@@ -163,5 +170,42 @@ class Algolia implements AdapterInterface
     private function getConnection()
     {
         return $this->resource->getConnection();
+    }
+
+    /**
+     * Get rows size
+     *
+     * @param Select $query
+     *
+     * @return int
+     */
+    private function getSize(Select $query)
+    {
+        $sql = $this->getSelectCountSql($query);
+        $parentSelect = $this->getConnection()->select();
+        $parentSelect->from(['core_select' => $sql]);
+        $parentSelect->reset(Select::COLUMNS);
+        $parentSelect->columns('COUNT(*)');
+        $totalRecords = $this->getConnection()->fetchOne($parentSelect);
+
+        return (int) $totalRecords;
+    }
+
+    /**
+     * Reset limit and offset
+     *
+     * @param Select $query
+     *
+     * @return Select
+     */
+    private function getSelectCountSql(Select $query)
+    {
+        foreach ($this->countSqlSkipParts as $part => $toSkip) {
+            if ($toSkip) {
+                $query->reset($part);
+            }
+        }
+
+        return $query;
     }
 }

@@ -63,7 +63,11 @@ class ProductCollectionAddPermissions implements ObserverInterface
         foreach ($permissionsCollection as $productId => $permissions) {
             $permissions = explode(',', $permissions);
             foreach ($permissions as $permission) {
-                list($permissionStoreId, $customerGroupId, $level) = explode('_', $permission);
+                $permission = explode('_', $permission);
+                if (count($permission) < 3) { // prevent undefined
+                    continue;
+                }
+                list($permissionStoreId, $customerGroupId, $level) = $permission;
                 if ($permissionStoreId == $storeId) {
 
                     $additionalData->addProductData($productId, [
@@ -90,7 +94,11 @@ class ProductCollectionAddPermissions implements ObserverInterface
         foreach ($sharedCollection as $productId => $permissions) {
             $permissions = explode(',', $permissions);
             foreach ($permissions as $permission) {
-                list($customerGroupId, $level) = explode('_', $permission);
+                $permission = explode('_', $permission);
+                if (count($permission) < 2) { // prevent undefined
+                    continue;
+                }
+                list($customerGroupId, $level) = $permission;
                 $additionalData->addProductData($productId, [
                     'shared_catalog_permission_' . $customerGroupId => $level,
                 ]);

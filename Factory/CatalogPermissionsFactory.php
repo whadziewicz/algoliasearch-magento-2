@@ -8,9 +8,6 @@ use Magento\Framework\ObjectManagerInterface;
 
 class CatalogPermissionsFactory
 {
-    const CATALOG_PERMISSIONS_ENABLED_CONFIG_PATH = 'catalog/magento_catalogpermissions/enabled';
-    const CATALOG_PERMISSIONS_ENABLED_ALLOW_BROWSING = 'catalog/magento_catalogpermissions/grant_catalog_category_view';
-
     private $scopeConfig;
     private $moduleManager;
     private $objectManager;
@@ -30,19 +27,8 @@ class CatalogPermissionsFactory
 
     public function isCatalogPermissionsEnabled($storeId)
     {
-        $isEnabled = $this->scopeConfig->isSetFlag(
-            self::CATALOG_PERMISSIONS_ENABLED_CONFIG_PATH,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-
-        $isAllowBrowsingCatalog = (int) $this->scopeConfig->getValue(
-            self::CATALOG_PERMISSIONS_ENABLED_ALLOW_BROWSING,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-
-        return $isEnabled && ($isAllowBrowsingCatalog !== 1) && $this->isCatalogPermissionsModuleEnabled();
+        return $this->isCatalogPermissionsModuleEnabled()
+            && $this->getCatalogPermissionsConfig()->isEnabled($storeId);
     }
 
     private function isCatalogPermissionsModuleEnabled()
@@ -58,6 +44,11 @@ class CatalogPermissionsFactory
     public function getCatalogPermissionsHelper()
     {
         return $this->objectManager->create('\Magento\CatalogPermissions\Helper\Data');
+    }
+
+    public function getCatalogPermissionsConfig()
+    {
+        return $this->objectManager->create('\Magento\CatalogPermissions\App\Config');
     }
 
     public function getCategoryPermissionsCollection()

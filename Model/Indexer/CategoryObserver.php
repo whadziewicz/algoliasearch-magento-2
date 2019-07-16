@@ -58,7 +58,8 @@ class CategoryObserver
             // To reduce the indexing operation for products, only update if these values have changed
             if ($category->getOrigData('name') !== $category->getData('name')
                 || $category->getOrigData('include_in_menu') !== $category->getData('include_in_menu')
-                || $category->getOrigData('is_active') !== $category->getData('is_active')) {
+                || $category->getOrigData('is_active') !== $category->getData('is_active')
+                || $category->getOrigData('path') !== $category->getData('path')) {
                 /** @var ProductCollection $productCollection */
                 $productCollection = $category->getProductCollection();
                 $collectionIds = (array) $productCollection->getColumnValues('entity_id');
@@ -88,7 +89,8 @@ class CategoryObserver
     public function beforeDelete(CategoryResourceModel $categoryResource, CategoryModel $category)
     {
         $categoryResource->addCommitCallback(function() use ($category) {
-            if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
+            // mview should be able to handle the changes for catalog_category_product relationship
+            if (!$this->indexer->isScheduled()) {
                 /* we are using products position because getProductCollection() doesn't use correct store */
                 $productCollection = $category->getProductsPosition();
                 CategoryIndexer::$affectedProductIds = array_keys($productCollection);

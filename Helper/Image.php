@@ -3,6 +3,7 @@
 namespace Algolia\AlgoliaSearch\Helper;
 
 use Magento\Catalog\Model\Product\ImageFactory;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ProductTypeConfigurable;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\View\ConfigInterface;
@@ -59,6 +60,44 @@ class Image extends \Magento\Catalog\Helper\Image
         }
 
         return $url;
+    }
+
+    protected function initBaseFile()
+    {
+        $model = $this->_getModel();
+        $baseFile = $model->getBaseFile();
+        if (!$baseFile) {
+            if ($this->getImageFile()) {
+                $model->setBaseFile($this->getImageFile());
+            } else {
+                $model->setBaseFile($this->getProductImageType());
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Configurable::setImageFromChildProduct() only pulls 'image' type
+     * and not the type set by the imageHelper
+     *
+     * @return string
+     */
+    private function getProductImageType()
+    {
+        if (!$this->getImageFile() && $this->getType() !== 'image') {
+            if ($this->getProduct()->getTypeId() == ProductTypeConfigurable::TYPE_CODE) {
+                $childProducts = $this->getProduct()->getTypeInstance()->getUsedProducts($this->getProduct());
+                foreach ($childProducts as $childProduct) {
+                    if ($childProduct->getData($this->getType())
+                        && $childProduct->getData($this->getType()) !== 'no_selection') {
+                        $imageUrl = $childProduct->getData($this->getType());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return isset($imageUrl) ? $imageUrl : $this->getProduct()->getImage();
     }
 
     public function removeProtocol($url)

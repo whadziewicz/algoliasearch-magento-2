@@ -28,8 +28,7 @@ class FilterableAttributeList extends \Magento\Catalog\Model\Layer\Search\Filter
 
     protected function _prepareAttributeCollection($collection)
     {
-        $collection->addIsFilterableInSearchFilter()
-            ->addVisibleFilter();
+        $collection = parent::_prepareAttributeCollection($collection);
 
         if ($this->configHelper->isBackendRenderingEnabled()) {
             $facets = $this->configHelper->getFacets($this->storeManager->getStore()->getId());
@@ -38,7 +37,7 @@ class FilterableAttributeList extends \Magento\Catalog\Model\Layer\Search\Filter
                 $filterAttributes[] = $facet['attribute'];
             }
 
-            $collection->addFieldToFilter('attribute_code', $filterAttributes, 'IN');
+            $collection->addFieldToFilter('attribute_code', ['in' => $filterAttributes]);
             $collection->setOrder('attribute_id', 'ASC');
         }
 

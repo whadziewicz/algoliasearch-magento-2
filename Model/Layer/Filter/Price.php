@@ -75,17 +75,14 @@ class Price extends \Magento\CatalogSearch\Model\Layer\Filter\Price
         $filter = $request->getParam($this->getRequestVar());
 
         if ($filter && !is_array($filter)) {
-            $filterParams = explode(',', $filter);
-            if ($filter) {
-                $this->dataProvider->setInterval($filter);
+            $this->dataProvider->setInterval($filter);
 
-                list($fromValue, $toValue) = explode('-', $filter);
-                $this->setCurrentValue(['from' => $fromValue, 'to' => $toValue]);
+            list($fromValue, $toValue) = explode('-', $filter);
+            $this->setCurrentValue(['from' => $fromValue, 'to' => $toValue]);
 
-                $this->getLayer()->getState()->addFilter(
-                    $this->_createItem($this->_renderRangeLabel(empty($fromValue) ? 0 : $fromValue, $toValue), $filter)
-                );
-            }
+            $this->getLayer()->getState()->addFilter(
+                $this->_createItem($this->_renderRangeLabel(empty($fromValue) ? 0 : $fromValue, $toValue), $filter)
+            );
         }
 
         return $this;

@@ -70,6 +70,8 @@ class FiltersHelper
     /**
      * Get the category filters from the context
      *
+     * @param int $storeId
+     *
      * @return array
      */
     public function getCategoryFilters($storeId)
@@ -144,7 +146,7 @@ class FiltersHelper
     {
         $facetFilters = [];
         // If the parameters variable is null, fetch them from the request
-        if (is_null($parameters)) {
+        if ($parameters === null) {
             $parameters = $this->request->getParams();
         }
 

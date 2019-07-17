@@ -34,14 +34,13 @@ class Attribute extends \Magento\Catalog\Model\Layer\Filter\Item
         if (is_array($this->getApplyValue())) {
             $idToRemove = null;
 
-            // FIXME - START
             foreach ($this->getFilter()->getAttributeModel()->getOptions() as $option) {
                 if ($option->getLabel() == $this->getLabel()) {
                     $idToRemove = $option->getValue();
                     break;
                 }
             }
-            // FIXME - END
+
             if (!is_null($idToRemove)) {
                 $resetValue = array_diff($this->getApplyValue(), [$idToRemove]);
             }

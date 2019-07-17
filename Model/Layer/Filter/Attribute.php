@@ -87,9 +87,7 @@ class Attribute extends \Magento\CatalogSearch\Model\Layer\Filter\Attribute
 
         foreach ($this->currentFilterValue as $currentFilter) {
             $filter = $this->_createItem(
-                $this->escaper->escapeHtml(
-                $this->getOptionText($currentFilter)
-            ),
+                $this->escaper->escapeHtml($this->getOptionText($currentFilter)),
                 $this->currentFilterValue
             );
             $layerState->addFilter($filter);

@@ -37,7 +37,7 @@ class FilterableAttributeList extends \Magento\Catalog\Model\Layer\Category\Filt
                 $filterAttributes[] = $facet['attribute'];
             }
 
-            $collection->addFieldToFilter('attribute_code', $filterAttributes, 'IN');
+            $collection->addFieldToFilter('attribute_code', ['in' => $filterAttributes]);
             $collection->setOrder('attribute_id', 'ASC');
         }
 

@@ -62,20 +62,18 @@ class PriceRenderer extends SliderRenderer
         return $maxValue;
     }
 
-    /*@return bool */
+    /* @return bool */
     private function isManualCalculation()
     {
-        $result = false;
         $calculation = $this->_scopeConfig->getValue(PriceDataProvider::XML_PATH_RANGE_CALCULATION, ScopeInterface::SCOPE_STORE);
-
         if ($calculation === PriceDataProvider::RANGE_CALCULATION_MANUAL) {
-            $result = true;
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
-    /*  @return int */
+    /* @return int */
     private function getStepValue()
     {
         $value = $this->_scopeConfig->getValue(PriceDataProvider::XML_PATH_RANGE_STEP, ScopeInterface::SCOPE_STORE);

@@ -6,11 +6,5 @@
                 <argument name="template" xsi:type="string">Algolia_AlgoliaSearch::layer/view.phtml</argument>
             </action>
         </referenceBlock>
-
-        <referenceBlock name="product_list_toolbar">
-            <action ifconfig="algoliasearch_instant/instant/backend_rendering_enable" method="setTemplate">
-                <argument name="template" xsi:type="string">Algolia_AlgoliaSearch::product/list/toolbar.phtml</argument>
-            </action>
-        </referenceBlock>
     </body>
 </page>

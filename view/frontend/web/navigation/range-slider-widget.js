@@ -61,7 +61,6 @@ define([
     },
 
     _applyRange : function () {
-      // Do not submit "rate applied" values. Revert the rate on submitted values.
       var range = {
         from : this.from * (1 / this.rate),
         to   : this.to * (1 / this.rate)

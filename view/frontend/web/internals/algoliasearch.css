@@ -1443,3 +1443,7 @@ a.ais-current-refined-values--link:hover {
   background-color: #FFFFFF;
   border: 1px solid #c8c8c8;
 }
+
+.algolia-rendering .sorter-action {
+  display: none;
+}

@@ -70,7 +70,7 @@ class Image extends \Magento\Catalog\Helper\Image
             if ($this->getImageFile()) {
                 $model->setBaseFile($this->getImageFile());
             } else {
-                $model->setBaseFile($this->getProductImageType());
+                $model->setBaseFile($this->getProductImage());
             }
         }
         return $this;
@@ -82,22 +82,28 @@ class Image extends \Magento\Catalog\Helper\Image
      *
      * @return string
      */
-    private function getProductImageType()
+    private function getProductImage()
     {
-        if (!$this->getImageFile() && $this->getType() !== 'image') {
-            if ($this->getProduct()->getTypeId() == ProductTypeConfigurable::TYPE_CODE) {
-                $childProducts = $this->getProduct()->getTypeInstance()->getUsedProducts($this->getProduct());
-                foreach ($childProducts as $childProduct) {
-                    if ($childProduct->getData($this->getType())
-                        && $childProduct->getData($this->getType()) !== 'no_selection') {
-                        $imageUrl = $childProduct->getData($this->getType());
-                        break;
-                    }
-                }
+        $imageUrl = $this->getProduct()->getImage();
+        if (!$this->getImageFile() && $this->getType() !== 'image'
+            && $this->getProduct()->getTypeId() == ProductTypeConfigurable::TYPE_CODE) {
+            $imageUrl = $this->getConfigurableProductImage() ?: $imageUrl;
+        }
+
+        return $imageUrl;
+    }
+
+    private function getConfigurableProductImage()
+    {
+        $childProducts = $this->getProduct()->getTypeInstance()->getUsedProducts($this->getProduct());
+        foreach ($childProducts as $childProduct) {
+            $childImageUrl = $childProduct->getData($this->getType());
+            if ($childImageUrl && $childImageUrl !== 'no_selection') {
+                return $childImageUrl;
             }
         }
 
-        return isset($imageUrl) ? $imageUrl : $this->getProduct()->getImage();
+        return null;
     }
 
     public function removeProtocol($url)

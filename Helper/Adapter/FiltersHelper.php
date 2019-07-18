@@ -208,7 +208,7 @@ class FiltersHelper
     {
         $disjunctiveFacets = [];
         // If the parameters variable is null, fetch them from the request
-        if (is_null($parameters)) {
+        if ($parameters === null) {
             $parameters = $this->request->getParams();
         }
 

@@ -1,5 +1,22 @@
 # CHANGE LOG
 
+## 1.11.2
+
+### UPDATES
+- Fix setSettings on TMP index when settings were not properly merged (#785)
+    * As well the settings are now set to the index immediately before the `move` operation so no settings are lost
+- Update Plugins observers for Magento v2.1 compatibility (#783)
+    * Use `after` and `before` plugin methods instead of `around` methods which increases DX and performance of the extension
+- Update to Category Merchandising by adding notification for category display mode, 50 pins limit, and spacing update to Merchandising page (#795)
+- Add price ranges widget to Landing Page Builder product grid (#779)
+- Add storeID to getFacets for multi-store compatibility (#789)
+
+## 1.11.1
+
+- Fixed compatibility with PHP 5.6 (#776, #780) 
+- Category plugin now uses "before" and "after" merhods instead of "around" methods (#775)
+- Fetch "image" attribute for Product object during indexing (#772)
+
 ## 1.11.0
 
 ### FEATURES

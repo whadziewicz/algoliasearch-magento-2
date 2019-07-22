@@ -32,6 +32,11 @@ class QueueTest extends TestCase
 
     public function testFill()
     {
+        $this->resetConfigs([
+            'algoliasearch_queue/queue/number_of_job_to_run',
+            'algoliasearch_advanced/advanced/number_of_element_by_page',
+        ]);
+
         $this->setConfig('algoliasearch_queue/queue/active', '1');
         $this->connection->query('TRUNCATE TABLE algoliasearch_queue');
 
@@ -62,7 +67,7 @@ class QueueTest extends TestCase
                 continue;
             }
 
-            $this->assertEquals('moveIndex', $row['method']);
+            $this->assertEquals('moveIndexWithSetSettings', $row['method']);
             $this->assertEquals(1, $row['data_size']);
         }
     }
@@ -120,6 +125,8 @@ class QueueTest extends TestCase
     public function testSettings()
     {
         $this->resetConfigs([
+            'algoliasearch_queue/queue/number_of_job_to_run',
+            'algoliasearch_advanced/advanced/number_of_element_by_page',
             'algoliasearch_instant/instant/facets',
             'algoliasearch_products/products/product_additional_attributes',
         ]);
@@ -153,6 +160,45 @@ class QueueTest extends TestCase
         $settings = $this->algoliaHelper->getIndex($this->indexPrefix . 'default_products')->getSettings();
         $this->assertFalse(empty($settings['attributesForFaceting']), 'AttributesForFacetting should be set, but they are not.');
         $this->assertFalse(empty($settings['searchableAttributes']), 'SearchableAttributes should be set, but they are not.');
+    }
+
+    public function testMergeSettings()
+    {
+        $this->setConfig('algoliasearch_queue/queue/active', '1');
+        $this->setConfig('algoliasearch_queue/queue/number_of_job_to_run', 1);
+        $this->setConfig('algoliasearch_advanced/advanced/number_of_element_by_page', 300);
+
+        $this->connection->query('TRUNCATE TABLE algoliasearch_queue');
+
+        /** @var Product $productIndexer */
+        $productIndexer = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\Product');
+        $productIndexer->executeFull();
+
+        $rows = $this->connection->query('SELECT * FROM algoliasearch_queue')->fetchAll();
+        $this->assertCount(3, $rows);
+
+        $productionIndexName = $this->indexPrefix . 'default_products';
+
+        $res = $this->algoliaHelper->getIndex($productionIndexName)->setSettings(['disableTypoToleranceOnAttributes' => ['sku']]);
+        $this->algoliaHelper->waitLastTask($productionIndexName, $res['taskID']);
+
+        $settings = $this->algoliaHelper->getIndex($productionIndexName)->getSettings();
+        $this->assertEquals(['sku'], $settings['disableTypoToleranceOnAttributes']);
+
+        /** @var QueueRunner $queueRunner */
+        $queueRunner = $this->getObjectManager()->create('\Algolia\AlgoliaSearch\Model\Indexer\QueueRunner');
+        $queueRunner->executeFull();
+
+        $this->algoliaHelper->waitLastTask();
+
+        $settings = $this->algoliaHelper->getIndex($this->indexPrefix . 'default_products_tmp')->getSettings();
+        $this->assertEquals(['sku'], $settings['disableTypoToleranceOnAttributes']);
+
+        $queueRunner->executeFull();
+        $queueRunner->executeFull();
+
+        $settings = $this->algoliaHelper->getIndex($productionIndexName)->getSettings();
+        $this->assertEquals(['sku'], $settings['disableTypoToleranceOnAttributes']);
     }
 
     public function testMerging()
@@ -452,8 +498,8 @@ class QueueTest extends TestCase
             ], [
                 'job_id' => 9,
                 'pid' => null,
-                'class' => 'Algolia\AlgoliaSearch\Helper\Data',
-                'method' => 'moveIndex',
+                'class' => 'Algolia\AlgoliaSearch\Model\IndexMover',
+                'method' => 'moveIndexWithSetSettings',
                 'data' => '{"store_id":"3","category_ids":["40"]}',
                 'max_retries' => 3,
                 'retries' => 0,
@@ -472,8 +518,8 @@ class QueueTest extends TestCase
             ], [
                 'job_id' => 11,
                 'pid' => null,
-                'class' => 'Algolia\AlgoliaSearch\Helper\Data',
-                'method' => 'moveIndex',
+                'class' => 'Algolia\AlgoliaSearch\Model\IndexMover',
+                'method' => 'moveIndexWithSetSettings',
                 'data' => '{"store_id":"2","product_ids":["405"]}',
                 'max_retries' => 3,
                 'retries' => 0,
@@ -511,9 +557,9 @@ class QueueTest extends TestCase
         $this->assertEquals('rebuildStoreProductIndex', $jobs[5]->getMethod());
         $this->assertEquals('saveConfigurationToAlgolia', $jobs[6]->getMethod());
         $this->assertEquals('rebuildStoreCategoryIndex', $jobs[7]->getMethod());
-        $this->assertEquals('moveIndex', $jobs[8]->getMethod());
+        $this->assertEquals('moveIndexWithSetSettings', $jobs[8]->getMethod());
         $this->assertEquals('rebuildStoreProductIndex', $jobs[9]->getMethod());
-        $this->assertEquals('moveIndex', $jobs[10]->getMethod());
+        $this->assertEquals('moveIndexWithSetSettings', $jobs[10]->getMethod());
         $this->assertEquals('rebuildStoreProductIndex', $jobs[11]->getMethod());
     }
 
@@ -817,6 +863,11 @@ class QueueTest extends TestCase
 
     public function testMaxSingleJobsSizeOnProductReindex()
     {
+        $this->resetConfigs([
+            'algoliasearch_queue/queue/number_of_job_to_run',
+            'algoliasearch_advanced/advanced/number_of_element_by_page',
+        ]);
+
         $this->setConfig('algoliasearch_queue/queue/active', '1');
 
         $this->setConfig('algoliasearch_queue/queue/number_of_job_to_run', 10);

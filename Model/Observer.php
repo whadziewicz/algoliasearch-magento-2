@@ -96,7 +96,7 @@ class Observer implements ObserverInterface
     {
         $storeId = $this->storeManager->getStore()->getId();
         if ($this->config->isBackendRenderingEnabled($storeId)) {
-            $this->pageConfig->addBodyClass("algolia-rendering");
+            $this->pageConfig->addBodyClass('algolia-rendering');
         }
     }
 }

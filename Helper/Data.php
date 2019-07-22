@@ -273,15 +273,6 @@ class Data
         $this->moveStoreSuggestionIndex($storeId);
     }
 
-    public function moveIndex($tmpIndexName, $indexName)
-    {
-        if ($this->isIndexingEnabled() === false) {
-            return;
-        }
-
-        $this->algoliaHelper->moveIndex($tmpIndexName, $indexName);
-    }
-
     public function moveStoreSuggestionIndex($storeId)
     {
         if ($this->isIndexingEnabled($storeId) === false) {

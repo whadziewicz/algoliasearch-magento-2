@@ -39,7 +39,7 @@ class CategoryObserver
      */
     public function beforeSave(CategoryResourceModel $categoryResource, CategoryModel $category)
     {
-        $categoryResource->addCommitCallback(function() use ($category) {
+        $categoryResource->addCommitCallback(function () use ($category) {
             if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
                 /** @var ProductCollection $productCollection */
                 $productCollection = $category->getProductCollection();
@@ -60,7 +60,7 @@ class CategoryObserver
      */
     public function beforeDelete(CategoryResourceModel $categoryResource, CategoryModel $category)
     {
-        $categoryResource->addCommitCallback(function() use ($category) {
+        $categoryResource->addCommitCallback(function () use ($category) {
             if (!$this->indexer->isScheduled() || $this->configHelper->isQueueActive()) {
                 /* we are using products position because getProductCollection() doesn't use correct store */
                 $productCollection = $category->getProductsPosition();

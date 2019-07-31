@@ -398,6 +398,8 @@ class Data
             return;
         }
 
+        $this->startEmulation($storeId);
+
         /** @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
         $collection = clone $collectionDefault;
         $collection->setCurPage($page)->setPageSize($pageSize);
@@ -435,6 +437,8 @@ class Data
         $collection->clear();
 
         unset($collection);
+
+        $this->stopEmulation();
     }
 
     private function getProductsRecords($storeId, $collection, $potentiallyDeletedProductsIds = null)

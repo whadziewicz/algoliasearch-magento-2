@@ -350,8 +350,12 @@ class Data
             return;
         }
 
+        $this->startEmulation($storeId);
+
         $collection = $this->categoryHelper->getCategoryCollectionQuery($storeId, null);
         $this->rebuildStoreCategoryIndexPage($storeId, $collection, $page, $pageSize);
+
+        $this->stopEmulation();
     }
 
     public function rebuildStoreSuggestionIndexPage($storeId, $collectionDefault, $page, $pageSize)

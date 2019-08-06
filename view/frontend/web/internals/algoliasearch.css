@@ -51,7 +51,7 @@ input::-ms-clear {
 
 /** REFINEMENT LIST */
 
-.ais-menu--link,
+.ais-Menu--link,
 .ais-hierarchical-menu--link,
 .ais-price-ranges--link,
 .ais-refinement-list--label {
@@ -194,13 +194,13 @@ a.ais-current-refined-values--link:hover {
   text-decoration: line-through;
 }
 
-.ais-menu--link:hover,
+.ais-Menu-link:hover,
 .ais-price-ranges--link:hover,
 .ais-hierarchical-menu--link:hover {
   color: #636363;
 }
 
-.ais-menu--count, .ais-hierarchical-menu--count, .ais-refinement-list--count {
+.ais-Menu-count, .ais-hierarchical-menu--count, .ais-refinement-list--count {
   float: right;
   color: #666;
 }

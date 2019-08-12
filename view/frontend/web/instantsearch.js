@@ -1,5 +1,6 @@
-requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBundle, priceUtils) {
-	algoliaBundle.$(function ($) {
+requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], function(algoliaBundle, priceUtils, __) {
+    algoliaBundle.$(function ($) {
+
 
 		/** We have nothing to do here if instantsearch is not enabled **/
 		if (!algoliaConfig.instant.enabled || !(algoliaConfig.isSearchPage || !algoliaConfig.autocomplete.enabled)) {
@@ -9,38 +10,38 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		if (!algoliaConfig.autocomplete.enabled && $(algoliaConfig.autocomplete.selector).length == 0) {
 			return;
 		}
-		
+
 		if ($(algoliaConfig.instant.selector).length <= 0) {
 			throw '[Algolia] Invalid instant-search selector: ' + algoliaConfig.instant.selector;
 		}
-		
+
 		if (algoliaConfig.autocomplete.enabled && $(algoliaConfig.instant.selector).find(algoliaConfig.autocomplete.selector).length > 0) {
 			throw '[Algolia] You can\'t have a search input matching "' + algoliaConfig.autocomplete.selector +
 			'" inside you instant selector "' + algoliaConfig.instant.selector + '"';
 		}
-		
+
 		var findAutocomplete = algoliaConfig.autocomplete.enabled && $(algoliaConfig.instant.selector).find('#algolia-autocomplete-container').length > 0;
 		if (findAutocomplete) {
 			$(algoliaConfig.instant.selector).find('#algolia-autocomplete-container').remove();
 		}
-		
+
 		/** BC of old hooks **/
 		if (typeof algoliaHookBeforeInstantsearchInit === 'function') {
 			algolia.registerHook('beforeInstantsearchInit', algoliaHookBeforeInstantsearchInit);
 		}
-		
+
 		if (typeof algoliaHookBeforeWidgetInitialization === 'function') {
 			algolia.registerHook('beforeWidgetInitialization', algoliaHookBeforeWidgetInitialization);
 		}
-		
+
 		if (typeof algoliaHookBeforeInstantsearchStart === 'function') {
 			algolia.registerHook('beforeInstantsearchStart', algoliaHookBeforeInstantsearchStart);
 		}
-		
+
 		if (typeof algoliaHookAfterInstantsearchStart === 'function') {
 			algolia.registerHook('afterInstantsearchStart', algoliaHookAfterInstantsearchStart);
 		}
-		
+
 		/**
 		 * Setup wrapper
 		 *
@@ -49,13 +50,13 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		 **/
 		var wrapperTemplate = algoliaBundle.Hogan.compile($('#instant_wrapper_template').html());
 		var instant_selector = !algoliaConfig.autocomplete.enabled ? algoliaConfig.autocomplete.selector : "#instant-search-bar";
-		
+
 		var div = document.createElement('div');
 		$(div).addClass('algolia-instant-results-wrapper');
-		
+
 		$(algoliaConfig.instant.selector).addClass('algolia-instant-replaced-content');
 		$(algoliaConfig.instant.selector).wrap(div);
-		
+
 		$('.algolia-instant-results-wrapper').append('<div class="algolia-instant-selector-results"></div>');
 		$('.algolia-instant-selector-results').html(wrapperTemplate.render({
 			second_bar: algoliaConfig.autocomplete.enabled,
@@ -63,13 +64,13 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			config: algoliaConfig.instant,
 			translations: algoliaConfig.translations
 		})).show();
-		
+
 		/**
 		 * Initialise instant search
 		 * For rendering instant search page is used Algolia's instantsearch.js library
 		 * Docs: https://community.algolia.com/instantsearch.js/
 		 **/
-		
+
 		var ruleContexts = ['']; // Empty context to keep BC for already create rules in dashboard
 		if (algoliaConfig.request.categoryId.length > 0) {
 			ruleContexts.push('magento-category-' + algoliaConfig.request.categoryId);
@@ -78,10 +79,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		if (algoliaConfig.request.landingPageId.length > 0) {
 			ruleContexts.push('magento-landingpage-' + algoliaConfig.request.landingPageId);
 		}
-		
+
+		var searchClient = algoliaBundle.algoliasearch(algoliaConfig.applicationId, algoliaConfig.apiKey);
 		var instantsearchOptions = {
-			appId: algoliaConfig.applicationId,
-			apiKey: algoliaConfig.apiKey,
+		    searchClient: searchClient,
 			indexName: algoliaConfig.indexName + '_products',
 			searchParameters: {
 				hitsPerPage: algoliaConfig.hitsPerPage,
@@ -110,38 +111,38 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				}
 			}
 		}
-		
+
 		instantsearchOptions = algolia.triggerHooks('beforeInstantsearchInit', instantsearchOptions, algoliaBundle);
-		
+
 		var search = algoliaBundle.instantsearch(instantsearchOptions);
-		
+
 		search.client.addAlgoliaAgent('Magento2 integration (' + algoliaConfig.extensionVersion + ')');
-		
-		/** Prepare sorting indicies data */
+
+		/** Prepare sorting indices data */
 		algoliaConfig.sortingIndices.unshift({
-			name: algoliaConfig.indexName + '_products',
+			value: algoliaConfig.indexName + '_products',
 			label: algoliaConfig.translations.relevance
 		});
-		
+
 		/** Setup attributes for current refinements widget **/
 		var attributes = [];
 		$.each(algoliaConfig.facets, function (i, facet) {
 			var name = facet.attribute;
-			
+
 			if (name === 'categories') {
 				name = 'categories.level0';
 			}
-			
+
 			if (name === 'price') {
 				name = facet.attribute + algoliaConfig.priceKey
 			}
-			
+
 			attributes.push({
 				name: name,
 				label: facet.label ? facet.label : facet.attribute
 			});
 		});
-		
+
 		var allWidgetConfiguration = {
 			infiniteHits: {},
 			hits: {},
@@ -159,18 +160,18 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					},
 					init: function (data) {
 						var page = data.helper.state.page;
-						
+
 						if (algoliaConfig.request.refinementKey.length > 0) {
 							data.helper.toggleRefine(algoliaConfig.request.refinementKey, algoliaConfig.request.refinementValue);
 						}
-						
+
 						if (algoliaConfig.isCategoryPage) {
 							data.helper.addNumericRefinement('visibility_catalog', '=', 1);
 						}
 						else {
 							data.helper.addNumericRefinement('visibility_search', '=', 1);
 						}
-						
+
 						data.helper.setPage(page);
 					},
 					render: function (data) {
@@ -207,16 +208,16 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 							var content = '<div class="no-results">';
 							content += '<div><b>' + algoliaConfig.translations.noProducts + ' "' + $("<div>").text(data.results.query).html() + '</b>"</div>';
 							content += '<div class="popular-searches">';
-							
+
 							if (algoliaConfig.showSuggestionsOnNoResultsPage && this.suggestions.length > 0) {
 								content += '<div>' + algoliaConfig.translations.popularQueries + '</div>' + this.suggestions.join(', ');
 							}
-							
+
 							content += '</div>';
 							content += algoliaConfig.translations.or + ' <a href="' + algoliaConfig.baseUrl + '/catalogsearch/result/?q=__empty__">' + algoliaConfig.translations.seeAll + '</a>'
-							
+
 							content += '</div>';
-							
+
 							$('#instant-search-results-container').html(content);
 						}
 					}
@@ -228,7 +229,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			 **/
 			searchBox: {
 				container: instant_selector,
-				placeholder: algoliaConfig.translations.searchFor
+				placeholder: algoliaConfig.translations.searchFor,
 			},
 			/**
 			 * Stats
@@ -243,9 +244,9 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					data.first = data.page * data.hitsPerPage + 1;
 					data.last = Math.min(data.page * data.hitsPerPage + data.hitsPerPage, data.nbHits);
 					data.seconds = data.processingTimeMS / 1000;
-					
+
 					data.translations = window.algoliaConfig.translations;
-					
+
 					return data;
 				}
 			},
@@ -253,9 +254,9 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			 * Sorting
 			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/sortBySelector.html
 			 **/
-			sortBySelector: {
+			sortBy: {
 				container: '#algolia-sorts',
-				indices: algoliaConfig.sortingIndices,
+				items: console.log(algoliaConfig.sortingIndices) || algoliaConfig.sortingIndices,
 				cssClass: 'form-control'
 			},
 			/**
@@ -263,21 +264,20 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
 			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
 			 **/
-			currentRefinedValues: {
+			currentRefinements: {
 				container: '#current-refinements',
 				cssClasses: {
-					root: 'facet'
+					// root: 'facet'
 				},
-				templates: {
-					header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
-					clearAll: algoliaConfig.translations.clearAll,
-					item: $('#current-refinements-template').html()
-				},
-				attributes: attributes,
-				onlyListedAttributes: true
+				// templates: {
+				// 	header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
+				// 	clearAll: algoliaConfig.translations.clearAll,
+				// 	item: $('#current-refinements-template').html()
+				// },
+				includedAttributes: attributes
 			}
 		};
-		
+
 		if (algoliaConfig.instant.infiniteScrollEnabled === true) {
 			/**
 			 * Products' infinite hits
@@ -293,18 +293,18 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					item: function (hit) {
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						
+
 						hit.algoliaConfig = window.algoliaConfig;
-						
+
 						hit.__position = hit.__hitIndex + 1;
-						
+
 						return hit;
 					}
 				},
 				showMoreLabel: algoliaConfig.translations.showMore,
 				escapeHits: true
 			};
-			
+
 			delete allWidgetConfiguration.hits;
 		} else {
 			/**
@@ -315,23 +315,25 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			allWidgetConfiguration.hits = {
 				container: '#instant-search-results-container',
 				templates: {
-					item: $('#instant-hit-template').html()
+					// item: $('#instant-hit-template').html()
+					// item: $('#instant-hit-template').html()
+                    item: "<span></span>"
 				},
 				transformData: {
 					item: function (hit) {
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						
+
 						hit.algoliaConfig = window.algoliaConfig;
-						
+
 						var state = search.helper.state;
 						hit.__position = (state.page * state.hitsPerPage) + hit.__hitIndex + 1;
-						
+
 						return hit;
 					}
 				}
 			};
-			
+
 			/**
 			 * Pagination
 			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/pagination.html
@@ -339,21 +341,25 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			allWidgetConfiguration.pagination = {
 				container: '#instant-search-pagination-container',
 				cssClass: 'algolia-pagination',
-				showFirstLast: false,
-				maxPages: 1000,
-				labels: {
+				showFirst: false,
+				showLast: false,
+				showNext: true,
+				showPrevious: true,
+				totalPages: 1000,
+				templates: {
 					previous: algoliaConfig.translations.previousPage,
 					next: algoliaConfig.translations.nextPage
 				},
-				scrollTo: 'body'
+				// scrollTo: 'body'
+				// FIXME: check if this is still needed
 			};
-			
+
 			delete allWidgetConfiguration.infiniteHits;
 		}
-		
+
 		/**
 		 * Here are specified custom attributes widgets which require special code to run properly
-		 * Custom widgets can be added to this object like [attributeName]: function(facet, templates)
+		 * Custom widgets can be added to this object like [attribute]: function(facet, templates)
 		 * Function must return instantsearch.widget object
 		 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets.html
 		 **/
@@ -362,7 +368,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				var hierarchical_levels = [];
 				for (var l = 0; l < 10; l++)
 					hierarchical_levels.push('categories.level' + l.toString());
-				
+
 				var hierarchicalMenuParams = {
 					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributes: hierarchical_levels,
@@ -373,242 +379,287 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					sortBy: ['name:asc'],
 					cssClasses: {
 						list: 'hierarchical',
-						root: 'facet hierarchical'
+						// root: 'facet hierarchical'
 					}
 				};
-				
+
 				hierarchicalMenuParams.templates.item = '' +
 					'<div class="ais-hierearchical-link-wrapper">' +
 					'<a class="{{cssClasses.link}}" href="{{url}}">{{label}}' +
 					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
 					'<span class="{{cssClasses.count}}">{{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}}</span></a>' +
 					'</div>';
-				
-				return ['hierarchicalMenu', hierarchicalMenuParams];
-			}
-		};
-		
-		/** Add all facet widgets to instantsearch object **/
-		
-		window.getFacetWidget = function (facet, templates) {
-			
-			if (facet.type === 'priceRanges') {
-				delete templates.item;
-				
-				return ['priceRanges', {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					labels: {
-						currency: algoliaConfig.currencySymbol,
-						separator: algoliaConfig.translations.to,
-						button: algoliaConfig.translations.go
-					},
-					templates: templates,
-					cssClasses: {
-						root: 'facet conjunctive'
-					}
-				}];
-			}
-			
-			if (facet.type === 'conjunctive') {
-				var refinementListOptions = {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					limit: algoliaConfig.maxValuesPerFacet,
-					operator: 'and',
-					templates: templates,
-					sortBy: ['count:desc', 'name:asc'],
-					cssClasses: {
-						root: 'facet conjunctive'
-					}
-				};
-				
-				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-				
-				return ['refinementList', refinementListOptions];
-			}
-			
-			if (facet.type === 'disjunctive') {
-				var refinementListOptions = {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					limit: algoliaConfig.maxValuesPerFacet,
-					operator: 'or',
-					templates: templates,
-					sortBy: ['count:desc', 'name:asc'],
-					cssClasses: {
-						root: 'facet disjunctive'
-					}
-				};
-				
-				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-				
-				return ['refinementList', refinementListOptions];
-			}
-			
-			if (facet.type === 'slider') {
-				delete templates.item;
 
-				return ['rangeSlider', {
-					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-					attributeName: facet.attribute,
-					templates: templates,
-					cssClasses: {
-						root: 'facet slider'
-					},
-					tooltips: {
-						format: function (formattedValue) {
-							return facet.attribute.match(/price/) === null ?
-								parseInt(formattedValue) :
-								priceUtils.formatPrice(formattedValue, algoliaConfig.priceFormat);
-						}
-					}
-				}];
-			}
-		};
-		
-		var wrapper = document.getElementById('instant-search-facets-container');
-		$.each(algoliaConfig.facets, function (i, facet) {
-			
-			if (facet.attribute.indexOf("price") !== -1)
-				facet.attribute = facet.attribute + algoliaConfig.priceKey;
-			
-			facet.wrapper = wrapper;
-			
-			var templates = {
-				header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
-				item: $('#refinements-lists-item-template').html()
-			};
-			
-			var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
-				customAttributeFacet[facet.attribute](facet, templates) :
-				getFacetWidget(facet, templates);
-			
-			var widgetType = widgetInfo[0],
-				widgetConfig = widgetInfo[1];
-			
-			if (typeof allWidgetConfiguration[widgetType] === 'undefined') {
-				allWidgetConfiguration[widgetType] = [widgetConfig];
-			} else {
-				allWidgetConfiguration[widgetType].push(widgetConfig);
-			}
-		});
-    
-    	if (algoliaConfig.analytics.enabled) {
-			if (typeof algoliaAnalyticsPushFunction !== 'function') {
-				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
-					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
-
-					// Universal Analytics
-					if (typeof window.ga !== 'undefined') {
-						window.ga('set', 'page', trackedUrl);
-						window.ga('send', 'pageView');
-					}
-				};
-			}
-
-			allWidgetConfiguration['analytics'] = {
-				pushFunction: algoliaAnalyticsPushFunction,
-				delay: algoliaConfig.analytics.delay,
-				triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
-				pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
-			};
+			return ['hierarchicalMenu', hierarchicalMenuParams];
 		}
+	};
 
-		// Banner from query rules
-		var bannerWrapper = document.getElementById('algolia-banner');
-		if (bannerWrapper !== null) {
-			var widgetConfig = {
-				templates: {
-					allItems: function(config) {
-						if (config && config.userData) {
-							var userData = config.userData;
-							var banners = userData.map(function(userDataObj) {
-								return userDataObj.banner;
-							});
-							return banners.join('');
-						}
-						return '';
-					},
-					empty: function(query) {
-						return '';
-			 		}
+	/** Add all facet widgets to instantsearch object **/
+
+	window.getFacetWidget = function (facet, templates) {
+
+	    var panelOptions = {
+	        templates: {
+                header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
+            },
+            cssClasses: {
+	            root: 'facet'
+            }
+        };
+		if (facet.type === 'priceRanges') {
+			delete templates.item;
+
+			return ['priceRanges', {
+				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+				attribute: facet.attribute,
+				labels: {
+					currency: algoliaConfig.currencySymbol,
+					separator: algoliaConfig.translations.to,
+					button: algoliaConfig.translations.go
 				},
-				container: bannerWrapper,
+				templates: templates,
+				cssClasses: {
+                    // root: 'facet conjunctive'
+                    root: 'conjunctive'
+				},
+                panelOptions: panelOptions,
+			}];
+		}
+
+		if (facet.type === 'conjunctive') {
+			var refinementListOptions = {
+				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+				attribute: facet.attribute,
+				limit: algoliaConfig.maxValuesPerFacet,
+				operator: 'and',
+				templates: templates,
+				sortBy: ['count:desc', 'name:asc'],
+				cssClasses: {
+					// root: 'facet conjunctive'
+					root: 'conjunctive'
+				},
+                panelOptions: panelOptions
 			};
 
-			if (typeof allWidgetConfiguration['hits'] === 'undefined') {
-				allWidgetConfiguration['hits'] = [widgetConfig];
-			} else {
-				var currentHits = allWidgetConfiguration['hits'];
-				allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
-			}
+			refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
+
+			return ['refinementList', refinementListOptions];
 		}
-		
-		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
-		
-		$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
-			if (Array.isArray(widgetConfig) === true) {
-				$.each (widgetConfig, function (i, widgetConfig) {
-					addWidget(search, widgetType, widgetConfig);
-				});
-			} else {
-				addWidget(search, widgetType, widgetConfig);
-			}
-		});
-		
-		var isStarted = false;
-		function startInstantSearch() {
-			if(isStarted === true) {
-				return;
-			}
-			
-			search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
-			
-			search.start();
-			
-			search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
-			
-			var instant_search_bar = $(instant_selector);
-			if (instant_search_bar.is(":focus") === false) {
-				focusInstantSearchBar(search, instant_search_bar);
-			}
-			
-			if (algoliaConfig.autocomplete.enabled) {
-				$('#search_mini_form').addClass('search-page');
-			}
-			
-			$(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
-				focusInstantSearchBar(search, instant_search_bar);
-			});
-			
-			isStarted = true;
+
+		console.log(templates)
+		if (facet.type === 'disjunctive') {
+			var refinementListOptions = {
+				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+				attribute: facet.attribute,
+				limit: algoliaConfig.maxValuesPerFacet,
+				operator: 'or',
+				templates: templates,
+				sortBy: ['count:desc', 'name:asc'],
+                panelOptions: panelOptions,
+				cssClasses: {
+					// root: 'facet disjunctive'
+					root: 'disjunctive'
+                    /*
+root: '',
+noRefinementRoot: '',
+noResults:'',
+list: the list of results.
+item: the list items. They contain the link and separator.
+selectedItem: each selected item in the list.
+label: each label element (when using the default template).
+checkbox: each checkbox element (when using the default template).
+labelText: each label text element.
+showMore: the “Show more” element.
+disabledShowMore: the disabled “Show more” element.
+count: each count element (when using the default template).
+searchableRoot: the root element of the search box.
+searchableForm: the form element of the search box.
+searchableInput: the input element of the search box.
+searchableSubmit: the reset button element of the search box.
+searchableSubmitIcon: the reset button icon of the search box.
+searchableReset: the loading indicator element of the search box.
+searchableResetIcon: the loading indicator icon of the search box.
+searchableLoadingIndicator: the submit button element of the search box.
+searchableLoadingIcon: the submit button icon of the search box.
+
+                     */
+				}
+			};
+
+			refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
+
+			return ['refinementList', refinementListOptions];
 		}
-		
-		/** Initialise searching **/
-		startInstantSearch();
+
+		if (facet.type === 'slider') {
+			delete templates.item;
+
+			return ['rangeSlider', {
+				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+				attribute: facet.attribute,
+				templates: templates,
+				cssClasses: {
+					// root: 'facet slider'
+					root: 'slider'
+				},
+				tooltips: {
+					format: function (formattedValue) {
+						return facet.attribute.match(/price/) === null ?
+							parseInt(formattedValue) :
+							priceUtils.formatPrice(formattedValue, algoliaConfig.priceFormat);
+					}
+				}
+			}];
+		}
+	};
+
+	var wrapper = document.getElementById('instant-search-facets-container');
+	$.each(algoliaConfig.facets, function (i, facet) {
+
+		if (facet.attribute.indexOf("price") !== -1)
+			facet.attribute = facet.attribute + algoliaConfig.priceKey;
+
+		facet.wrapper = wrapper;
+
+		var templates = {
+			// header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
+			item: $('#refinements-lists-item-template').html()
+		};
+
+		var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
+			customAttributeFacet[facet.attribute](facet, templates) :
+			getFacetWidget(facet, templates);
+
+		var widgetType = widgetInfo[0],
+			widgetConfig = widgetInfo[1];
+
+		if (typeof allWidgetConfiguration[widgetType] === 'undefined') {
+			allWidgetConfiguration[widgetType] = [widgetConfig];
+		} else {
+			allWidgetConfiguration[widgetType].push(widgetConfig);
+		}
 	});
-	
-	function addWidget(search, type, config) {
-		if (type === 'custom') {
-			search.addWidget(config);
-			
-			return;
-		}
-		
-		search.addWidget(algoliaBundle.instantsearch.widgets[type](config));
-	}
-	
-	function addSearchForFacetValues(facet, options) {
-		if (facet.searchable === '1') {
-			options['searchForFacetValues'] = {
-				placeholder: algoliaConfig.translations.searchForFacetValuesPlaceholder,
-				templates: {
-					noResults: '<div class="sffv-no-results">' + algoliaConfig.translations.noResults + '</div>'
+
+	if (algoliaConfig.analytics.enabled) {
+		if (typeof algoliaAnalyticsPushFunction !== 'function') {
+			var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
+				var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
+
+				// Universal Analytics
+				if (typeof window.ga !== 'undefined') {
+					window.ga('set', 'page', trackedUrl);
+					window.ga('send', 'pageView');
 				}
 			};
 		}
-		
+
+		allWidgetConfiguration['analytics'] = {
+			pushFunction: algoliaAnalyticsPushFunction,
+			delay: algoliaConfig.analytics.delay,
+			triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
+			pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
+		};
+	}
+
+	// Banner from query rules
+	var bannerWrapper = document.getElementById('algolia-banner');
+	if (bannerWrapper !== null) {
+		var widgetConfig = {
+			templates: {
+				allItems: function(config) {
+					if (config && config.userData) {
+						var userData = config.userData;
+						var banners = userData.map(function(userDataObj) {
+							return userDataObj.banner;
+						});
+						return banners.join('');
+					}
+					return '';
+				},
+				empty: function(query) {
+					return '';
+				}
+			},
+			container: bannerWrapper,
+		};
+
+		if (typeof allWidgetConfiguration['hits'] === 'undefined') {
+			allWidgetConfiguration['hits'] = [widgetConfig];
+		} else {
+			var currentHits = allWidgetConfiguration['hits'];
+			allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
+		}
+	}
+
+	allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
+
+	$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
+		if (Array.isArray(widgetConfig) === true) {
+			$.each (widgetConfig, function (i, widgetConfig) {
+				addWidget(search, widgetType, widgetConfig);
+			});
+		} else {
+			addWidget(search, widgetType, widgetConfig);
+		}
+	});
+
+	var isStarted = false;
+	function startInstantSearch() {
+		if(isStarted === true) {
+			return;
+		}
+
+		search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
+
+		search.start();
+
+		search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
+
+		var instant_search_bar = $(instant_selector);
+		if (instant_search_bar.is(":focus") === false) {
+			focusInstantSearchBar(search, instant_search_bar);
+		}
+
+		if (algoliaConfig.autocomplete.enabled) {
+			$('#search_mini_form').addClass('search-page');
+		}
+
+		$(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
+				focusInstantSearchBar(search, instant_search_bar);
+			});
+
+			isStarted = true;
+		}
+
+		/** Initialise searching **/
+		startInstantSearch();
+	});
+
+	function addWidget(search, type, config) {
+		if (type === 'custom') {
+			search.addWidget(config);
+
+			return;
+		}
+		var widget = algoliaBundle.instantsearch.widgets[type];
+		if (config.panelOptions) {
+            widget = algoliaBundle.instantsearch.widgets.panel(config.panelOptions)(widget);
+        }
+		delete config.panelOptions;
+
+		search.addWidget(widget(config));
+	}
+
+	function addSearchForFacetValues(facet, options) {
+	    console.log(facet)
+		if (facet.searchable === '1') {
+            options.searchable = true;
+            options.searchableIsAlwaysActive = false;
+		    options.searchablePlaceholder =  algoliaConfig.translations.searchForFacetValuesPlaceholder;
+			options.templates = options.templates || {};
+			options.templates.searchableNoResults = '<div class="sffv-no-results">' + algoliaConfig.translations.noResults + '</div>';
+		}
+
 		return options;
 	}
 });

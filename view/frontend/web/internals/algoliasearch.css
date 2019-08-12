@@ -526,17 +526,17 @@ a.ais-current-refined-values--link:hover {
     right: 0;
     height: 100%;
   }
-  
+
   #algolia-autocomplete-container .col3 {
     float: left;
     width: 30%;
   }
-  
+
   #algolia-autocomplete-container.reverse .col3 {
     float: left;
     width: 30%;
   }
-  
+
   #algolia-autocomplete-container.reverse .col9 {
     border-right: solid 1px #eeeeee;
     float: left;
@@ -1021,10 +1021,16 @@ a.ais-current-refined-values--link:hover {
   display: block;
 }
 
-#algolia_instant_selector .as-search-box--input {
+#algolia_instant_selector .as-search-box--input,
+#algolia_instant_selector .ais-SearchBox-input {
   width: 100%;
   height: 40px;
   font-family: "Raleway", "Helvetica Neue", Verdana, Arial, sans-serif;
+  position: relative;
+}
+
+#algolia_instant_selector  .ais-SearchBox-input {
+    height: 36px;
 }
 
 #algolia_instant_selector #instant-search-bar:focus {
@@ -1046,7 +1052,7 @@ a.ais-current-refined-values--link:hover {
   width: 140px;
   text-align: right;
 }
-
+.ais-SearchBox-submit,
 .ais-search-box--magnifier {
   background: transparent;
   position: absolute;
@@ -1057,7 +1063,12 @@ a.ais-current-refined-values--link:hover {
   top: 8px;
   left: 7px;
 }
-
+button.ais-SearchBox-submit {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+}
+.ais-SearchBox-submit svg,
 .ais-search-box--magnifier svg {
   display: block;
   vertical-align: middle;
@@ -1067,6 +1078,7 @@ a.ais-current-refined-values--link:hover {
   stroke: #FFFFFF;
 }
 
+.ais-SearchBox-reset,
 .ais-search-box--reset {
   background: none !important;
   box-shadow: none !important;
@@ -1082,11 +1094,18 @@ a.ais-current-refined-values--link:hover {
   -ms-user-select: none;
   user-select: none;
 }
+.ais-SearchBox-reset svg,
 .ais-search-box--reset svg {
   display: block;
   width: 17px;
   height: 17px;
   fill: #636363;
+}
+
+button.ais-SearchBox-reset {
+    padding: 0;
+    border: none;
+    box-shadow: none;
 }
 
 #algolia_instant_selector .before_special {
@@ -1125,22 +1144,22 @@ a.ais-current-refined-values--link:hover {
   vertical-align: middle;
 }
 
-#algolia_instant_selector button:not(.ais-price-ranges--button) {
-  background: #f4f4f4 none repeat scroll 0 0;
-  display: block;
-  margin: 0 auto auto;
-  padding: 7px 15px;
-  border: 0 none;
-  color: #666666;
-  font-size: 13px;
-  font-weight: normal;
-  font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;
-  line-height: 19px;
-  text-align: center;
-  text-transform: uppercase;
-  vertical-align: middle;
-  white-space: nowrap;
-}
+/*#algolia_instant_selector button:not(.ais-price-ranges--button) {*/
+  /*background: #f4f4f4 none repeat scroll 0 0;*/
+  /*display: block;*/
+  /*margin: 0 auto auto;*/
+  /*padding: 7px 15px;*/
+  /*border: 0 none;*/
+  /*color: #666666;*/
+  /*font-size: 13px;*/
+  /*font-weight: normal;*/
+  /*font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;*/
+  /*line-height: 19px;*/
+  /*text-align: center;*/
+  /*text-transform: uppercase;*/
+  /*vertical-align: middle;*/
+  /*white-space: nowrap;*/
+/*}*/
 
 #algolia_instant_selector button:not(.ais-price-ranges--button):hover {
   background: rgb(53, 153, 204) none repeat scroll 0 0;
@@ -1214,19 +1233,19 @@ a.ais-current-refined-values--link:hover {
   #algolia_instant_selector .col-md-3, #algolia_instant_selector .col-md-4, #algolia_instant_selector .col-md-9, #algolia_instant_selector .col-md-12 {
     float: left;
   }
-  
+
   #algolia_instant_selector .col-md-12 {
     width: 100%;
   }
-  
+
   #algolia_instant_selector .col-md-9 {
     width: 75%;
   }
-  
+
   #algolia_instant_selector .col-md-4 {
     width: 33.33333333%;
   }
-  
+
   #algolia_instant_selector .col-md-3 {
     width: 25%;
   }
@@ -1253,11 +1272,11 @@ a.ais-current-refined-values--link:hover {
   #algolia_instant_selector .visible-xs {
     display: block !important
   }
-  
+
   #algolia_instant_selector .hidden-xs {
     display: none!important
   }
-  
+
   .algolia-search-block {
     clear: both;
   }
@@ -1267,7 +1286,7 @@ a.ais-current-refined-values--link:hover {
   #algolia_instant_selector .visible-sm {
     display: block !important
   }
-  
+
   #algolia_instant_selector .hidden-sm {
     display: none!important
   }
@@ -1446,4 +1465,12 @@ a.ais-current-refined-values--link:hover {
 
 .algolia-rendering .sorter-action {
   display: none;
+}
+
+/* added */
+#algolia_instant_selector [hidden] {
+    display: none !important;
+}
+#algolia_instant_selector #instant-search-bar {
+    padding: 0;
 }

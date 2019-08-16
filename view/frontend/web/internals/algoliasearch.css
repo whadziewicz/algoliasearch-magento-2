@@ -1145,22 +1145,22 @@ button.ais-SearchBox-reset {
   vertical-align: middle;
 }
 
-/*#algolia_instant_selector button:not(.ais-price-ranges--button) {*/
-  /*background: #f4f4f4 none repeat scroll 0 0;*/
-  /*display: block;*/
-  /*margin: 0 auto auto;*/
-  /*padding: 7px 15px;*/
-  /*border: 0 none;*/
-  /*color: #666666;*/
-  /*font-size: 13px;*/
-  /*font-weight: normal;*/
-  /*font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;*/
-  /*line-height: 19px;*/
-  /*text-align: center;*/
-  /*text-transform: uppercase;*/
-  /*vertical-align: middle;*/
-  /*white-space: nowrap;*/
-/*}*/
+#algolia_instant_selector button:not(.ais-price-ranges--button) {
+  background: #f4f4f4 none repeat scroll 0 0;
+  display: block;
+  margin: 0 auto auto;
+  padding: 7px 15px;
+  border: 0 none;
+  color: #666666;
+  font-size: 13px;
+  font-weight: normal;
+  font-family: "Raleway","Helvetica Neue",Verdana,Arial,sans-serif;
+  line-height: 19px;
+  text-align: center;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
 
 #algolia_instant_selector button:not(.ais-price-ranges--button):hover {
   background: rgb(53, 153, 204) none repeat scroll 0 0;

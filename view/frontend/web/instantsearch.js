@@ -230,6 +230,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			searchBox: {
 				container: instant_selector,
 				placeholder: algoliaConfig.translations.searchFor,
+                showSubmit: false
 			},
 			/**
 			 * Stats
@@ -264,17 +265,29 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
 			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
 			 **/
-			currentRefinements: {
+            currentRefinements: {
 				container: '#current-refinements',
-				cssClasses: {
-					// root: 'facet'
-				},
-				// templates: {
+				templates: {
 				// 	header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
 				// 	clearAll: algoliaConfig.translations.clearAll,
-				// 	item: $('#current-refinements-template').html()
-				// },
-				includedAttributes: attributes
+					item: $('#current-refinements-template').html()
+				},
+                panelOptions: {
+                    templates: {
+                        header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>'
+                    },
+                    cssClasses: {
+                        root: 'facet hierarchical'
+                    },
+                },
+				includedAttributes: console.log(attributes) || attributes.map(attribute => attribute.name),
+                transformItems: items => {
+				    console.log(items);
+				    return items.map(item => {
+				        const attribute = attributes.filter(_attribute => item.attribute === _attribute.name)[0]
+                        return {...item, label: attribute.label }
+                    })
+                }
 			}
 		};
 
@@ -468,7 +481,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			return ['refinementList', refinementListOptions];
 		}
 
-		console.log(templates)
 		if (facet.type === 'disjunctive') {
 			var refinementListOptions = {
 				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
@@ -479,32 +491,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				sortBy: ['count:desc', 'name:asc'],
                 panelOptions: panelOptions,
 				cssClasses: {
-					// root: 'facet disjunctive'
 					root: 'disjunctive'
-                    /*
-root: '',
-noRefinementRoot: '',
-noResults:'',
-list: the list of results.
-item: the list items. They contain the link and separator.
-selectedItem: each selected item in the list.
-label: each label element (when using the default template).
-checkbox: each checkbox element (when using the default template).
-labelText: each label text element.
-showMore: the “Show more” element.
-disabledShowMore: the disabled “Show more” element.
-count: each count element (when using the default template).
-searchableRoot: the root element of the search box.
-searchableForm: the form element of the search box.
-searchableInput: the input element of the search box.
-searchableSubmit: the reset button element of the search box.
-searchableSubmitIcon: the reset button icon of the search box.
-searchableReset: the loading indicator element of the search box.
-searchableResetIcon: the loading indicator icon of the search box.
-searchableLoadingIndicator: the submit button element of the search box.
-searchableLoadingIcon: the submit button icon of the search box.
-
-                     */
 				}
 			};
 
@@ -679,7 +666,6 @@ searchableLoadingIcon: the submit button icon of the search box.
 	}
 
 	function addSearchForFacetValues(facet, options) {
-	    console.log(facet)
 		if (facet.searchable === '1') {
             options.searchable = true;
             options.searchableIsAlwaysActive = false;

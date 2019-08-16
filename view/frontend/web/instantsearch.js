@@ -256,7 +256,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			 **/
 			sortBy: {
 				container: '#algolia-sorts',
-				items: console.log(algoliaConfig.sortingIndices) || algoliaConfig.sortingIndices,
+				items: algoliaConfig.sortingIndices,
 				cssClass: 'form-control'
 			},
 			/**
@@ -292,6 +292,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				transformData: {
 					item: function (hit) {
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+                        // FIXME: transformHit is a global
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
 
 						hit.algoliaConfig = window.algoliaConfig;
@@ -315,13 +316,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			allWidgetConfiguration.hits = {
 				container: '#instant-search-results-container',
 				templates: {
-					// item: $('#instant-hit-template').html()
-					// item: $('#instant-hit-template').html()
-                    item: "<span></span>"
+					item: $('#instant-hit-template').html()
 				},
 				transformData: {
 					item: function (hit) {
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+						// FIXME: transformHit is a global
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
 
 						hit.algoliaConfig = window.algoliaConfig;
@@ -373,22 +373,28 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 					attributes: hierarchical_levels,
 					separator: ' /// ',
+                    templates: templates,
 					alwaysGetRootLevel: true,
 					limit: algoliaConfig.maxValuesPerFacet,
-					templates: templates,
 					sortBy: ['name:asc'],
 					cssClasses: {
-						list: 'hierarchical',
-						// root: 'facet hierarchical'
+					    depth: 'deeep'
 					}
 				};
 
 				hierarchicalMenuParams.templates.item = '' +
-					'<div class="ais-hierearchical-link-wrapper">' +
-					'<a class="{{cssClasses.link}}" href="{{url}}">{{label}}' +
-					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
-					'<span class="{{cssClasses.count}}">{{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}}</span></a>' +
-					'</div>';
+					'<a class="{{cssClasses.link}} {{#isRefined}}{{cssClasses.link}}--selected{{/isRefined}}" href="{{url}}">{{label}}' + ' ' +
+					'<span class="{{cssClasses.count}}">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>' + ' ' +
+                    '{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
+                    '</a>';
+				hierarchicalMenuParams.panelOptions = {
+                    templates: {
+                        header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
+                    },
+                    cssClasses: {
+                        root: 'facet hierarchical'
+                    },
+                };
 
 			return ['hierarchicalMenu', hierarchicalMenuParams];
 		}
@@ -404,6 +410,23 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
             },
             cssClasses: {
 	            root: 'facet'
+            },
+            hidden: function (options) {
+                if (!options.results) return true;
+                switch (facet.type) {
+                    case 'conjunctive':
+                        var facetsNames = options.results.facet.map(function (f) {
+                            return f.name
+                        });
+                        return facetsNames.indexOf(facet.attribute) === -1;
+                    case 'disjunctive':
+                        var disjunctiveFacetsNames = options.results.disjunctiveFacets.map(function (f) {
+                            return f.name
+                        });
+                        return disjunctiveFacetsNames.indexOf(facet.attribute) === -1;
+                    default:
+                        return false;
+                }
             }
         };
 		if (facet.type === 'priceRanges') {
@@ -419,7 +442,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				},
 				templates: templates,
 				cssClasses: {
-                    // root: 'facet conjunctive'
                     root: 'conjunctive'
 				},
                 panelOptions: panelOptions,
@@ -502,6 +524,8 @@ searchableLoadingIcon: the submit button icon of the search box.
 					// root: 'facet slider'
 					root: 'slider'
 				},
+                pips: false,
+                panelOptions: panelOptions,
 				tooltips: {
 					format: function (formattedValue) {
 						return facet.attribute.match(/price/) === null ?
@@ -566,16 +590,18 @@ searchableLoadingIcon: the submit button icon of the search box.
 	if (bannerWrapper !== null) {
 		var widgetConfig = {
 			templates: {
-				allItems: function(config) {
-					if (config && config.userData) {
-						var userData = config.userData;
-						var banners = userData.map(function(userDataObj) {
-							return userDataObj.banner;
-						});
-						return banners.join('');
-					}
-					return '';
-				},
+				// allItems: function(config) {
+				// 	if (config && config.userData) {
+				// 		var userData = config.userData;
+				// 		var banners = userData.map(function(userDataObj) {
+				// 			return userDataObj.banner;
+				// 		});
+				// 		return banners.join('');
+				// 	}
+				// 	return '';
+				// },
+                item: item => '',
+                // FIXME: fix banners
 				empty: function(query) {
 					return '';
 				}
@@ -618,6 +644,7 @@ searchableLoadingIcon: the submit button icon of the search box.
 		var instant_search_bar = $(instant_selector);
 		if (instant_search_bar.is(":focus") === false) {
 			focusInstantSearchBar(search, instant_search_bar);
+            // FIXME: focusInstantSearchBar is a global
 		}
 
 		if (algoliaConfig.autocomplete.enabled) {
@@ -626,6 +653,7 @@ searchableLoadingIcon: the submit button icon of the search box.
 
 		$(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
 				focusInstantSearchBar(search, instant_search_bar);
+                // FIXME: focusInstantSearchBar is a global
 			});
 
 			isStarted = true;

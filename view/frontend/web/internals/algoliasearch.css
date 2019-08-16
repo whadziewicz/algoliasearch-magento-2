@@ -848,6 +848,7 @@ a.ais-current-refined-values--link:hover {
   margin-bottom: 30px;
 }
 
+#algolia_instant_selector .ais-Hits-item .product-reviews-summary,
 #algolia_instant_selector .ais-hits--item .product-reviews-summary {
   text-align: center;
   margin-top: 5px;
@@ -1467,10 +1468,3 @@ button.ais-SearchBox-reset {
   display: none;
 }
 
-/* added */
-#algolia_instant_selector [hidden] {
-    display: none !important;
-}
-#algolia_instant_selector #instant-search-bar {
-    padding: 0;
-}

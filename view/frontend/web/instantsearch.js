@@ -257,12 +257,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			 **/
 			sortBy: {
 				container: '#algolia-sorts',
-				items: console.log(algoliaConfig.sortingIndices)  || algoliaConfig.sortingIndices.map(function (sortingIndice){
-				    return {
-                        label: sortingIndice.label,
-                        value: sortingIndice.name,
-                    }
-                }),
+				items: console.log(algoliaConfig.sortingIndices) || algoliaConfig.sortingIndices.map(function (sortingIndice) {
+					return {
+						label: sortingIndice.label,
+						value: sortingIndice.name,
+					}
+				}),
 				cssClass: 'form-control'
 			},
 			/**
@@ -270,29 +270,52 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			 * Widget displays all filters and refinements applied on query. It also let your customer to clear them one by one
 			 * Docs: https://community.algolia.com/instantsearch.js/v2/widgets/currentRefinedValues.html
 			 **/
-            currentRefinements: {
+			currentRefinements: {
 				container: '#current-refinements',
 				templates: {
-				// 	header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
-				// 	clearAll: algoliaConfig.translations.clearAll,
+					// 	header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>',
+					// 	clearAll: algoliaConfig.translations.clearAll,
 					item: $('#current-refinements-template').html()
 				},
-                panelOptions: {
-                    templates: {
-                        header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>'
-                    },
-                    cssClasses: {
-                        root: 'facet hierarchical'
-                    },
-                },
-				includedAttributes: console.log(attributes) || attributes.map(attribute => attribute.name),
-                transformItems: items => {
-				    return items.map(item => {
-				        const attribute = attributes.filter(_attribute => item.attribute === _attribute.name)[0]
-                        return {...item, label: attribute.label }
-                    })
-                }
-			}
+				panelOptions: {
+					templates: {
+						header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>'
+					}
+				},
+                includedAttributes: attributes.map(function (attribute) {
+                    return attribute.name
+                }),
+				transformItems: function (items) {
+					return items.map(function (item) {
+						var attribute = attributes.filter(function (_attribute) {
+							return item.attribute === _attribute.name
+						})[0];
+						if (!attribute) return item;
+						return {...item, label: attribute.label}
+					})
+				}
+			},
+
+
+			clearRefinements: {
+				container: '#clear-refinements',
+				templates: {
+					resetLabel: algoliaConfig.translations.clearAll,
+				},
+				includedAttributes: attributes.map(function (attribute) {
+					return attribute.name
+				}),
+				transformItems: function (items) {
+					return items.map(function (item) {
+						var attribute = attributes.filter(function (_attribute) {
+							return item.attribute === _attribute.name
+						})[0];
+						if (!attribute) return item;
+						return {...item, label: attribute.label}
+					})
+				}
+			},
+
 		};
 
 		if (algoliaConfig.instant.infiniteScrollEnabled === true) {
@@ -329,8 +352,8 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			allWidgetConfiguration.hits = {
 				container: '#instant-search-results-container',
 				templates: {
-                    item: $('#instant-hit-template').html(),
-                    empty: $('#instant-hit-template-empty').html()
+					item: $('#instant-hit-template').html(),
+					empty: $('#instant-hit-template-empty').html()
 				},
 				transformData: {
 					item: function (hit) {
@@ -389,16 +412,13 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				hierarchicalMenuParams.templates.item = '' +
 					'<a class="{{cssClasses.link}} {{#isRefined}}{{cssClasses.link}}--selected{{/isRefined}}" href="{{url}}">{{label}}' + ' ' +
 					'<span class="{{cssClasses.count}}">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>' + ' ' +
-                    '{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
-                    '</a>';
+					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
+					'</a>';
 				hierarchicalMenuParams.panelOptions = {
-                    templates: {
-                        header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
-                    },
-                    cssClasses: {
-                        root: 'facet hierarchical'
-                    },
-                };
+					templates: {
+						header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
+					}
+				};
 
 			return ['hierarchicalMenu', hierarchicalMenuParams];
 		}
@@ -411,9 +431,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 	    var panelOptions = {
 	        templates: {
                 header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
-            },
-            cssClasses: {
-	            root: 'facet'
             },
             hidden: function (options) {
                 if (!options.results) return true;
@@ -461,7 +478,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				templates: templates,
 				sortBy: ['count:desc', 'name:asc'],
 				cssClasses: {
-					// root: 'facet conjunctive'
 					root: 'conjunctive'
 				},
                 panelOptions: panelOptions
@@ -498,12 +514,8 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
 				attribute: facet.attribute,
 				templates: templates,
-				cssClasses: {
-					// root: 'facet slider'
-					root: 'slider'
-				},
-                pips: false,
-                panelOptions: panelOptions,
+				pips: false,
+				panelOptions: panelOptions,
 				tooltips: {
 					format: function (formattedValue) {
 						return facet.attribute.match(/price/) === null ?
@@ -524,7 +536,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 		facet.wrapper = wrapper;
 
 		var templates = {
-			// header: '<div class="name">' + (facet.label ? facet.label : facet.attribute) + '</div>',
 			item: $('#refinements-lists-item-template').html()
 		};
 
@@ -563,8 +574,9 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 		};
 	}
 
+	// FIXME: migrate to queryCUstim
 	// Banner from query rules
-	var bannerWrapper = document.getElementById('algolia-banner');
+	// var bannerWrapper = document.getElementById('algolia-banner');
 	// if (bannerWrapper !== null) {
 	// 	var widgetConfig = {
 	// 		templates: {

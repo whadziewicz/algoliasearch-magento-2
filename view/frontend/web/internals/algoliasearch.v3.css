@@ -1,10 +1,6 @@
 @import "./algolia-reset.css";
 @import "./grid.css";
 
-#algolia_instant_selector [hidden] {
-  display: none !important;
-}
-
 /* infos */
 .algolia-infos {
     padding: 6px 10px;
@@ -58,11 +54,6 @@ input.ais-SearchBox-input {
 /* Hits */
 
 /* HierarchicalMenu */
-
-.ais-HierarchicalMenu-list--child .ais-HierarchicalMenu-list {
-  padding-left: 1em;
-}
-
 .ais-HierarchicalMenu-item {
   margin: 0;
 }
@@ -84,7 +75,6 @@ input.ais-SearchBox-input {
 }
 
 /* RefinementList */
-
 .ais-RefinementList-searchBox {
   padding-bottom: 7px;
 }

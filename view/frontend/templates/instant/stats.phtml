@@ -9,5 +9,7 @@
         </strong>
     {{/hasManyResults}}
 
+    {{^hasNoResults}}
     <?php echo $block->escapeHtml(__('in')); ?> {{seconds}} <?php echo $block->escapeHtml(__('seconds')); ?>
+    {{/hasNoResults}}
 </script>

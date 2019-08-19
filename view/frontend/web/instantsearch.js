@@ -120,7 +120,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 
 		/** Prepare sorting indices data */
 		algoliaConfig.sortingIndices.unshift({
-			value: algoliaConfig.indexName + '_products',
+			name: algoliaConfig.indexName + '_products',
 			label: algoliaConfig.translations.relevance
 		});
 
@@ -257,7 +257,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			 **/
 			sortBy: {
 				container: '#algolia-sorts',
-				items: algoliaConfig.sortingIndices,
+				items: console.log(algoliaConfig.sortingIndices)  || algoliaConfig.sortingIndices.map(function (sortingIndice){
+				    return {
+                        label: sortingIndice.label,
+                        value: sortingIndice.name,
+                    }
+                }),
 				cssClass: 'form-control'
 			},
 			/**
@@ -282,7 +287,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
                 },
 				includedAttributes: console.log(attributes) || attributes.map(attribute => attribute.name),
                 transformItems: items => {
-				    console.log(items);
 				    return items.map(item => {
 				        const attribute = attributes.filter(_attribute => item.attribute === _attribute.name)[0]
                         return {...item, label: attribute.label }
@@ -307,11 +311,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
                         // FIXME: transformHit is a global
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-
 						hit.algoliaConfig = window.algoliaConfig;
-
-						hit.__position = hit.__hitIndex + 1;
-
 						return hit;
 					}
 				},
@@ -329,19 +329,15 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 			allWidgetConfiguration.hits = {
 				container: '#instant-search-results-container',
 				templates: {
-					item: $('#instant-hit-template').html()
+                    item: $('#instant-hit-template').html(),
+                    empty: $('#instant-hit-template-empty').html()
 				},
 				transformData: {
 					item: function (hit) {
 						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
 						// FIXME: transformHit is a global
 						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-
 						hit.algoliaConfig = window.algoliaConfig;
-
-						var state = search.helper.state;
-						hit.__position = (state.page * state.hitsPerPage) + hit.__hitIndex + 1;
-
 						return hit;
 					}
 				}
@@ -362,9 +358,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 				templates: {
 					previous: algoliaConfig.translations.previousPage,
 					next: algoliaConfig.translations.nextPage
-				},
-				// scrollTo: 'body'
-				// FIXME: check if this is still needed
+				}
 			};
 
 			delete allWidgetConfiguration.infiniteHits;
@@ -389,10 +383,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
                     templates: templates,
 					alwaysGetRootLevel: true,
 					limit: algoliaConfig.maxValuesPerFacet,
-					sortBy: ['name:asc'],
-					cssClasses: {
-					    depth: 'deeep'
-					}
+					sortBy: ['name:asc']
 				};
 
 				hierarchicalMenuParams.templates.item = '' +
@@ -574,35 +565,33 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils', 'mage/translate'], 
 
 	// Banner from query rules
 	var bannerWrapper = document.getElementById('algolia-banner');
-	if (bannerWrapper !== null) {
-		var widgetConfig = {
-			templates: {
-				// allItems: function(config) {
-				// 	if (config && config.userData) {
-				// 		var userData = config.userData;
-				// 		var banners = userData.map(function(userDataObj) {
-				// 			return userDataObj.banner;
-				// 		});
-				// 		return banners.join('');
-				// 	}
-				// 	return '';
-				// },
-                item: item => '',
-                // FIXME: fix banners
-				empty: function(query) {
-					return '';
-				}
-			},
-			container: bannerWrapper,
-		};
-
-		if (typeof allWidgetConfiguration['hits'] === 'undefined') {
-			allWidgetConfiguration['hits'] = [widgetConfig];
-		} else {
-			var currentHits = allWidgetConfiguration['hits'];
-			allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
-		}
-	}
+	// if (bannerWrapper !== null) {
+	// 	var widgetConfig = {
+	// 		templates: {
+	// 			allItems: function(config) {
+	// 				if (config && config.userData) {
+	// 					var userData = config.userData;
+	// 					var banners = userData.map(function(userDataObj) {
+	// 						return userDataObj.banner;
+	// 					});
+	// 					return banners.join('');
+	// 				}
+	// 				return '';
+	// 			},
+	// 			empty: function(query) {
+	// 				return '';
+	// 			}
+	// 		},
+	// 		container: bannerWrapper,
+	// 	};
+    //
+	// 	if (typeof allWidgetConfiguration['hits'] === 'undefined') {
+	// 		allWidgetConfiguration['hits'] = [widgetConfig];
+	// 	} else {
+	// 		var currentHits = allWidgetConfiguration['hits'];
+	// 		allWidgetConfiguration['hits'] = [currentHits, widgetConfig];
+	// 	}
+	// }
 
 	allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
 

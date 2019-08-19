@@ -3,46 +3,45 @@
 
 /* infos */
 .algolia-infos {
-    padding: 6px 10px;
-    color: #aaa;
-    text-align: center;
-    background: #f4f4f4;
-    font-size: 12px;
-    clear: both;
-    line-height: 32px;
+  padding: 6px 10px;
+  color: #aaa;
+  text-align: center;
+  background: #f4f4f4;
+  font-size: 12px;
+  clear: both;
+  line-height: 32px;
 }
-
 
 /* SearchBox */
 .ais-SearchBox {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 .ais-SearchBox-submit {
-    display: none;
+  display: none;
 }
 .ais-SearchBox-form {
-    position: relative;
+  position: relative;
 }
 .ais-SearchBox-reset {
-    position: absolute;
-    right: 0;
+  position: absolute;
+  right: 0;
 }
 
 button.ais-SearchBox-reset {
-    box-shadow: none;
-    padding-left: .5em;
-    padding-right: .5em;
-    background: transparent;
+  box-shadow: none;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: transparent;
 }
 
 button.ais-SearchBox-reset:focus,
 button.ais-SearchBox-reset:active,
 button.ais-SearchBox-reset:hover {
-    border: 0;
+  border: 0;
 }
 
 input.ais-SearchBox-input {
-    padding-right: 2em;
+  padding-right: 2em;
 }
 
 .ais-SearchBox-reset,
@@ -50,9 +49,37 @@ input.ais-SearchBox-input {
   height: 32px;
 }
 
-
 /* Hits */
+.ais-Hits.ais-Hits--empty {
+    margin: 40px 25px;
+    color: #636363;
+    font-size: 16px;
+}
 
+
+.ais-Hits-item a:hover {
+  color: #666666;
+}
+
+.ais-Hits-list .no-results .clear-button {
+  cursor: pointer;
+}
+
+.ais-Hits-list .no-results .popular-searches {
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.ais-Hits-item .product-reviews-summary {
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.ais-InfiniteHits-loadMore {
+  clear: both;
+}
 /* HierarchicalMenu */
 .ais-HierarchicalMenu-item {
   margin: 0;
@@ -94,59 +121,58 @@ input.ais-SearchBox-input {
 
 /* RangeSlider */
 .ais-RangeSlider {
-    margin: 0 20px;
+  margin: 0 20px;
 }
 .ais-RangeSlider .rheostat-background {
-    border: 0;
+  border: 0;
 }
 .ais-RangeSlider .rheostat-progress {
-    background-color: #006bb4;
+  background-color: #006bb4;
 }
 
 /* Pagination */
 .ais-Pagination-list {
-    margin: 2em 0;
-    justify-content: center;
+  margin: 2em 0;
+  justify-content: center;
 }
 .ais-Pagination-item {
-    padding: 1em;
+  padding: 1em;
 }
 .ais-Pagination-item--selected {
-    color: black;
-    font-weight: bold;
+  color: black;
+  font-weight: bold;
 }
 
 /* CurrentRefinements */
 .ais-CurrentRefinements-item {
-    color: #636363;
-    border-radius: 2px;
-    border: solid 1px #ddd;
-    background-color: #f4f4f4;
-    display: inline-block;
-    max-width: 100%;
-    white-space: nowrap;
-    padding: .2em .5em ;
-    overflow: hidden;
+  color: #636363;
+  border-radius: 2px;
+  border: solid 1px #ddd;
+  background-color: #f4f4f4;
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  padding: 0.2em 0.5em;
+  overflow: hidden;
 }
 .ais-CurrentRefinements-label {
-    font-weight: bold;
+  font-weight: bold;
 }
 .ais-CurrentRefinements-category {
-    margin: 0 .5em;
+  margin: 0 0.5em;
 }
 .ais-CurrentRefinements-categoryLabel {
-
 }
 button.ais-CurrentRefinements-delete {
-    line-height: inherit;
-    box-shadow: none;
-    margin-left: .2em;
+  line-height: inherit;
+  box-shadow: none;
+  margin-left: 0.2em;
 }
 
 button.ais-CurrentRefinements-delete:hover,
 button.ais-CurrentRefinements-delete:active,
 button.ais-CurrentRefinements-delete:focus {
-    box-shadow: none;
-    background: none;
-    border: none;
+  box-shadow: none;
+  background: none;
+  border: none;
 }

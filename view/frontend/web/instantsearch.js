@@ -239,14 +239,13 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				templates: {
 					text: function (data) {
 						var hoganTemplate = algoliaBundle.Hogan.compile($('#instant-stats-template').html());
-						var _data = Object.assign({}, data)
 
-						_data.first = data.page * data.hitsPerPage + 1;
-						_data.last = Math.min(data.page * data.hitsPerPage + data.hitsPerPage, data.nbHits);
-						_data.seconds = data.processingTimeMS / 1000;
-						_data.translations = window.algoliaConfig.translations;
+						data.first = data.page * data.hitsPerPage + 1;
+						data.last = Math.min(data.page * data.hitsPerPage + data.hitsPerPage, data.nbHits);
+						data.seconds = data.processingTimeMS / 1000;
+						data.translations = window.algoliaConfig.translations;
 
-						return hoganTemplate.render(_data)
+						return hoganTemplate.render(data)
 					}
 				}
 			},
@@ -287,7 +286,8 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 							return item.attribute === _attribute.name
 						})[0];
 						if (!attribute) return item;
-						return {...item, label: attribute.label}
+						item.label = attribute.label;
+						return item;
 					})
 				}
 			},
@@ -311,7 +311,8 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 							return item.attribute === _attribute.name
 						})[0];
 						if (!attribute) return item;
-						return {...item, label: attribute.label}
+						item.label = attribute.label;
+						return item;
 					})
 				}
 			},
@@ -342,12 +343,11 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				},
 				transformItems: function (items) {
 					return items.map(function (item) {
-						var hit = Object.assign({}, item);
-						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+						item = transformHit(item, algoliaConfig.priceKey, search.helper);
 						// FIXME: transformHit is a global
-						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						hit.algoliaConfig = window.algoliaConfig;
-						return hit;
+						item.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
+						item.algoliaConfig = window.algoliaConfig;
+						return item;
 					});
 				},
 				showMoreLabel: algoliaConfig.translations.showMore,
@@ -368,12 +368,11 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				},
 				transformItems: function (items) {
 					return items.map(function (item) {
-						var hit = Object.assign({}, item);
-						hit = transformHit(hit, algoliaConfig.priceKey, search.helper);
+						item = transformHit(item, algoliaConfig.priceKey, search.helper);
 						// FIXME: transformHit is a global
-						hit.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
-						hit.algoliaConfig = window.algoliaConfig;
-						return hit;
+						item.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;
+						item.algoliaConfig = window.algoliaConfig;
+						return item;
 					})
 				}
 			};

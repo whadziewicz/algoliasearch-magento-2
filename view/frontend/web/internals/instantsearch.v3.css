@@ -1,6 +1,3 @@
-@import "./algolia-reset.css";
-@import "./grid.css";
-
 /* infos */
 .algolia-infos {
     padding: 6px 10px;
@@ -68,6 +65,7 @@ input.ais-SearchBox-input {
 
 .ais-Hits-item a:hover {
     color: #666666;
+    text-decoration: none;
 }
 
 .ais-Hits-list .no-results .clear-button {
@@ -80,10 +78,9 @@ input.ais-SearchBox-input {
     margin-bottom: 30px;
 }
 
-.ais-Hits-item .product-reviews-summary {
+.ais-Hits-item .result-wrapper {
     text-align: center;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    padding: 25px 0;
 }
 
 .ais-InfiniteHits-loadMore {
@@ -196,9 +193,14 @@ button.ais-CurrentRefinements-delete:focus {
     background: none;
     border: none;
 }
-
-/* ClearRefinements */
-.ais-ClearRefinements {
+.ais-ClearRefinements-button {
     float: right;
-    padding: 7px;
+}
+.ais-ClearRefinements-button--disabled {
+    display: none;
+}
+
+.no-results {
+    padding: 3em 0;
+    text-align:center;
 }

@@ -217,6 +217,8 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 							content += '</div>';
 
 							$('#instant-empty-results-container').html(content);
+						} else {
+							$('#instant-empty-results-container').html('');
 						}
 					}
 				}
@@ -272,11 +274,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				templates: {
 					item: $('#current-refinements-template').html()
 				},
-				panelOptions: {
-					templates: {
-						header: '<div class="name">' + algoliaConfig.translations.selectedFilters + '</div>'
-					}
-				},
 				includedAttributes: attributes.map(function (attribute) {
 					return attribute.name
 				}),
@@ -292,7 +289,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				}
 			},
 
-			/**
+			/*
 			 * clearRefinements
 			 * Widget displays a button that lets the user clean every refinement applied to the search. You can control which attributes are impacted by the button with the options.
 			 * Docs: https://www.algolia.com/doc/api-reference/widgets/clear-refinements/js/
@@ -316,16 +313,15 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					})
 				}
 			},
+			/*
+			 * queryRuleCustomData
+			 * The queryRuleCustomData widget displays custom data from Query Rules.
+			 * Docs: https://www.algolia.com/doc/api-reference/widgets/query-rule-custom-data/js/
+			 **/
 			queryRuleCustomData: {
 				container: '#algolia-banner',
 				templates: {
-					default: `
-						{{#items}}
-							{{#banner}}
-								{{{banner}}}
-							{{/banner}}
-						{{/items}}`
-					,
+					default: '{{#items}} {{#banner}} {{{banner}}} {{/banner}} {{/items}}',
 				}
 			}
 		};
@@ -339,6 +335,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			allWidgetConfiguration.infiniteHits = {
 				container: '#instant-search-results-container',
 				templates: {
+					empty: '',
 					item: $('#instant-hit-template').html()
 				},
 				transformItems: function (items) {
@@ -364,6 +361,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			allWidgetConfiguration.hits = {
 				container: '#instant-search-results-container',
 				templates: {
+					empty: '',
 					item: $('#instant-hit-template').html(),
 				},
 				transformItems: function (items) {
@@ -603,28 +601,11 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 		}
 
 		search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
-
 		search.start();
-
 		search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
 
-		var instant_search_bar = $(instant_selector);
-		if (instant_search_bar.is(":focus") === false) {
-			focusInstantSearchBar(search, instant_search_bar);
-			// FIXME: focusInstantSearchBar is a global
-		}
-
-		if (algoliaConfig.autocomplete.enabled) {
-			$('#search_mini_form').addClass('search-page');
-		}
-
-		$(document).on('click', '.ais-hierarchical-menu--link, .ais-refinement-list--checkbox', function () {
-			focusInstantSearchBar(search, instant_search_bar);
-			// FIXME: focusInstantSearchBar is a global
-		});
-
-			isStarted = true;
-		}
+		isStarted = true;
+	}
 
 		/** Initialise searching **/
 		startInstantSearch();

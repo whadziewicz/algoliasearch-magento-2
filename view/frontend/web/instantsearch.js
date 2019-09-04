@@ -433,8 +433,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 
 	/** Add all facet widgets to instantsearch object **/
 	window.getFacetWidget = function (facet, templates) {
-
-	    var panelOptions = {
+		var panelOptions = {
 			templates: {
 				header: '<div class="name">'
 					+ (facet.label ? facet.label : facet.attribute)

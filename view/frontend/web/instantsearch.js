@@ -1,4 +1,4 @@
-requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBundle, priceUtils) {
+requirejs(['algoliaBundle', 'Magento_Catalog/js/price-utils'], function (algoliaBundle, priceUtils) {
 	algoliaBundle.$(function ($) {
 		/** We have nothing to do here if instantsearch is not enabled **/
 		if (!algoliaConfig.instant.enabled || !(algoliaConfig.isSearchPage || !algoliaConfig.autocomplete.enabled)) {
@@ -86,7 +86,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				hitsPerPage: algoliaConfig.hitsPerPage,
 				ruleContexts: ruleContexts
 			},
-			searchFunction: function(helper) {
+			searchFunction: function (helper) {
 				if (helper.state.query === '' && !algoliaConfig.isSearchPage) {
 					$('.algolia-instant-replaced-content').show();
 					$('.algolia-instant-selector-results').hide();
@@ -96,12 +96,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					$('.algolia-instant-selector-results').show();
 				}
 			},
-			routing : window.routing,
+			routing: window.routing,
 		};
 
 		if (algoliaConfig.request.path.length > 0 && window.location.hash.indexOf('categories.level0') === -1) {
 			if (algoliaConfig.areCategoriesInFacets === false) {
-				instantsearchOptions.searchParameters['facetsRefinements'] = { };
+				instantsearchOptions.searchParameters['facetsRefinements'] = {};
 				instantsearchOptions.searchParameters['facetsRefinements']['categories.level' + algoliaConfig.request.level] = [algoliaConfig.request.path];
 			} else {
 				instantsearchOptions.searchParameters['hierarchicalFacetsRefinements'] = {
@@ -165,8 +165,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 
 						if (algoliaConfig.isCategoryPage) {
 							data.helper.addNumericRefinement('visibility_catalog', '=', 1);
-						}
-						else {
+						} else {
 							data.helper.addNumericRefinement('visibility_search', '=', 1);
 						}
 
@@ -177,8 +176,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 							if (data.results.query.length === 0) {
 								$('.algolia-instant-replaced-content').show();
 								$('.algolia-instant-selector-results').hide();
-							}
-							else {
+							} else {
 								$('.algolia-instant-replaced-content').hide();
 								$('.algolia-instant-selector-results').show();
 							}
@@ -284,6 +282,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 						})[0];
 						if (!attribute) return item;
 						item.label = attribute.label;
+						item.refinements.forEach(function (refinement) {
+							if (refinement.type !== 'hierarchical') return refinement;
+							var levels = refinement.label.split('///');
+							var lastLevel = levels[levels.length - 1];
+							refinement.label = lastLevel;
+						});
 						return item;
 					})
 				}
@@ -336,7 +340,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 				container: '#instant-search-results-container',
 				templates: {
 					empty: '',
-					item: $('#instant-hit-template').html()
+					item: $('#instant-hit-template').html(),
+				},
+				cssClasses: {
+					loadMore: ['action', 'primary']
 				},
 				transformItems: function (items) {
 					return items.map(function (item) {
@@ -427,184 +434,185 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					}
 				};
 
-			return ['hierarchicalMenu', hierarchicalMenuParams];
-		}
-	};
-
-	/** Add all facet widgets to instantsearch object **/
-	window.getFacetWidget = function (facet, templates) {
-		var panelOptions = {
-			templates: {
-				header: '<div class="name">'
-					+ (facet.label ? facet.label : facet.attribute)
-					+ '</div>',
-			},
-			hidden: function (options) {
-				if (!options.results) return true;
-				switch (facet.type) {
-					case 'conjunctive':
-						var facetsNames = options.results.facet.map(function (f) {
-							return f.name
-						});
-						return facetsNames.indexOf(facet.attribute) === -1;
-					case 'disjunctive':
-						var disjunctiveFacetsNames = options.results.disjunctiveFacets.map(function (f) {
-							return f.name
-						});
-						return disjunctiveFacetsNames.indexOf(facet.attribute) === -1;
-					default:
-						return false;
-				}
+				return ['hierarchicalMenu', hierarchicalMenuParams];
 			}
 		};
-		if (facet.type === 'priceRanges') {
-			delete templates.item;
 
-			return ['priceRanges', {
-				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-				attribute: facet.attribute,
-				labels: {
-					currency: algoliaConfig.currencySymbol,
-					separator: algoliaConfig.translations.to,
-					button: algoliaConfig.translations.go
+		/** Add all facet widgets to instantsearch object **/
+		window.getFacetWidget = function (facet, templates) {
+			var panelOptions = {
+				templates: {
+					header: '<div class="name">'
+						+ (facet.label ? facet.label : facet.attribute)
+						+ '</div>',
 				},
-				templates: templates,
-				cssClasses: {
-					root: 'conjunctive'
-				},
-				panelOptions: panelOptions,
-			}];
-		}
-
-		if (facet.type === 'conjunctive') {
-			var refinementListOptions = {
-				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-				attribute: facet.attribute,
-				limit: algoliaConfig.maxValuesPerFacet,
-				operator: 'and',
-				templates: templates,
-				sortBy: ['count:desc', 'name:asc'],
-				cssClasses: {
-					root: 'conjunctive'
-				},
-				panelOptions: panelOptions
-			};
-
-			refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-
-			return ['refinementList', refinementListOptions];
-		}
-
-		if (facet.type === 'disjunctive') {
-			var refinementListOptions = {
-				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-				attribute: facet.attribute,
-				limit: algoliaConfig.maxValuesPerFacet,
-				operator: 'or',
-				templates: templates,
-				sortBy: ['count:desc', 'name:asc'],
-				panelOptions: panelOptions,
-				cssClasses: {
-					root: 'disjunctive'
-				}
-			};
-
-			refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
-
-			return ['refinementList', refinementListOptions];
-		}
-
-		if (facet.type === 'slider') {
-			delete templates.item;
-
-			return ['rangeSlider', {
-				container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
-				attribute: facet.attribute,
-				templates: templates,
-				pips: false,
-				panelOptions: panelOptions,
-				tooltips: {
-					format: function (formattedValue) {
-						return facet.attribute.match(/price/) === null ?
-							parseInt(formattedValue) :
-							priceUtils.formatPrice(formattedValue, algoliaConfig.priceFormat);
+				hidden: function (options) {
+					if (!options.results) return true;
+					switch (facet.type) {
+						case 'conjunctive':
+							var facetsNames = options.results.facet.map(function (f) {
+								return f.name
+							});
+							return facetsNames.indexOf(facet.attribute) === -1;
+						case 'disjunctive':
+							var disjunctiveFacetsNames = options.results.disjunctiveFacets.map(function (f) {
+								return f.name
+							});
+							return disjunctiveFacetsNames.indexOf(facet.attribute) === -1;
+						default:
+							return false;
 					}
 				}
-			}];
-		}
-	};
+			};
+			if (facet.type === 'priceRanges') {
+				delete templates.item;
 
-	var wrapper = document.getElementById('instant-search-facets-container');
-	$.each(algoliaConfig.facets, function (i, facet) {
+				return ['priceRanges', {
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+					attribute: facet.attribute,
+					labels: {
+						currency: algoliaConfig.currencySymbol,
+						separator: algoliaConfig.translations.to,
+						button: algoliaConfig.translations.go
+					},
+					templates: templates,
+					cssClasses: {
+						root: 'conjunctive'
+					},
+					panelOptions: panelOptions,
+				}];
+			}
 
-		if (facet.attribute.indexOf("price") !== -1)
-			facet.attribute = facet.attribute + algoliaConfig.priceKey;
+			if (facet.type === 'conjunctive') {
+				var refinementListOptions = {
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+					attribute: facet.attribute,
+					limit: algoliaConfig.maxValuesPerFacet,
+					operator: 'and',
+					templates: templates,
+					sortBy: ['count:desc', 'name:asc'],
+					cssClasses: {
+						root: 'conjunctive'
+					},
+					panelOptions: panelOptions
+				};
 
-		facet.wrapper = wrapper;
+				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
 
-		var templates = {
-			item: $('#refinements-lists-item-template').html()
+				return ['refinementList', refinementListOptions];
+			}
+
+			if (facet.type === 'disjunctive') {
+				var refinementListOptions = {
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+					attribute: facet.attribute,
+					limit: algoliaConfig.maxValuesPerFacet,
+					operator: 'or',
+					templates: templates,
+					sortBy: ['count:desc', 'name:asc'],
+					panelOptions: panelOptions,
+					cssClasses: {
+						root: 'disjunctive'
+					}
+				};
+
+				refinementListOptions = addSearchForFacetValues(facet, refinementListOptions);
+
+				return ['refinementList', refinementListOptions];
+			}
+
+			if (facet.type === 'slider') {
+				delete templates.item;
+
+				return ['rangeSlider', {
+					container: facet.wrapper.appendChild(createISWidgetContainer(facet.attribute)),
+					attribute: facet.attribute,
+					templates: templates,
+					pips: false,
+					panelOptions: panelOptions,
+					tooltips: {
+						format: function (formattedValue) {
+							return facet.attribute.match(/price/) === null ?
+								parseInt(formattedValue) :
+								priceUtils.formatPrice(formattedValue, algoliaConfig.priceFormat);
+						}
+					}
+				}];
+			}
 		};
 
-		var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
-			customAttributeFacet[facet.attribute](facet, templates) :
-			getFacetWidget(facet, templates);
+		var wrapper = document.getElementById('instant-search-facets-container');
+		$.each(algoliaConfig.facets, function (i, facet) {
 
-		var widgetType = widgetInfo[0],
-			widgetConfig = widgetInfo[1];
+			if (facet.attribute.indexOf("price") !== -1)
+				facet.attribute = facet.attribute + algoliaConfig.priceKey;
 
-		if (typeof allWidgetConfiguration[widgetType] === 'undefined') {
-			allWidgetConfiguration[widgetType] = [widgetConfig];
-		} else {
-			allWidgetConfiguration[widgetType].push(widgetConfig);
-		}
-	});
+			facet.wrapper = wrapper;
 
-	if (algoliaConfig.analytics.enabled) {
-		if (typeof algoliaAnalyticsPushFunction !== 'function') {
-			var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
-				var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
+			var templates = {
+				item: $('#refinements-lists-item-template').html()
+			};
 
-				// Universal Analytics
-				if (typeof window.ga !== 'undefined') {
-					window.ga('set', 'page', trackedUrl);
-					window.ga('send', 'pageView');
-				}
+			var widgetInfo = customAttributeFacet[facet.attribute] !== undefined ?
+				customAttributeFacet[facet.attribute](facet, templates) :
+				getFacetWidget(facet, templates);
+
+			var widgetType = widgetInfo[0],
+				widgetConfig = widgetInfo[1];
+
+			if (typeof allWidgetConfiguration[widgetType] === 'undefined') {
+				allWidgetConfiguration[widgetType] = [widgetConfig];
+			} else {
+				allWidgetConfiguration[widgetType].push(widgetConfig);
+			}
+		});
+
+		if (algoliaConfig.analytics.enabled) {
+			if (typeof algoliaAnalyticsPushFunction !== 'function') {
+				var algoliaAnalyticsPushFunction = function (formattedParameters, state, results) {
+					var trackedUrl = '/catalogsearch/result/?q=' + state.query + '&' + formattedParameters + '&numberOfHits=' + results.nbHits;
+
+					// Universal Analytics
+					if (typeof window.ga !== 'undefined') {
+						window.ga('set', 'page', trackedUrl);
+						window.ga('send', 'pageView');
+					}
+				};
+			}
+
+			allWidgetConfiguration['analytics'] = {
+				pushFunction: algoliaAnalyticsPushFunction,
+				delay: algoliaConfig.analytics.delay,
+				triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
+				pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
 			};
 		}
 
-		allWidgetConfiguration['analytics'] = {
-			pushFunction: algoliaAnalyticsPushFunction,
-			delay: algoliaConfig.analytics.delay,
-			triggerOnUIInteraction: algoliaConfig.analytics.triggerOnUiInteraction,
-			pushInitialSearch: algoliaConfig.analytics.pushInitialSearch
-		};
-	}
+		allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
 
-	allWidgetConfiguration = algolia.triggerHooks('beforeWidgetInitialization', allWidgetConfiguration, algoliaBundle);
-
-	$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
-		if (Array.isArray(widgetConfig) === true) {
-			$.each (widgetConfig, function (i, widgetConfig) {
+		$.each(allWidgetConfiguration, function (widgetType, widgetConfig) {
+			if (Array.isArray(widgetConfig) === true) {
+				$.each(widgetConfig, function (i, widgetConfig) {
+					addWidget(search, widgetType, widgetConfig);
+				});
+			} else {
 				addWidget(search, widgetType, widgetConfig);
-			});
-		} else {
-			addWidget(search, widgetType, widgetConfig);
+			}
+		});
+
+		var isStarted = false;
+
+		function startInstantSearch() {
+			if (isStarted === true) {
+				return;
+			}
+
+			search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
+			search.start();
+			search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
+
+			isStarted = true;
 		}
-	});
-
-	var isStarted = false;
-	function startInstantSearch() {
-		if(isStarted === true) {
-			return;
-		}
-
-		search = algolia.triggerHooks('beforeInstantsearchStart', search, algoliaBundle);
-		search.start();
-		search = algolia.triggerHooks('afterInstantsearchStart', search, algoliaBundle);
-
-		isStarted = true;
-	}
 
 		/** Initialise searching **/
 		startInstantSearch();

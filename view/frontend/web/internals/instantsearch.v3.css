@@ -49,7 +49,14 @@ input.ais-SearchBox-input {
     height: 32px;
 }
 
-/* Hits */
+/* Hits & InfiniteHits */
+.ais-InfiniteHits,
+.ais-Hits {
+    text-align: center;
+    padding-bottom: 30px;
+}
+
+.ais-InfiniteHits--empty,
 .ais-Hits--empty {
     margin: 40px 0;
     color: #636363;
@@ -57,34 +64,71 @@ input.ais-SearchBox-input {
     font-weight: bold;
 }
 
+.ais-InfiniteHits--empty q:before,
+.ais-InfiniteHits--empty q:after,
 .ais-Hits--empty q:before,
 .ais-Hits--empty q:after {
-    content: "\""
+    content: '"';
 }
 
-
+.ais-InfiniteHits-item a:hover,
 .ais-Hits-item a:hover {
     color: #666666;
     text-decoration: none;
 }
 
+.ais-InfiniteHits-list .no-results .clear-button,
 .ais-Hits-list .no-results .clear-button {
     cursor: pointer;
 }
 
+.ais-InfiniteHits-list .no-results .popular-searches,
 .ais-Hits-list .no-results .popular-searches {
     text-align: left;
     margin-top: 20px;
     margin-bottom: 30px;
 }
 
+.ais-InfiniteHits-item .result-wrapper,
 .ais-Hits-item .result-wrapper {
-    text-align: center;
+    /*text-align: center;*/
     padding: 25px 0;
 }
 
 .ais-InfiniteHits-loadMore {
-    clear: both;
+    background: #f4f4f4;
+    border-color: transparent;
+    color: #666666;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 19px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.result-wrapper .tocart {
+    background: #f4f4f4;
+    border-color: transparent;
+    color: #666666;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 19px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.result-wrapper .price {
+    text-align: center;
+    font-size: 1.2em;
+    color: #54A5CD;
+}
+
+.result-wrapper .before_special {
+    color: #aaaaaa;
+    text-decoration: line-through;
+    font-size: 12px;
 }
 
 /* HierarchicalMenu */
@@ -135,6 +179,7 @@ input.ais-SearchBox-input {
 
 .ais-RangeSlider .rheostat-background {
     border: 0;
+    background-color: #efefef;
 }
 
 .ais-RangeSlider .rheostat-progress {
@@ -193,14 +238,16 @@ button.ais-CurrentRefinements-delete:focus {
     background: none;
     border: none;
 }
+
 .ais-ClearRefinements-button {
     float: right;
 }
+
 .ais-ClearRefinements-button--disabled {
     display: none;
 }
 
 .no-results {
     padding: 3em 0;
-    text-align:center;
+    text-align: center;
 }

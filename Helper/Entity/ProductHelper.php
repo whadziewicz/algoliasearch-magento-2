@@ -11,8 +11,8 @@ use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\Product\PriceManager;
 use Algolia\AlgoliaSearch\Helper\Logger;
-use AlgoliaSearch\AlgoliaException;
-use AlgoliaSearch\Index;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\SearchIndex;
 use Magento\Bundle\Model\Product\Type as BundleProductType;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
@@ -186,6 +186,7 @@ class ProductHelper
 
     public function isAttributeEnabled($additionalAttributes, $attributeName)
     {
+        
         foreach ($additionalAttributes as $attr) {
             if ($attr['attribute'] === $attributeName) {
                 return true;
@@ -1052,17 +1053,19 @@ class ProductHelper
 
         if ($rules) {
             $this->logger->log('Setting facets query rules to "' . $indexName . '" index: ' . json_encode($rules));
-            $index->batchRules($rules, true);
+            $index->saveRules($rules, [
+                'forwardToReplicas' => true
+            ]);
         }
     }
 
-    private function clearFacetsQueryRules(Index $index)
+    private function clearFacetsQueryRules(SearchIndex $index)
     {
         try {
             $hitsPerPage = 100;
             $page = 0;
             do {
-                $fetchedQueryRules = $index->searchRules([
+                $fetchedQueryRules = $index->searchRules('', [
                     'context' => 'magento_filters',
                     'page' => $page,
                     'hitsPerPage' => $hitsPerPage,

@@ -580,6 +580,13 @@ class ConfigHelper
         return $this->configInterface->getValue(self::SEARCH_ONLY_API_KEY, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
+    public function credentialsAreConfigured($storeId = null)
+    {
+        return $this->getApplicationID($storeId) &&
+            $this->getAPIKey($storeId) &&
+            $this->getSearchOnlyAPIKey($storeId);
+    }
+
     public function getIndexPrefix($storeId = null)
     {
         return $this->configInterface->getValue(self::INDEX_PREFIX, ScopeInterface::SCOPE_STORE, $storeId);

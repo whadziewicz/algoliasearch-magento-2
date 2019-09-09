@@ -4,7 +4,8 @@ namespace Algolia\AlgoliaSearch\Model;
 
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\Data;
-use AlgoliaSearch\AlgoliaException;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+
 
 class IndexMover
 {

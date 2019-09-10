@@ -5,6 +5,7 @@ namespace Algolia\AlgoliaSearch\Helper;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\SearchClient;
 use Algolia\AlgoliaSearch\SearchIndex;
+use Algolia\AlgoliaSearch\Support\UserAgent;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Message\ManagerInterface;
@@ -59,7 +60,10 @@ class AlgoliaHelper extends AbstractHelper
             $this->config->getNonCastableAttributes()
         );
 
-        //TODO: set custom version info?
+        UserAgent::addCustomUserAgent('Magento2 integration', $this->config->getExtensionVersion());
+        UserAgent::addCustomUserAgent('PHP', phpversion());
+        UserAgent::addCustomUserAgent('Magento', $this->config->getMagentoVersion());
+        UserAgent::addCustomUserAgent('Edition', $this->config->getMagentoEdition());
     }
 
     public function getRequest()

@@ -306,6 +306,9 @@ requirejs(['algoliaBundle', 'Magento_Catalog/js/price-utils'], function (algolia
 				includedAttributes: attributes.map(function (attribute) {
 					return attribute.name
 				}),
+				cssClasses: {
+					button: ['action', 'primary']
+				},
 				transformItems: function (items) {
 					return items.map(function (item) {
 						var attribute = attributes.filter(function (_attribute) {

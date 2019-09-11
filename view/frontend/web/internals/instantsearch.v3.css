@@ -61,6 +61,7 @@ input.ais-SearchBox-input {
 .ais-InfiniteHits,
 .ais-Hits {
     text-align: center;
+    padding-top: 30px;
     padding-bottom: 30px;
 }
 
@@ -102,6 +103,12 @@ input.ais-SearchBox-input {
     padding: 25px 0;
 }
 
+.ais-InfiniteHits-list::after,
+.ais-Hits-list::after {
+    content: ' ';
+    clear: both;
+    display: block;
+}
 .ais-InfiniteHits-loadMore {
     background: #f4f4f4;
     border-color: transparent;
@@ -112,6 +119,11 @@ input.ais-SearchBox-input {
     text-transform: uppercase;
     vertical-align: middle;
     white-space: nowrap;
+}
+
+.ais-InfiniteHits-loadPrevious--disabled,
+.ais-InfiniteHits-loadMore--disabled {
+    display: none !important;
 }
 
 .result-wrapper .tocart {

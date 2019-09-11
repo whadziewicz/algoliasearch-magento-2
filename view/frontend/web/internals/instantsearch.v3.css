@@ -256,7 +256,7 @@ button.ais-CurrentRefinements-delete:focus {
 
 .ais-ClearRefinements-button {
     width: 100%;
-    margin-bottom: 1em;
+    margin-bottom: 0.2em;
 }
 
 .ais-ClearRefinements-button--disabled {

@@ -144,8 +144,7 @@ class AlgoliaHelper extends AbstractHelper
             'forwardToReplicas' => $forwardToReplicas,
         ]);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function deleteIndex($indexName)
@@ -153,8 +152,7 @@ class AlgoliaHelper extends AbstractHelper
         $this->checkClient(__FUNCTION__);
         $res = $this->client->initIndex($indexName)->delete();
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function deleteObjects($ids, $indexName)
@@ -165,8 +163,7 @@ class AlgoliaHelper extends AbstractHelper
 
         $res = $index->deleteObjects($ids);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function moveIndex($tmpIndexName, $indexName)
@@ -174,8 +171,7 @@ class AlgoliaHelper extends AbstractHelper
         $this->checkClient(__FUNCTION__);
         $res = $this->client->moveIndex($tmpIndexName, $indexName);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function generateSearchSecuredApiKey($key, $params = [])
@@ -235,13 +231,26 @@ class AlgoliaHelper extends AbstractHelper
         $index = $this->getIndex($indexName);
 
         if ($this->config->isPartialUpdateEnabled()) {
-            $res = $index->partialUpdateObjects($objects);
+            $response = $index->partialUpdateObjects($objects);
         } else {
-            $res = $index->saveObjects($objects);
+            $response = $index->saveObjects($objects);
         }
 
+        self::setLastOperationInfo($indexName, $response);
+    }
+
+    private static function setLastOperationInfo($indexName, $response)
+    {
         self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+
+        if ($response instanceof BatchIndexingResponse) {
+            foreach ($response as $res) {
+                $response = $res;
+            }
+        }
+
+        self::$lastTaskId = $response['taskID'];
+
     }
 
     public function saveRule($rule, $indexName, $forwardToReplicas = false)
@@ -251,8 +260,7 @@ class AlgoliaHelper extends AbstractHelper
             'forwardToReplicas' => $forwardToReplicas
         ]);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function batchRules($rules, $indexName)
@@ -263,8 +271,7 @@ class AlgoliaHelper extends AbstractHelper
             'clearExistingRules'    => false
         ]);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function searchRules($indexName, $parameters)
@@ -285,8 +292,7 @@ class AlgoliaHelper extends AbstractHelper
             'forwardToReplicas' => $forwardToReplicas
         ]);
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function setSynonyms($indexName, $synonyms)
@@ -329,8 +335,7 @@ class AlgoliaHelper extends AbstractHelper
             ]);
         }
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function copySynonyms($fromIndexName, $toIndexName)
@@ -368,8 +373,7 @@ class AlgoliaHelper extends AbstractHelper
             ]);
         }
 
-        self::$lastUsedIndexName= $toIndex;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($toIndex, $res);
     }
 
     /**
@@ -413,8 +417,7 @@ class AlgoliaHelper extends AbstractHelper
             ]);
         }
 
-        self::$lastUsedIndexName= $toIndex;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($toIndex, $res);
     }
 
     private function checkClient($methodName)
@@ -435,8 +438,7 @@ class AlgoliaHelper extends AbstractHelper
     {
         $res = $this->getIndex($indexName)->clearObjects();
 
-        self::$lastUsedIndexName = $indexName;
-        self::$lastTaskId = $res['taskID'];
+        self::setLastOperationInfo($indexName, $res);
     }
 
     public function waitLastTask($lastUsedIndexName = null, $lastTaskId = null)

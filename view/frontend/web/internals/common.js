@@ -103,12 +103,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					colors.push(color.value);
 
 					if (algoliaConfig.useAdaptiveImage === true) {
-						var re = /<em>(.*?)<\/em>/g;
-						var matchedWords = color.value.match(re).map(function (val) {
-							return val.replace(/<\/?em>/g, '');
-						});
-
-						var matchedColor = matchedWords.join(' ');
+						var matchedColor = color.matchedWords.join(' ');
 
 						if (hit.images_data && color.fullyHighlighted && color.fullyHighlighted === true) {
 							matchedColors.push(matchedColor);

@@ -3,6 +3,9 @@
 namespace Algolia\AlgoliaSearch\Helper;
 
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Response\AbstractResponse;
+use Algolia\AlgoliaSearch\Response\BatchIndexingResponse;
+use Algolia\AlgoliaSearch\Response\MultiResponse;
 use Algolia\AlgoliaSearch\SearchClient;
 use Algolia\AlgoliaSearch\SearchIndex;
 use Algolia\AlgoliaSearch\Support\UserAgent;
@@ -99,7 +102,7 @@ class AlgoliaHelper extends AbstractHelper
     {
         $this->checkClient(__FUNCTION__);
 
-        return $this->client->listIndexes();
+        return $this->client->listIndices();
     }
 
     public function query($indexName, $q, $params)
@@ -243,10 +246,14 @@ class AlgoliaHelper extends AbstractHelper
     {
         self::$lastUsedIndexName = $indexName;
 
-        if ($response instanceof BatchIndexingResponse) {
-            foreach ($response as $res) {
+        if ($response instanceof BatchIndexingResponse || $response instanceof MultiResponse) {
+            foreach ($response->getBody() as $res) {
                 $response = $res;
             }
+        }
+
+        if ($response instanceof AbstractResponse) {
+            $response = $response->getBody();
         }
 
         self::$lastTaskId = $response['taskID'];

@@ -455,7 +455,7 @@ requirejs(['algoliaBundle', 'Magento_Catalog/js/price-utils'], function (algolia
 					if (!options.results) return true;
 					switch (facet.type) {
 						case 'conjunctive':
-							var facetsNames = options.results.facet.map(function (f) {
+							var facetsNames = options.results.facets.map(function (f) {
 								return f.name
 							});
 							return facetsNames.indexOf(facet.attribute) === -1;

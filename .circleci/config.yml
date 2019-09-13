@@ -43,7 +43,7 @@ shared: &shared
             command: |
                 cd ~/magento_directory/dev/tests/integration
                 export CI_BUILD_NUM=$CIRCLE_BUILD_NUM
-                export CI_PROJ_USRNAME=$CIRCLE_PROJECT_USERNAME
+                export CI_PROJ_USERNAME=$CIRCLE_PROJECT_USERNAME
                 export CI_PROJ_REPONAME=$CIRCLE_PROJECT_REPONAME
                 eval $(~/build_directory/algoliasearch-magento-2/algolia-keys export)
                 php -dmemory_limit=-1 ../../../vendor/bin/phpunit ../../../vendor/algolia/algoliasearch-magento-2/Test

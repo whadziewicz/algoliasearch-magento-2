@@ -178,9 +178,24 @@ input.ais-SearchBox-input {
     opacity: 1;
 }
 
+.ais-HierarchicalMenu-count::before {
+    content: '('
+}
+
+.ais-HierarchicalMenu-count::after {
+    content: ')'
+}
 /* RefinementList */
 .ais-RefinementList-searchBox {
     padding-bottom: 7px;
+}
+
+.ais-RefinementList-count::before {
+    content: '('
+}
+
+.ais-RefinementList-count::after {
+    content: ')'
 }
 
 /* Panel */

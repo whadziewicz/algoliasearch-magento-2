@@ -430,7 +430,7 @@ requirejs(['algoliaBundle', 'Magento_Catalog/js/price-utils'], function (algolia
 
 				hierarchicalMenuParams.templates.item = '' +
 					'<a class="{{cssClasses.link}} {{#isRefined}}{{cssClasses.link}}--selected{{/isRefined}}" href="{{url}}">{{label}}' + ' ' +
-					'<span class="{{cssClasses.count}}">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>' + ' ' +
+					'<span class="{{cssClasses.count}}">{{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}}</span>' + ' ' +
 					'{{#isRefined}}<span class="cross-circle"></span>{{/isRefined}}' +
 					'</a>';
 				hierarchicalMenuParams.panelOptions = {

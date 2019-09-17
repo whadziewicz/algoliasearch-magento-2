@@ -6,6 +6,15 @@
     display: none !important;
 }
 
+#refine-toggle {
+    text-align: center;
+    line-height: 40px;
+    border: solid 1px #ededed;
+    margin: 10px 0 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 /* infos */
 .algolia-infos {
     padding: 6px 10px;

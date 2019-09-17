@@ -248,6 +248,11 @@ input.ais-SearchBox-input {
 }
 
 /* CurrentRefinements */
+.ais-CurrentRefinements {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 .ais-CurrentRefinements-item {
     color: #636363;
     border-radius: 2px;

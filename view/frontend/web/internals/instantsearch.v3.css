@@ -136,6 +136,7 @@ input.ais-SearchBox-input {
     text-transform: uppercase;
     vertical-align: middle;
     white-space: nowrap;
+    margin-top: 10px;
 }
 
 .result-wrapper .price {

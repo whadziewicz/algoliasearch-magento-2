@@ -227,6 +227,10 @@ input.ais-SearchBox-input {
     font-weight: bold;
 }
 
+.ais-Pagination-item--disabled {
+    display: none;
+}
+
 /* CurrentRefinements */
 .ais-CurrentRefinements-item {
     color: #636363;

@@ -187,9 +187,13 @@ input.ais-SearchBox-input {
     content: ')'
 }
 /* RefinementList */
-.ais-RefinementList-searchBox {
-    padding-top: 4px;
-    padding-bottom: 4px;
+.ais-RefinementList-searchBox .ais-SearchBox-input {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.ais-RefinementList-searchBox .ais-SearchBox-input[disabled] {
+    display: none;
 }
 
 .ais-RefinementList-count::before {
@@ -249,9 +253,8 @@ input.ais-SearchBox-input {
 }
 
 /* CurrentRefinements */
-.ais-CurrentRefinements {
-    padding-top: 10px;
-    padding-bottom: 10px;
+.ais-CurrentRefinements-list:not(:empty) {
+    margin-bottom: 10px;
 }
 
 .ais-CurrentRefinements-item {
@@ -293,9 +296,10 @@ button.ais-CurrentRefinements-delete:focus {
     border: none;
 }
 
+/* CurrentRefinements */
 .ais-ClearRefinements-button {
     width: 100%;
-    margin-bottom: 0.2em;
+    margin-bottom: 15px;
 }
 
 .ais-ClearRefinements-button--disabled {

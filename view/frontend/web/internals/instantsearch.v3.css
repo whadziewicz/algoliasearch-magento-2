@@ -187,7 +187,8 @@ input.ais-SearchBox-input {
 }
 /* RefinementList */
 .ais-RefinementList-searchBox {
-    padding-bottom: 7px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .ais-RefinementList-count::before {

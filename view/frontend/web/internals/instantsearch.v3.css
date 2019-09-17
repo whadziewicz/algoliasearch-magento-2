@@ -160,6 +160,7 @@ input.ais-SearchBox-input {
 /* HierarchicalMenu */
 .ais-HierarchicalMenu-item {
     margin: 0;
+    line-height: 1.8em;
 }
 
 .ais-HierarchicalMenu-link--selected {

@@ -17,7 +17,7 @@ if ($algoliaHelper) {
     foreach ($indices['items'] as $index) {
         $name = $index['name'];
 
-        if (mb_strpos($name, $this->indexPrefix) === 0) {
+        if (mb_strpos($name, getenv('MAGENTO_CLOUD_ENVIRONMENT')) === 0) {
             try {
                 $algoliaHelper->deleteIndex($name);
                 echo 'Index "' . $name . '" has been deleted.';

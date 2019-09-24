@@ -2,7 +2,7 @@
 <?php
 
 use Magento\Framework\App\Bootstrap;
-require __DIR__ . '/app/bootstrap.php';
+require '/app/bootstrap.php';
 
 $params = $_SERVER;
 $bootstrap = Bootstrap::create(BP, $params);

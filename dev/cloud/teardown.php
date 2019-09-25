@@ -3,8 +3,7 @@
 use Magento\Framework\App\Bootstrap;
 require '/app/app/bootstrap.php';
 
-$params = $_SERVER;
-$bootstrap = Bootstrap::create(BP, $params);
+$bootstrap = Bootstrap::create(BP, $_SERVER);
 $obj = $bootstrap->getObjectManager();
 
 $algoliaHelper = $obj->get('\Algolia\AlgoliaSearch\Helper\AlgoliaHelper');

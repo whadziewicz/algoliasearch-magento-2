@@ -27,4 +27,21 @@ if ($algoliaHelper) {
             }
         }
     }
+
+   $replicas = $algoliaHelper->listIndexes();
+   if (count($replicas) > 0) {
+       foreach ($replicas['items'] as $index) {
+           $name = $index['name'];
+           if (mb_strpos($name, getenv('MAGENTO_CLOUD_ENVIRONMENT')) === 0) {
+               try {
+                   $algoliaHelper->deleteIndex($name);
+                   echo 'Index "' . $name . '" has been deleted.';
+                   echo "\n";
+               } catch (Exception $e) {
+                   // Might be a replica
+               }
+           }
+       }
+   }
+
 }

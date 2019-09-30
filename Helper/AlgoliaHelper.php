@@ -234,9 +234,13 @@ class AlgoliaHelper extends AbstractHelper
         $index = $this->getIndex($indexName);
 
         if ($this->config->isPartialUpdateEnabled()) {
-            $response = $index->partialUpdateObjects($objects);
+            $response = $index->partialUpdateObjects($objects, [
+                'createIfNotExists' => true
+            ]);
         } else {
-            $response = $index->saveObjects($objects);
+            $response = $index->saveObjects($objects, [
+                'autoGenerateObjectIDIfNotExist' => true
+            ]);
         }
 
         self::setLastOperationInfo($indexName, $response);

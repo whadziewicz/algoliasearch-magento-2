@@ -18,11 +18,5 @@
     "psr-4": {
       "Algolia\\AlgoliaSearch\\": ""
     }
-  },
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://repo.magento.com/"
-    }
-  ]
+  }
 }

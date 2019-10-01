@@ -4,20 +4,21 @@ use Magento\Framework\App\Bootstrap;
 require '/app/app/bootstrap.php';
 
 $bootstrap = Bootstrap::create(BP, $_SERVER);
-$obj = $bootstrap->getObjectManager();
+$objectManager = $bootstrap->getObjectManager();
 
-$algoliaHelper = $obj->get('\Algolia\AlgoliaSearch\Helper\AlgoliaHelper');
+$algoliaHelper = $objectManager->get('\Algolia\AlgoliaSearch\Helper\AlgoliaHelper');
+$indexNamePrefix = getenv('MAGENTO_CLOUD_ENVIRONMENT');
 
 /**
  * @param $algoliaHelper Algolia\AlgoliaSearch\Helper\AlgoliaHelper
  * @param array $indices
  */
-function deleteIndexes($algoliaHelper, array $indices)
+function deleteIndexes($algoliaHelper, array $indices, $indexNamePrefix)
 {
     foreach ($indices['items'] as $index) {
         $name = $index['name'];
 
-        if (mb_strpos($name, getenv('MAGENTO_CLOUD_ENVIRONMENT')) === 0) {
+        if (mb_strpos($name, $indexNamePrefix) === 0) {
             try {
                 $algoliaHelper->deleteIndex($name);
                 echo 'Index "' . $name . '" has been deleted.';
@@ -32,11 +33,11 @@ function deleteIndexes($algoliaHelper, array $indices)
 if ($algoliaHelper) {
     $indices = $algoliaHelper->listIndexes();
     if (count($indices) > 0) {
-        deleteIndexes($algoliaHelper, $indices);
+        deleteIndexes($algoliaHelper, $indices, $indexNamePrefix);
     }
 
     $replicas = $algoliaHelper->listIndexes();
     if (count($replicas) > 0) {
-        deleteIndexes($algoliaHelper, $replicas);
+        deleteIndexes($algoliaHelper, $replicas, $indexNamePrefix);
     }
 }

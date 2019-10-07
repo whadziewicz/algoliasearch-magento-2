@@ -179,6 +179,11 @@ class AlgoliaHelper extends AbstractHelper
 
     public function generateSearchSecuredApiKey($key, $params = [])
     {
+        // This is to handle a difference between API client v1 and v2.
+        if (! isset($params['tagFilters'])) {
+            $params['tagFilters'] = '';
+        }
+
         return SearchClient::generateSecuredApiKey($key, $params);
     }
 

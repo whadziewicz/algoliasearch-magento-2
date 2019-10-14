@@ -50,15 +50,17 @@ requirejs(['algoliaBundle', 'algoliaAnalytics'], function (algoliaBundle, algoli
 			});
 		}
 
-		// "Place order" conversions
-		// "algoliaConfig.ccAnalytics.orderedProductIds" are set only on checkout success page
-		// FIXME: reenable this code later
-		// if (algoliaConfig.ccAnalytics.conversionAnalyticsMode === 'place_order'
-		// 	&& algoliaConfig.ccAnalytics.orderedProductIds.length > 0) {
-		// 	$.each(algoliaConfig.ccAnalytics.orderedProductIds, function (i, objectId) {
-		// 		trackConversion(objectId);
-		// 	});
-		// }
+
+		if (algoliaConfig.ccAnalytics.conversionAnalyticsMode === 'place_order') {
+
+			if (typeof algoliaOrderConversionJson !== 'undefined') {
+				$.each(algoliaOrderConversionJson, function(idx, itemData) {
+					trackConversion(itemData.objectID, itemData.queryID, itemData.indexName);
+				});
+			}
+			// trackConversion(objectId, queryID, indexName);
+		}
+
 	});
 
 	algolia.registerHook('beforeInstantsearchInit', function (instantsearchOptions) {

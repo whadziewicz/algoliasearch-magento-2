@@ -6,7 +6,7 @@ use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\ExtensionNotification;
 
-class Common
+class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
     /** @var ProxyHelper */
     private $proxyHelper;

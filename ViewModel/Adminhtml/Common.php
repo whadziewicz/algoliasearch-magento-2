@@ -5,6 +5,10 @@ namespace Algolia\AlgoliaSearch\ViewModel\Adminhtml;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\ProxyHelper;
 use Algolia\AlgoliaSearch\Model\ExtensionNotification;
+use Magento\Framework\Module\Manager as ModuleManager;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Search\EngineResolverInterface;
+use Magento\Search\Model\EngineResolver;
 
 class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
@@ -13,6 +17,15 @@ class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
 
     /** @var ConfigHelper */
     private $configHelper;
+
+    /** @var ModuleManager */
+    private $moduleManager;
+
+    /** @var ObjectManagerInterface */
+    private $objectManager;
+
+    /** @var EngineResolverInterface */
+    private $engineResolver;
 
     /** @var ExtensionNotification */
     private $extensionNotification;
@@ -182,10 +195,16 @@ class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
     public function __construct(
         ProxyHelper $proxyHelper,
         ConfigHelper $configHelper,
+        ModuleManager $moduleManager,
+        ObjectManagerInterface $objectManager,
+        EngineResolverInterface $engineResolver,
         ExtensionNotification $extensionNotification
     ) {
         $this->proxyHelper = $proxyHelper;
         $this->configHelper = $configHelper;
+        $this->moduleManager = $moduleManager;
+        $this->objectManager = $objectManager;
+        $this->engineResolver = $engineResolver;
         $this->extensionNotification = $extensionNotification;
     }
 
@@ -221,6 +240,39 @@ class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
     public function isClickAnalyticsTurnedOnInAdmin()
     {
         return $this->configHelper->isClickConversionAnalyticsEnabled();
+    }
+
+    public function isMysqlUsed()
+    {
+        return $this->engineResolver->getCurrentSearchEngine() === EngineResolver::CATALOG_SEARCH_MYSQL_ENGINE;
+    }
+
+    public function isEsWarningNeeded()
+    {
+        return !$this->isMysqlUsed();
+    }
+
+    public function isMsiExternalModuleNeeded()
+    {
+        // If Magento Inventory is not installed, no need for the external module
+        $hasMsiModule = $this->moduleManager->isEnabled('Magento_Inventory');
+        if (! $hasMsiModule) {
+            return false;
+        }
+
+        // If the external module is already installed, no need to do it again
+        $hasMsiExternalModule = $this->moduleManager->isEnabled('Algolia_AlgoliaSearchInventory');
+        if ($hasMsiExternalModule) {
+            return false;
+        }
+
+        // Module installation is only needed if there's more than one source
+        $sourceCollection = $this->objectManager->create('\Magento\Inventory\Model\ResourceModel\Source\Collection');
+        if ($sourceCollection->getSize() <= 1) {
+            return false;
+        }
+
+        return true;
     }
 
     /** @return array|void */

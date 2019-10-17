@@ -154,7 +154,7 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					getConfiguration: function () {
 						if (algoliaConfig.request.query.length > 0 && location.hash.length < 1) {
 							return {
-								query: htmlspecialchars_decode(algoliaConfig.request.query)
+								query: algolia.htmlspecialcharsDecode(algoliaConfig.request.query)
 							}
 						}
 						return {};

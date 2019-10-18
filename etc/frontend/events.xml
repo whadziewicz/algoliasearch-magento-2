@@ -8,8 +8,8 @@
     </event>
 
     <!-- Click and Conversion Analytics -->
-    <event name="checkout_cart_product_add_before">
-        <observer name="algoliasearch_set_request_to_product" instance="Algolia\AlgoliaSearch\Model\Observer\ClickAnalytics\CheckoutCartProductAddBefore" />
+    <event name="catalog_controller_product_init_before">
+        <observer name="algoliasearch_set_parameters_to_session" instance="Algolia\AlgoliaSearch\Model\Observer\ClickAnalytics\CatalogControllerProductInitBefore" />
     </event>
     <event name="checkout_cart_product_add_after">
         <observer name="algoliasearch_add_request_to_quote_item" instance="Algolia\AlgoliaSearch\Model\Observer\ClickAnalytics\CheckoutCartProductAddAfter" />

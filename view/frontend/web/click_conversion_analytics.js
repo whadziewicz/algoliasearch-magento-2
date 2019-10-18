@@ -55,7 +55,9 @@ requirejs(['algoliaBundle', 'algoliaAnalytics'], function (algoliaBundle, algoli
 
 			if (typeof algoliaOrderConversionJson !== 'undefined') {
 				$.each(algoliaOrderConversionJson, function(idx, itemData) {
-					trackConversion(itemData.objectID, itemData.queryID, itemData.indexName);
+					if (itemData !== null && typeof itemData.queryID !== 'undefined') {
+						trackConversion(itemData.objectID, itemData.queryID, itemData.indexName);
+					}
 				});
 			}
 		}

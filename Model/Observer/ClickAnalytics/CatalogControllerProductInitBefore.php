@@ -7,7 +7,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
-class CheckoutCartProductAddAfter implements ObserverInterface
+class CatalogControllerProductInitBefore implements ObserverInterface
 {
     /** @var ConfigHelper */
     private $configHelper;
@@ -29,20 +29,24 @@ class CheckoutCartProductAddAfter implements ObserverInterface
         $this->checkoutSession = $checkoutSession;
     }
 
-    /**
-     * @param Observer $observer
-     */
     public function execute(Observer $observer)
     {
-        /** @var \Magento\Quote\Model\Quote\Item $quoteItem */
-        $quoteItem = $observer->getEvent()->getQuoteItem();
-        /** @var \Magento\Catalog\Model\Product $product */
-        $product = $observer->getEvent()->getProduct();
+        $controllerAction = $observer->getEvent()->getControllerAction();
+        $params = $controllerAction->getRequest()->getParams();
 
-        if ($this->configHelper->isClickConversionAnalyticsEnabled($product->getStoreId())
-            && $this->configHelper->getConversionAnalyticsMode($product->getStoreId()) === 'place_order'
+        $storeID = $this->checkoutSession->getQuote()->getStoreId();
+        if ($this->configHelper->isClickConversionAnalyticsEnabled($storeID)
+            && $this->configHelper->getConversionAnalyticsMode($storeID) === 'place_order'
         ) {
-            $quoteItem->setData('algoliasearch_query_param', $this->checkoutSession->getData('algoliasearch_query_param'));
+            if (isset($params['queryID'])) {
+                $conversionData = [
+                    'queryID' => $params['queryID'],
+                    'indexName' => $params['indexName'],
+                    'objectID' => $params['objectID'],
+                ];
+
+                $this->checkoutSession->setData('algoliasearch_query_param', json_encode($conversionData));
+            }
         }
     }
 }

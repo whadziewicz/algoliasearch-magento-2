@@ -58,7 +58,6 @@ requirejs(['algoliaBundle', 'algoliaAnalytics'], function (algoliaBundle, algoli
 					trackConversion(itemData.objectID, itemData.queryID, itemData.indexName);
 				});
 			}
-			// trackConversion(objectId, queryID, indexName);
 		}
 
 	});

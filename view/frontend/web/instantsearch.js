@@ -378,6 +378,7 @@ requirejs(['algoliaBundle', 'Magento_Catalog/js/price-utils'], function (algolia
 				},
 				transformItems: function (items) {
 					return items.map(function (item) {
+						item.__indexName = search.helper.lastResults.index;
 						item = transformHit(item, algoliaConfig.priceKey, search.helper);
 						// FIXME: transformHit is a global
 						item.isAddToCartEnabled = algoliaConfig.instant.isAddToCartEnabled;

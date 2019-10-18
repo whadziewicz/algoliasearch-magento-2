@@ -6,33 +6,26 @@ use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Psr\Log\LoggerInterface;
 
 class CheckoutCartProductAddBefore implements ObserverInterface
 {
     /** @var ConfigHelper */
     private $configHelper;
 
-    /** @var LoggerInterface */
-    private $logger;
-
     private $analyticsParams = [
         'queryID',
         'indexName',
-        'objectID'
+        'objectID',
     ];
 
     /**
      * CheckoutCartProductAddAfter constructor.
+     *
      * @param ConfigHelper $configHelper
-     * @param LoggerInterface $logger
      */
-    public function __construct(
-        ConfigHelper $configHelper,
-        LoggerInterface $logger
-    ) {
+    public function __construct(ConfigHelper $configHelper)
+    {
         $this->configHelper = $configHelper;
-        $this->logger = $logger;
     }
 
     /**
@@ -40,16 +33,13 @@ class CheckoutCartProductAddBefore implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $requestInfo = $observer->getEvent()->getInfo();
-        $this->logger->debug('CheckoutCartProductAddBefore', $requestInfo);
-
         /** @var Product $product */
         $product = $observer->getEvent()->getProduct();
+        $requestInfo = $observer->getEvent()->getInfo();
 
         if ($this->configHelper->isClickConversionAnalyticsEnabled($product->getStoreId())
             && $this->configHelper->getConversionAnalyticsMode($product->getStoreId()) === 'place_order'
         ) {
-
             $params = [];
             foreach ($this->analyticsParams as $param) {
                 if (isset($requestInfo['as_' . $param])) {

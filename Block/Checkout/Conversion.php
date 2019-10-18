@@ -41,6 +41,7 @@ class Conversion extends Template
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->checkoutSession->getLastRealOrder();
+
         return $order->getAllVisibleItems();
     }
 

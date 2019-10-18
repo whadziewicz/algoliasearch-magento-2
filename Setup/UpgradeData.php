@@ -31,6 +31,7 @@ class UpgradeData implements UpgradeDataInterface
     /**
      * @param ModuleDataSetupInterface $setup
      * @param ModuleContextInterface $context
+     *
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
@@ -47,7 +48,7 @@ class UpgradeData implements UpgradeDataInterface
                 [
                     'type' => TABLE::TYPE_TEXT,
                     'nullable' => true,
-                    'comment' => 'Reference for Algolia analytics order conversion'
+                    'comment' => 'Reference for Algolia analytics order conversion',
                 ]
             );
 
@@ -59,11 +60,9 @@ class UpgradeData implements UpgradeDataInterface
                 [
                     'type' => TABLE::TYPE_TEXT,
                     'nullable' => true,
-                    'comment' => 'Reference for Algolia analytics order conversion'
+                    'comment' => 'Reference for Algolia analytics order conversion',
                 ]
             );
         }
-
     }
-
 }

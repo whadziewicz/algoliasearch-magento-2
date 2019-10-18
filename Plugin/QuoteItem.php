@@ -14,6 +14,7 @@ class QuoteItem
 
     /**
      * QuoteItem constructor.
+     *
      * @param ConfigHelper $configHelper
      */
     public function __construct(ConfigHelper $configHelper)
@@ -26,6 +27,7 @@ class QuoteItem
      * @param OrderItemInterface $orderItem
      * @param AbstractItem $item
      * @param array $additional
+     *
      * @return OrderItemInterface
      */
     public function afterConvert(

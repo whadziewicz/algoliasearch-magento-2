@@ -5,6 +5,8 @@
 /** @var \Algolia\AlgoliaSearch\ViewModel\Adminhtml\Common $viewModel */
 $viewModel = $this->getViewModel();
 
+$applicationId = $viewModel->getApplicationId();
+
 $isClickAnalyticsEnabled = true;
 $isClickAnalyticsTurnedOnInAdmin = true;
 $isQueryRulesEnabled = true;
@@ -43,6 +45,7 @@ $newVersionNotification = $viewModel->getNewVersionNotification();
 ?>
 
 <script>
+var applicationId = <?php echo json_encode($applicationId); ?>;
 var isClickAnalyticsEnabled = <?php echo json_encode($isClickAnalyticsEnabled); ?>;
 var isClickAnalyticsTurnedOnInAdmin = <?php echo json_encode($isClickAnalyticsTurnedOnInAdmin); ?>;
 var isQueryRulesEnabled = <?php echo json_encode($isQueryRulesEnabled); ?>;
@@ -279,6 +282,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					$input.show();
 				}
 			}
+
+			// EVENT TRACKING
+            algoliaEventsTracking.track();
+
 		});
 	});
 

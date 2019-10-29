@@ -203,6 +203,12 @@ class Common implements \Magento\Framework\View\Element\Block\ArgumentInterface
         $this->extensionNotification = $extensionNotification;
     }
 
+    /** @return string */
+    public function getApplicationId()
+    {
+        return $this->configHelper->getApplicationID();
+    }
+
     /** @return bool */
     public function isQueryRulesEnabled()
     {

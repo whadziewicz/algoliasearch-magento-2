@@ -465,13 +465,23 @@ class ConfigHelper
         return $this->configInterface->isSetFlag(self::AUTOCOMPLETE_MENU_DEBUG, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    public function getSortingIndices($originalIndexName, $storeId = null, $currentCustomerGroupId = null)
+    public function getRawSortingValue($storeId = null)
     {
-        $attrs = $this->unserialize($this->configInterface->getValue(
+        return $this->configInterface->getValue(
             self::SORTING_INDICES,
             ScopeInterface::SCOPE_STORE,
             $storeId
-        ));
+        );
+    }
+
+    public function getSorting($storeId = null)
+    {
+        return $this->unserialize($this->getRawSortingValue($storeId));
+    }
+
+    public function getSortingIndices($originalIndexName, $storeId = null, $currentCustomerGroupId = null)
+    {
+        $attrs = $this->getSorting($storeId);
 
         $currency = $this->getCurrencyCode($storeId);
         $attributesToAdd = [];
@@ -692,13 +702,28 @@ class ConfigHelper
         return [];
     }
 
-    public function getProductCustomRanking($storeId = null)
+    /**
+     * @param int|null $storeId
+     *
+     * @return mixed
+     */
+    public function getRawProductCustomRanking($storeId = null)
     {
-        $attrs = $this->unserialize($this->configInterface->getValue(
+        return $this->configInterface->getValue(
             self::PRODUCT_CUSTOM_RANKING,
             ScopeInterface::SCOPE_STORE,
             $storeId
-        ));
+        );
+    }
+
+    /**
+     * @param int|null $storeId
+     *
+     * @return array|mixed
+     */
+    public function getProductCustomRanking($storeId = null)
+    {
+        $attrs = $this->unserialize($this->getRawProductCustomRanking($storeId));
 
         if (is_array($attrs)) {
             return $attrs;

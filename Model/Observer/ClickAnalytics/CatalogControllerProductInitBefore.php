@@ -9,6 +9,12 @@ use Magento\Framework\Event\ObserverInterface;
 
 class CatalogControllerProductInitBefore implements ObserverInterface
 {
+    protected $analyticsParams = [
+        'queryID',
+        'indexName',
+        'objectID',
+    ];
+
     /** @var ConfigHelper */
     private $configHelper;
 
@@ -29,24 +35,39 @@ class CatalogControllerProductInitBefore implements ObserverInterface
         $this->checkoutSession = $checkoutSession;
     }
 
+    /**
+     * @param array $params
+     *
+     * @return bool
+     */
+    protected function hasRequiredParameters($params = [])
+    {
+        foreach ($this->analyticsParams as $requiredParam) {
+            if (!isset($params[$requiredParam])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function execute(Observer $observer)
     {
         $controllerAction = $observer->getEvent()->getControllerAction();
         $params = $controllerAction->getRequest()->getParams();
 
         $storeID = $this->checkoutSession->getQuote()->getStoreId();
-        if ($this->configHelper->isClickConversionAnalyticsEnabled($storeID)
+        if ($this->hasRequiredParameters($params)
+            && $this->configHelper->isClickConversionAnalyticsEnabled($storeID)
             && $this->configHelper->getConversionAnalyticsMode($storeID) === 'place_order'
         ) {
-            if (isset($params['queryID'])) {
-                $conversionData = [
-                    'queryID' => $params['queryID'],
-                    'indexName' => $params['indexName'],
-                    'objectID' => $params['objectID'],
-                ];
+            $conversionData = [
+                'queryID' => $params['queryID'],
+                'indexName' => $params['indexName'],
+                'objectID' => $params['objectID'],
+            ];
 
-                $this->checkoutSession->setData('algoliasearch_query_param', json_encode($conversionData));
-            }
+            $this->checkoutSession->setData('algoliasearch_query_param', json_encode($conversionData));
         }
     }
 }

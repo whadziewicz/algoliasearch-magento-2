@@ -28,8 +28,8 @@ var extensionNotices = <?php echo json_encode($extensionNotices); ?>;
 document.addEventListener("DOMContentLoaded", function(event) {
 	requirejs(['algoliaAdminBundle'], function(algoliaAdminBundle) {
 		algoliaAdminBundle.$(function ($) {
-			$('form[action*="algoliasearch"] .accordion .config .label').css('width', 'auto');
-			$('form[action*="algoliasearch"] .accordion .config .value').css('width', 'auto');
+			// $('form[action*="algoliasearch"] .accordion .config .label').css('width', 'auto');
+			// $('form[action*="algoliasearch"] .accordion .config .value').css('width', 'auto');
 
 			var fixHelper = function(e, ui) {
 				ui.children().each(function() {

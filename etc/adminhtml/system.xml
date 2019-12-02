@@ -566,7 +566,7 @@
                 </field>
             </group>
         </section>
-        <section id="algoliasearch_synonyms" translate="label" type="text" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="algoliasearch_synonyms" translate="label" type="text" sortOrder="66" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Synonyms</label>
             <tab>algolia</tab>
             <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
@@ -632,7 +632,7 @@
                 </field>
             </group>
         </section>
-        <section id="algoliasearch_cc_analytics" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="algoliasearch_cc_analytics" translate="label" type="text" sortOrder="67" showInDefault="1" showInWebsite="1" showInStore="1">
             <label><![CDATA[Click & Conversion Analytics]]></label>
             <tab>algolia</tab>
             <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
@@ -688,7 +688,7 @@
                 </field>
             </group>
         </section>
-        <section id="algoliasearch_analytics" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="algoliasearch_analytics" translate="label" type="text" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Google Analytics</label>
             <tab>algolia</tab>
             <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
@@ -746,6 +746,154 @@
                 </field>
             </group>
         </section>
+
+
+        <section id="algoliasearch_personalization" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Personalization</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="personalization_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Personalization</label>
+                <comment>
+                    <![CDATA[
+                            <p>Please select what events we should track. Don't forget to save your preferences afterwards.</p>
+                            <p>The Algolia extension for Magento will implement it automatically for you, no extra coding required.</p>
+                        ]]>
+                </comment>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Personalization</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <group id="personalization_view_events_group" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>View events</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="view_category" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>View a category page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="view_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>View a product page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="view_landing_page" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>View an Algolia landing page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+
+                <group id="personalization_click_events_group" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Click events</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="click_category" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Click on a category page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="click_category_selector" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="click_category">1</field>
+                        </depends>
+                    </field>
+                    <field id="click_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Click on a product page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="click_product_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="click_product">1</field>
+                        </depends>
+                    </field>
+                    <field id="click_search" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Click on a search result</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="click_search_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="click_search">1</field>
+                        </depends>
+                    </field>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+
+                <group id="personalization_conversion_events_group" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conversion events</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="conversion_wishist" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Add to wishlist</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="conversion_wishist_selector" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="conversion_wishist">1</field>
+                        </depends>
+                    </field>
+                    <field id="conversion_cart" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Add to cart</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="conversion_cart_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="conversion_cart">1</field>
+                        </depends>
+                    </field>
+                    <field id="conversion_order" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Place order</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="conversion_order_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <comment>
+                            <![CDATA[
+                            Specify a DOM selector to track this particular event.
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="conversion_order">1</field>
+                        </depends>
+                    </field>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+            </group>
+
+        </section>
+
+
         <section id="algoliasearch_advanced" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Advanced</label>
             <tab>algolia</tab>

@@ -7,12 +7,12 @@ use Algolia\AlgoliaSearch\Exception\ProductDisabledException;
 use Algolia\AlgoliaSearch\Exception\ProductNotVisibleException;
 use Algolia\AlgoliaSearch\Exception\ProductOutOfStockException;
 use Algolia\AlgoliaSearch\Exception\ProductReindexingException;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\Product\PriceManager;
 use Algolia\AlgoliaSearch\Helper\Image as ImageHelper;
 use Algolia\AlgoliaSearch\Helper\Logger;
-use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\SearchIndex;
 use Magento\Bundle\Model\Product\Type as BundleProductType;
 use Magento\Catalog\Model\Product;
@@ -204,7 +204,6 @@ class ProductHelper
 
     public function isAttributeEnabled($additionalAttributes, $attributeName)
     {
-        
         foreach ($additionalAttributes as $attr) {
             if ($attr['attribute'] === $attributeName) {
                 return true;
@@ -1071,7 +1070,7 @@ class ProductHelper
         if ($rules) {
             $this->logger->log('Setting facets query rules to "' . $indexName . '" index: ' . json_encode($rules));
             $index->saveRules($rules, [
-                'forwardToReplicas' => true
+                'forwardToReplicas' => true,
             ]);
         }
     }

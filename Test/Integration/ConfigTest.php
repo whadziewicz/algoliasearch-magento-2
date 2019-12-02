@@ -2,8 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Test\Integration;
 
-use Algolia\AlgoliaSearch\Model\IndicesConfigurator;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Model\IndicesConfigurator;
 
 class ConfigTest extends TestCase
 {

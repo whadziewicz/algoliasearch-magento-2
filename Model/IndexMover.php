@@ -2,10 +2,9 @@
 
 namespace Algolia\AlgoliaSearch\Model;
 
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\Data;
-use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
-
 
 class IndexMover
 {

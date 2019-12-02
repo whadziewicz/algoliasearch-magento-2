@@ -70,7 +70,6 @@ class AnalyticsHelper
         $this->proxyHelper = $proxyHelper;
 
         $this->logger = $logger;
-
     }
 
     private function setupAnalyticsClient()

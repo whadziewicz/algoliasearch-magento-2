@@ -2,8 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 
 class MerchandisingHelper
 {

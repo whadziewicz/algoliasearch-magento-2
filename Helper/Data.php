@@ -770,7 +770,7 @@ class Data
         $counter = 0;
         $browseOptions = [
             'query' => '',
-            'attributesToRetrieve' => ['objectID']
+            'attributesToRetrieve' => ['objectID'],
         ];
         foreach ($index->browseObjects($browseOptions) as $hit) {
             $objectIds[] = $hit['objectID'];

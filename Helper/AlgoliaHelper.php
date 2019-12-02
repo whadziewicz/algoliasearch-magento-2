@@ -224,7 +224,6 @@ class AlgoliaHelper extends AbstractHelper
             }
         }
 
-
         foreach ($settings as $key => $value) {
             $onlineSettings[$key] = $value;
         }
@@ -240,11 +239,11 @@ class AlgoliaHelper extends AbstractHelper
 
         if ($this->config->isPartialUpdateEnabled()) {
             $response = $index->partialUpdateObjects($objects, [
-                'createIfNotExists' => true
+                'createIfNotExists' => true,
             ]);
         } else {
             $response = $index->saveObjects($objects, [
-                'autoGenerateObjectIDIfNotExist' => true
+                'autoGenerateObjectIDIfNotExist' => true,
             ]);
         }
 
@@ -266,14 +265,13 @@ class AlgoliaHelper extends AbstractHelper
         }
 
         self::$lastTaskId = $response['taskID'];
-
     }
 
     public function saveRule($rule, $indexName, $forwardToReplicas = false)
     {
         $index = $this->getIndex($indexName);
         $res = $index->saveRule($rule, [
-            'forwardToReplicas' => $forwardToReplicas
+            'forwardToReplicas' => $forwardToReplicas,
         ]);
 
         self::setLastOperationInfo($indexName, $res);
@@ -284,7 +282,7 @@ class AlgoliaHelper extends AbstractHelper
         $index = $this->getIndex($indexName);
         $res = $index->saveRules($rules, [
             'forwardToReplicas'     => false,
-            'clearExistingRules'    => false
+            'clearExistingRules'    => false,
         ]);
 
         self::setLastOperationInfo($indexName, $res);
@@ -305,7 +303,7 @@ class AlgoliaHelper extends AbstractHelper
     {
         $index = $this->getIndex($indexName);
         $res = $index->deleteRule($objectID, [
-            'forwardToReplicas' => $forwardToReplicas
+            'forwardToReplicas' => $forwardToReplicas,
         ]);
 
         self::setLastOperationInfo($indexName, $res);
@@ -327,7 +325,7 @@ class AlgoliaHelper extends AbstractHelper
                 [
                     'type'          => ['altCorrection1', 'altCorrection2', 'placeholder'],
                     'page'          => $page,
-                    'hitsPerPage'   => $hitsPerPage
+                    'hitsPerPage'   => $hitsPerPage,
                 ]
             );
 
@@ -347,7 +345,7 @@ class AlgoliaHelper extends AbstractHelper
         } else {
             $res = $index->saveSynonyms($synonyms, [
                 'forwardToReplicas'         => true,
-                'replaceExistingSynonyms'   => true
+                'replaceExistingSynonyms'   => true,
             ]);
         }
 
@@ -366,7 +364,7 @@ class AlgoliaHelper extends AbstractHelper
         do {
             $fetchedSynonyms = $fromIndex->searchSynonyms('', [
                 'page' => $page,
-                'hitsPerPage' => $hitsPerPage
+                'hitsPerPage' => $hitsPerPage,
             ]);
 
             foreach ($fetchedSynonyms['hits'] as $hit) {
@@ -383,9 +381,9 @@ class AlgoliaHelper extends AbstractHelper
                 'forwardToReplicas' => true,
             ]);
         } else {
-            $res = $toIndex->saveSynonyms($synonymsToSet,[
+            $res = $toIndex->saveSynonyms($synonymsToSet, [
                 'forwardToReplicas'         => true,
-                'replaceExistingSynonyms'   => true
+                'replaceExistingSynonyms'   => true,
             ]);
         }
 
@@ -424,7 +422,7 @@ class AlgoliaHelper extends AbstractHelper
 
         if (!$queryRulesToSet) {
             $res = $toIndex->clearRules([
-                'forwardToReplicas' => true
+                'forwardToReplicas' => true,
             ]);
         } else {
             $res = $toIndex->saveRules($queryRulesToSet, [

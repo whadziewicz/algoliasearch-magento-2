@@ -7,15 +7,33 @@ use Algolia\AlgoliaSearch\Api\Data\QueryInterface;
 use Magento\Framework\App\Config\ConfigResource\ConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\DB\Ddl\Table;
+use Magento\Framework\Indexer\IndexerInterfaceFactory;
+use Magento\Framework\Mview\View\SubscriptionFactory;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
+    /**
+     * @var ConfigInterface
+     */
     private $config;
 
+    /**
+     * @var IndexerInterfaceFactory
+     */
+    private $indexerFactory;
+
+    /**
+     * @var ProductMetadataInterface
+     */
     private $productMetadata;
+
+    /**
+     * @var SubscriptionFactory
+     */
+    private $subscriptionFactory;
 
     private $defaultConfigData = [
         'algoliasearch_credentials/credentials/enable_backend' => '1',
@@ -58,7 +76,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         'algoliasearch_queue/queue/number_of_retries' => '3',
 
         'algoliasearch_cc_analytics/cc_analytics_group/enable' => '0',
-        'algoliasearch_cc_analytics/cc_analytics_group/is_selector' => '.ais-hits--item a.result, .ais-infinite-hits--item a.result',
+        'algoliasearch_cc_analytics/cc_analytics_group/is_selector' => '.ais-Hits-item a.result, .ais-InfiniteHits-item a.result',
         'algoliasearch_cc_analytics/cc_analytics_group/enable_conversion_analytics' => 'disabled',
         'algoliasearch_cc_analytics/cc_analytics_group/add_to_cart_selector' => '.action.primary.tocart',
 
@@ -80,6 +98,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         'algoliasearch_advanced/advanced/prevent_backend_rendering' => '0',
         'algoliasearch_advanced/advanced/prevent_backend_rendering_display_mode' => 'all',
         'algoliasearch_advanced/advanced/backend_rendering_allowed_user_agents' => "Googlebot\nBingbot",
+        'algoliasearch_advanced/advanced/archive_clear_limit' => '30',
     ];
 
     private $defaultArrayConfigData = [
@@ -242,10 +261,16 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ],
     ];
 
-    public function __construct(ConfigInterface $config, ProductMetadataInterface $productMetadata)
-    {
+    public function __construct(
+        ConfigInterface $config,
+        IndexerInterfaceFactory $indexerFactory,
+        ProductMetadataInterface $productMetadata,
+        SubscriptionFactory $subscriptionFactory
+    ) {
         $this->config = $config;
+        $this->indexerFactory = $indexerFactory;
         $this->productMetadata = $productMetadata;
+        $this->subscriptionFactory = $subscriptionFactory;
 
         $this->serializeDefaultArrayConfigData();
         $this->mergeDefaultDataWithArrayData();
@@ -561,6 +586,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
             $connection->createTable($table);
+        }
+
+        if (version_compare($context->getVersion(), '1.12.1', '<')) {
+            // @see \Magento\Framework\Mview\View::unsubscribe
+            /** @var \Magento\Framework\Indexer\IndexerInterface $indexer */
+            $indexer = $this->indexerFactory->create()->load('algolia_products');
+            $subscriptionInstance = $this->subscriptionFactory->create(
+                [
+                    'view' => $indexer->getView(),
+                    'tableName' => 'catalog_product_index_price',
+                    'columnName' => 'entity_id',
+                ]
+            );
+            $subscriptionInstance->remove();
         }
 
         $setup->endSetup();

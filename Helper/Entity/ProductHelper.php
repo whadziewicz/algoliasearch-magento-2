@@ -10,6 +10,7 @@ use Algolia\AlgoliaSearch\Exception\ProductReindexingException;
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\Product\PriceManager;
+use Algolia\AlgoliaSearch\Helper\Image as ImageHelper;
 use Algolia\AlgoliaSearch\Helper\Logger;
 use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\SearchIndex;
@@ -20,19 +21,22 @@ use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute as AttributeResource;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Helper\Stock;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Customer\Model\ResourceModel\Group\Collection as GroupCollection;
 use Magento\Directory\Model\Currency as CurrencyHelper;
 use Magento\Eav\Model\Config;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 
 class ProductHelper
 {
+    protected $productCollectionFactory;
+    protected $groupCollection;
     private $eavConfig;
     private $configHelper;
     private $algoliaHelper;
@@ -41,8 +45,7 @@ class ProductHelper
     private $eventManager;
     private $visibility;
     private $stockHelper;
-    protected $stockRegistry;
-    private $objectManager;
+    private $stockRegistry;
     private $currencyManager;
     private $categoryHelper;
     private $priceManager;
@@ -86,6 +89,26 @@ class ProductHelper
         'color',
     ];
 
+    /**
+     * ProductHelper constructor.
+     *
+     * @param Config $eavConfig
+     * @param ConfigHelper $configHelper
+     * @param AlgoliaHelper $algoliaHelper
+     * @param Logger $logger
+     * @param StoreManagerInterface $storeManager
+     * @param ManagerInterface $eventManager
+     * @param Visibility $visibility
+     * @param Stock $stockHelper
+     * @param StockRegistryInterface $stockRegistry
+     * @param CurrencyHelper $currencyManager
+     * @param CategoryHelper $categoryHelper
+     * @param PriceManager $priceManager
+     * @param Type $productType
+     * @param CollectionFactory $productCollectionFactory
+     * @param GroupCollection $groupCollection
+     * @param ImageHelper $imageHelper
+     */
     public function __construct(
         Config $eavConfig,
         ConfigHelper $configHelper,
@@ -96,11 +119,13 @@ class ProductHelper
         Visibility $visibility,
         Stock $stockHelper,
         StockRegistryInterface $stockRegistry,
-        ObjectManagerInterface $objectManager,
         CurrencyHelper $currencyManager,
         CategoryHelper $categoryHelper,
         PriceManager $priceManager,
-        Type $productType
+        Type $productType,
+        CollectionFactory $productCollectionFactory,
+        GroupCollection $groupCollection,
+        ImageHelper $imageHelper
     ) {
         $this->eavConfig = $eavConfig;
         $this->configHelper = $configHelper;
@@ -111,20 +136,13 @@ class ProductHelper
         $this->visibility = $visibility;
         $this->stockHelper = $stockHelper;
         $this->stockRegistry = $stockRegistry;
-        $this->objectManager = $objectManager;
         $this->currencyManager = $currencyManager;
         $this->categoryHelper = $categoryHelper;
         $this->priceManager = $priceManager;
         $this->productType = $productType;
-
-        $this->imageHelper = $this->objectManager->create(
-            'Algolia\AlgoliaSearch\Helper\Image',
-            [
-                'options' =>[
-                    'shouldRemovePubDir' => $this->configHelper->shouldRemovePubDirectory(),
-                ],
-            ]
-        );
+        $this->productCollectionFactory = $productCollectionFactory;
+        $this->groupCollection = $groupCollection;
+        $this->imageHelper = $imageHelper;
     }
 
     public function getIndexNameSuffix()
@@ -202,10 +220,8 @@ class ProductHelper
         $onlyVisible = true,
         $includeNotVisibleIndividually = false
     ) {
-        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $products */
-        $products = $this->objectManager->create('Magento\Catalog\Model\ResourceModel\Product\Collection');
-
-        $products = $products
+        $productCollection = $this->productCollectionFactory->create();
+        $products = $productCollection
             ->setStoreId($storeId)
             ->addStoreFilter($storeId)
             ->distinct(true);
@@ -331,7 +347,7 @@ class ProductHelper
 
         $replicas = [];
 
-        if ($this->configHelper->isInstantEnabled()) {
+        if ($this->configHelper->isInstantEnabled() || $this->configHelper->isBackendRenderingEnabled()) {
             $replicas = array_values(array_map(function ($sortingIndex) {
                 return $sortingIndex['name'];
             }, $sortingIndices));
@@ -432,7 +448,7 @@ class ProductHelper
 
     public function getAllCategories($categoryIds)
     {
-        $categories = $this->categoryHelper->getCoreCategories();
+        $categories = $this->categoryHelper->getCoreCategories(false);
 
         $selectedCategories = [];
         foreach ($categoryIds as $id) {
@@ -638,13 +654,6 @@ class ProductHelper
                 $path = [];
 
                 foreach ($category->getPathIds() as $treeCategoryId) {
-                    if (!$this->configHelper->showCatsNotIncludedInNavigation($storeId)
-                        && !$this->categoryHelper->isCategoryVisibleInMenu($treeCategoryId, $storeId)) {
-                        // If the category should not be included in menu - skip it
-                        $path[] = null;
-                        continue;
-                    }
-
                     $name = $this->categoryHelper->getCategoryName($treeCategoryId, $storeId);
                     if ($name) {
                         $categoryIds[] = $treeCategoryId;
@@ -972,10 +981,7 @@ class ProductHelper
                     $facet['attribute'] = 'price.' . $currency_code . '.default';
 
                     if ($this->configHelper->isCustomerGroupsEnabled($storeId)) {
-                        $groupCollection = $this->objectManager
-                            ->create('Magento\Customer\Model\ResourceModel\Group\Collection');
-
-                        foreach ($groupCollection as $group) {
+                        foreach ($this->groupCollection as $group) {
                             $group_id = (int) $group->getData('customer_group_id');
 
                             $attributesForFaceting[] = 'price.' . $currency_code . '.group_' . $group_id;
@@ -1153,10 +1159,18 @@ class ProductHelper
         return true;
     }
 
+    /**
+     * Returns is product in stock
+     *
+     * @param Product $product
+     * @param int $storeId
+     *
+     * @return bool
+     */
     public function productIsInStock($product, $storeId)
     {
         $stockItem = $this->stockRegistry->getStockItem($product->getId());
 
-        return $stockItem->getIsInStock();
+        return $product->isSaleable() && $stockItem->getIsInStock();
     }
 }

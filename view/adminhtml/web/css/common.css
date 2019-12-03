@@ -433,3 +433,78 @@
 .algolia_dashboard_warning_page {
 	margin-bottom : 0;
 }
+
+/* Global Config*/
+form[action*="algoliasearch"] .accordion .config .label,
+form[action*="algoliasearch"] .accordion .config .value {
+	width: auto;
+}
+
+#algoliasearch_personalization_personalization_group .entry-edit-head {
+	background-color: #f8f8f8;
+	border-bottom: 1px solid #e3e3e3;
+	border-top: 1px solid #e3e3e3;
+}
+
+#algoliasearch_personalization_personalization_group .section-config{
+	border: 0;
+	margin-left : 0;
+}
+
+#algoliasearch_personalization_personalization_group .section-config .entry-edit-head > a {
+	padding-left: 3.8rem;
+}
+
+#algoliasearch_personalization_personalization_group .section-config .entry-edit-head > a::before {
+	left: 10px;
+}
+
+/* Personalization Config */
+#algoliasearch_personalization_personalization_group td.label{
+	width: 40%;
+	text-align: left;
+	/*padding: 2.2rem 1.5rem 3.2rem 0;*/
+}
+
+#algoliasearch_personalization_personalization_group span[data-config-scope]::before{
+	right: auto;
+}
+
+#algoliasearch_personalization_personalization_group td.value {
+	width: 60%;
+	padding: 1.7rem 1.5rem 3.2rem 0;
+}
+
+#algoliasearch_personalization_personalization_group td.value select{
+	width: 30%;
+}
+
+#algoliasearch_personalization_personalization_group td.value input{
+	width: 50%;
+}
+
+#algoliasearch_personalization_personalization_group td.value .note{
+	position: absolute;
+	left: 0;
+}
+
+#algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.label{
+	padding: 0 1.5rem 3.2rem 0;
+}
+
+#algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.value{
+	padding: 0 1.5rem 3.2rem 0;
+}
+
+#algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.use-default{
+	position: absolute;
+	left: 39%;
+	bottom: 0;
+}
+
+
+#row_algoliasearch_personalization_personalization_group_personalization_view_events_group tr,
+#row_algoliasearch_personalization_personalization_group_personalization_click_events_group tr ,
+#row_algoliasearch_personalization_personalization_group_personalization_conversion_events_group tr{
+	position: relative;
+}

@@ -767,17 +767,25 @@
                 <group id="personalization_view_events_group" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>View events</label>
                     <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            Alternative description for view events
+                        ]]>
+                    </comment>
                     <field id="view_category" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>View a category page</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="view_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>View a product page</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="view_landing_page" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>View an Algolia landing page</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <depends>
                         <field id="enable">1</field>
@@ -787,47 +795,44 @@
                 <group id="personalization_click_events_group" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Click events</label>
                     <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            Event tracking is based on default Magento behaviors and components. If you are using a specific component that
+                            is not Magento native, please specify its DOM selector, so Algolia should know where to look for this event
+                        ]]>
+                    </comment>
                     <field id="click_category" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Click on a category page</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="click_category_selector" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="click_category">1</field>
                         </depends>
                     </field>
                     <field id="click_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Click on a product page</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="click_product_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="click_product">1</field>
                         </depends>
                     </field>
                     <field id="click_search" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Click on a search result</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="click_search_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="click_search">1</field>
                         </depends>
@@ -840,47 +845,44 @@
                 <group id="personalization_conversion_events_group" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Conversion events</label>
                     <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            Event tracking is based on default Magento behaviors and components. If you are using a specific component that
+                            is not Magento native, please specify its DOM selector, so Algolia should know where to look for this event
+                        ]]>
+                    </comment>
                     <field id="conversion_wishist" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Add to wishlist</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="conversion_wishist_selector" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="conversion_wishist">1</field>
                         </depends>
                     </field>
                     <field id="conversion_cart" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Add to cart</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="conversion_cart_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="conversion_cart">1</field>
                         </depends>
                     </field>
                     <field id="conversion_order" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Place order</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
                     <field id="conversion_order_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
-                        <comment>
-                            <![CDATA[
-                            Specify a DOM selector to track this particular event.
-                        ]]>
-                        </comment>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="conversion_order">1</field>
                         </depends>

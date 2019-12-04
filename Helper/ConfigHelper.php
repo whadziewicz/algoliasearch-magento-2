@@ -619,6 +619,8 @@ class ConfigHelper
             ScopeInterface::SCOPE_STORE,
             $storeId
         ));
+
+        $customRankings = $customRankings ?: [];
         $customRankings = array_filter($customRankings, function ($customRanking) {
             return $customRanking['attribute'] !== 'custom_attribute';
         });
@@ -658,6 +660,8 @@ class ConfigHelper
             ScopeInterface::SCOPE_STORE,
             $storeId
         ));
+
+        $customRankings = $customRankings ?: [];
         $customRankings = array_filter($customRankings, function ($customRanking) {
             return $customRanking['attribute'] !== 'custom_attribute';
         });
@@ -678,14 +682,16 @@ class ConfigHelper
             $storeId
         ));
 
-        foreach ($attrs as &$attr) {
-            if ($attr['type'] === 'other') {
-                $attr['type'] = $attr['other_type'];
+        if ($attrs) {
+            foreach ($attrs as &$attr) {
+                if ($attr['type'] === 'other') {
+                    $attr['type'] = $attr['other_type'];
+                }
             }
-        }
 
-        if (is_array($attrs)) {
-            return array_values($attrs);
+            if (is_array($attrs)) {
+                return array_values($attrs);
+            }
         }
 
         return [];

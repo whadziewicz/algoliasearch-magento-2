@@ -1,0 +1,51 @@
+{
+    "name": "algolia/algoliasearch-admin",
+    "description": "Algolia Search Admin extension for Magento 2",
+    "type": "magento2-module",
+    "keywords": [
+        "php",
+        "magento",
+        "magento2",
+        "algolia",
+        "search",
+        "ui"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Algolia",
+            "email": "support@algolia.com"
+        }
+    ],
+    "support": {
+        "source": "https://https://github.com/algolia/algoliasearch-magento-2",
+        "issues": "https://https://github.com/algolia/algoliasearch-magento-2/issues"
+    },
+    "require": {
+        "php": "^7.1.3",
+        "magento/framework": "^101.0|^102.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Algolia\\AlgoliaSearchAdmin\\": ""
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "platform": {
+            "php": "7.2.0"
+        }
+    }
+}

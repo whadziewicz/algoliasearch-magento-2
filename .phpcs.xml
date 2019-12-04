@@ -1,0 +1,55 @@
+<ruleset xsi:noNamespaceSchemaLocation="phpcs.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!-- Files -->
+    <file>.</file>
+
+    <!-- Excludes -->
+    <exclude-pattern>vendor/</exclude-pattern>
+
+    <!-- Arguments -->
+    <arg name="basepath" value="."/>
+    <arg name="tab-width" value="4"/>
+    <arg name="colors"/>
+    <arg name="parallel" value="75"/>
+    <arg value="p"/>
+    <ini name="memory_limit" value="128M"/>
+
+    <!-- Internal -->
+    <rule ref="Internal.Tokenizer.Exception">
+        <type>error</type>
+    </rule>
+
+    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
+
+    <!-- Presets -->
+    <rule ref="PSR12" />
+    <rule ref="PHPCompatibility" />
+    <rule ref="vendor/magento/magento-coding-standard/Magento2/ruleset.xml"> </rule>
+    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">
+        <exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces" />
+        <exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName" />
+        <exclude name="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming" />
+    </rule>
+
+    <rule ref="vendor/object-calisthenics/phpcs-calisthenics-rules/src/ObjectCalisthenics/ruleset.xml" />
+
+    <!-- Speficic rules -->
+    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/Sniffs/Namespaces/AlphabeticallySortedUsesSniff.php">
+        <properties>
+            <property name="caseSensitive" value="true"/>
+        </properties>
+    </rule>
+    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/Sniffs/TypeHints/DeclareStrictTypesSniff.php">
+        <properties>
+            <property name="newlinesCountBetweenOpenTagAndDeclare" value="2"/>
+            <property name="newlinesCountAfterDeclare" value="2"/>
+            <property name="spacesCountAroundEqualsSign" value="0"/>
+        </properties>
+    </rule>
+
+    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/Sniffs/Classes/EmptyLinesAroundClassBracesSniff.php">
+        <properties>
+            <property name="linesCountAfterOpeningBrace" value="0"/>
+            <property name="linesCountBeforeClosingBrace" value="0"/>
+        </properties>
+    </rule>
+</ruleset>

@@ -1,61 +1,65 @@
-Algolia Search for Magento 2
-==================
+This branch is created by initiative of the Magento squad to discuss the architecture of the new extension.
 
-![Latest version](https://img.shields.io/badge/latest-1.12.1-green.svg)
-![Magento 2](https://img.shields.io/badge/Magento-%3E=2.2-blue.svg)
-![PHP >= 7.0.6](https://img.shields.io/badge/PHP-%3E=7.0-green.svg)
+The *goal* is: **Improving the extension quality with an iterative refactoring**.
 
-[![CircleCI](https://circleci.com/gh/algolia/algoliasearch-magento-2/tree/master.svg?style=svg)](https://circleci.com/gh/algolia/algoliasearch-magento-2/tree/master)
+## Modules organization
 
--------
+A module is a logical group – that is, a directory containing blocks, controllers, helpers, models – that are
+related to a specific business feature. A module encapsulates one feature and has minimal dependencies on other modules.
 
-🔎 Are you a Magento engineer? [Join our team](https://www.algolia.com/careers#!?j=eed58660-f684-436d-a2ff-e9947d2b65a2) and help us deliver the best search solution for Magento stores!
+More info about this: [https://devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html](https://devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html)
 
--------
+- Module name pattern: `Algolia{Product}{Concern}`:
 
-- **Auto-completion menu:** Offer End-Users immediate access to your whole catalog from the dropdown menu, whatever your number of categories or attributes.
+```
+./composer.json : at root level, depends of all modulues, and contains development dependencies
+./Algolia{Product}{Concern}/composer.json : at module level, has minimal dependencies on other modules
+./Algolia{Product}{Concern}/Test/Unit : at module level, contains unit tests
+./Algolia{Product}{Concern}/Test/Mftf : at module level, contains integration tests with (or not) other modules
+```
 
-- **Instant search results page:** Have your search results page, navigation and pagination updated in realtime, after each keystroke.
+## Deployment
 
-Official website: [community.algolia.com/magento](https://community.algolia.com/magento).
+On a new version, the script `composer release` should be performed to release the extension on the git/marketplace. Note
+that the script `composer release` is in charge to perform environment/misc validations to ensure that a new version can
+be released.
 
-*Note: if your store is running under Magento version 1.x, please check our [Algolia for Magento 1 extension](https://github.com/algolia/algoliasearch-magento).*
+The end-goal would add this script to a workflow on circle-ci, that should run on push-to-master.
 
-Demo
---------------
+- `composer release`
 
-Try the auto-complete and the instant search results page on our [live demo](https://magento2.algolia.com). 
+## Test suite
 
-Algolia Search
---------------
+The test suite run before on a `pre-commit` hook. As so, it should be fast, reliable, isolated, and without flakiness:
 
-[Algolia](http://www.algolia.com) is a search engine API as a service capable of delivering realtime results from the first keystroke.
+composer.json > extra > hooks.
 
-This extension replaces the default search of Magento with a typo-tolerant, fast & relevant search experience backed by Algolia. It's based on [algoliasearch-client-php](https://github.com/algolia/algoliasearch-client-php), [autocomplete.js](https://github.com/algolia/autocomplete.js) and [instantsearch.js](https://github.com/algolia/instantsearch.js).
+> It's important to NOT understime the importance of this task. A well designed test suite, will drastically 
+reduce the amount of time we spend debugging.
 
-<!-- 
-The extension officially supports only 2.0.X versions of Magento. 
-It's possible to use it for versions >= 2.1.0, but some unexpected issues might appear. When you experience that, please [open an issue](https://github.com/algolia/algoliasearch-magento-2/issues/new).
--->
+The test suite can also be run manually using:
 
-Documentation
---------------
+- `composer test` Runs the whole test suite in `--dry-run` mode.
 
-Check out the [Algolia Search for Magento 2 documentation](https://www.algolia.com/doc/integration/magento-2/getting-started/quick-start/).
+## Coding Style
 
+Ensures good practices and clean code:
 
-Installation
-------------
+- `composer lint` Runs the linter.
+- `composer test:lint` Runs the linter in `--dry-run`.
 
-The easiest way to install the extension is to use [Composer](https://getcomposer.org/) and follow our [getting started guide](https://www.algolia.com/doc/integration/magento-2/getting-started/quick-start/).
+## Static Analysis
 
-Run the following commands:
+Static analyics focuses on finding errors in your code without actually running it. Contains rules to get us
+on the habit of writing robust, safe, and maintainable code.
 
-- ```$ composer require algolia/algoliasearch-magento-2```
-- ```$ bin/magento module:enable Algolia_AlgoliaSearch```
-- ```$ bin/magento setup:upgrade && bin/magento setup:static-content:deploy```
+They are aggressive, but just TypeScript, they point you in the right direction.
 
-Contribution
-------------
+- `composer test:types` Runs the type checker.
 
-To start contribuiting to the extension follow the [contributing guildelines](.github/CONTRIBUTING.md).
+## TODO
+
+[ ] - Create the `Search` product along side their respective modules, unit tests and integration tests
+[ ] - Develop `dev/release.sh`
+[ ] - Develop `.circle.ci` without pre-docker images this time, and run tests against: magento version <=> php version <=> lower|high dependencies
+[ ] - Consider `https://github.com/bamarni/composer-bin-plugin` for development dependencies. As magento seems stuck in older versions of symfony compoments.

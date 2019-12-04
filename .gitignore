@@ -1,5 +1,6 @@
-dev/frontend/node_modules/
-dev/bin/auth.json
+.idea/*
+.idea/codeStyleSettings.xml
 composer.lock
-vendor/
-.php_cs.cache
+/vendor/
+.phpunit.result.cache
+.DS_Store

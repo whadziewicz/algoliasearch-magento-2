@@ -1,0 +1,12 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/localheinz/phpstan-rules/rules.neon
+    - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
+    - vendor/roave/no-floaters/rules.neon
+
+parameters:
+    level: max
+    paths:
+        - AlgoliaSearchAdmin
+    ignoreErrors:
+        - '#is neither abstract nor final#'

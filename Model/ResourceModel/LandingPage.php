@@ -54,17 +54,19 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _afterSave(AbstractModel $object)
     {
-        if ($object->dataHasChangedFor('url_key') || $object->dataHasChangedFor('store_id')) {
+        if ($object->dataHasChangedFor('url_key')
+            || $object->dataHasChangedFor('store_id')
+            || $object->dataHasChangedFor('is_active')) {
             $urls = $this->landingPageUrlRewriteGenerator->generate($object);
 
             $this->urlPersist->deleteByData([
                 UrlRewrite::ENTITY_ID => $object->getId(),
                 UrlRewrite::ENTITY_TYPE => LandingPageUrlRewriteGenerator::ENTITY_TYPE,
             ]);
-            $this->urlPersist->replace($urls);
+            if ($object->getIsActive()) {
+                $this->urlPersist->replace($urls);
+            }
         }
-
-        return parent::_afterSave($object);
     }
 
     /**

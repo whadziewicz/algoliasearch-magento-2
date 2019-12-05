@@ -67,6 +67,8 @@ class LandingPage extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 $this->urlPersist->replace($urls);
             }
         }
+
+        return parent::_afterSave($object);
     }
 
     /**

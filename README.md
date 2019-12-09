@@ -18,12 +18,24 @@ Example: [github.com/algolia/algoliasearch-magento-2/tree/release/v2.0.0/Algolia
 ./Algolia{Product}{Concern}/composer.json : at module level, has minimal dependencies on other modules
 ```
 
+Here is an example:
+
+```
+AlgoliaAnalytics: contains features related to analytics
+AlgoliaSearchAdmin: contains admin code related to search
+AlgoliaSearchCore: contains indexation part, or similar
+AlgoliaSearchFrontend: contains front-end assets related to search
+...
+```
+
+Note that, we can have everthing in the same repository as no git history is needed on the market place.
+
 ## Test suite
 
 Here is where tests should be localled and they goal:
 ```
-./Algolia{Product}{Concern}/Test/Unit : at module level, contains unit tests
-./Algolia{Product}{Concern}/Test/Mftf : at module level, contains integration tests with (or not) other modules
+./Algolia{Product}{Concern}/Test/Unit : at module level, contains UNIT tests
+./Algolia{Product}{Concern}/Test/Mftf : at module level, contains INTEGRATION tests with (or not) other modules
 ```
 
 The test suite will run as  `pre-commit` hook. As so, it should be fast, reliable, isolated, and without flakiness:
@@ -35,7 +47,7 @@ composer.json > extra > hooks.
 
 The test suite can also be run manually using:
 
-- `composer test` Runs the whole test suite in `--dry-run` mode.
+- `composer test` Runs the whole test suite (except the integration testing) in `--dry-run` mode.
 
 ## Continous integration
 

@@ -7,18 +7,24 @@ The *goal* is: **Improving the extension quality with an iterative refactoring**
 A module is a logical group – that is, a directory containing blocks, controllers, helpers, models – that are
 related to a specific business feature. A module encapsulates one feature and has minimal dependencies on other modules.
 
-More info about this: [https://devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html](https://devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html)
+More info about this: [devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html](https://devdocs.magento.com/guides/v2.3/architecture/archi_perspectives/components/modules/mod_intro.html)
 
 - Module name pattern: `Algolia{Product}{Concern}`. Example: AlgoliaSearchAdmin, AlgoliaAnalyticsAdmin.
 
+Example: [github.com/algolia/algoliasearch-magento-2/tree/release/v2.0.0/AlgoliaSearchAdmin](https://github.com/algolia/algoliasearch-magento-2/tree/release/v2.0.0/AlgoliaSearchAdmin)
+
 ```
-./composer.json : at root level, depends of all modulues, and contains development dependencies
+./composer.json : at root level (it's not a module, is a metapackage), depends of all modules, and contains DEV dependencies
 ./Algolia{Product}{Concern}/composer.json : at module level, has minimal dependencies on other modules
-./Algolia{Product}{Concern}/Test/Unit : at module level, contains unit tests
-./Algolia{Product}{Concern}/Test/Mftf : at module level, contains integration tests with (or not) other modules
 ```
 
 ## Test suite
+
+Here is where tests should be localled and they goal:
+```
+./Algolia{Product}{Concern}/Test/Unit : at module level, contains unit tests
+./Algolia{Product}{Concern}/Test/Mftf : at module level, contains integration tests with (or not) other modules
+```
 
 The test suite will run as  `pre-commit` hook. As so, it should be fast, reliable, isolated, and without flakiness:
 
@@ -36,11 +42,13 @@ The test suite can also be run manually using:
 As discussed on the point `release`, eventually the CI will be responsible to release new versions of the extension. But before
 that is important to set up a test suite on the CI that tests the current extension against different scenarios, here are some:
 
-1 - magento 101, php 7.0
-2 - magento 101, php 7.1
-3 - magento 101, php 7.2
-4 - magento 102, php 7.0
-// ...
+```
+- magento 101, php 7.0
+- magento 101, php 7.1
+- magento 101, php 7.2
+- magento 102, php 7.0
+...
+```
 
 ## Coding Style
 
@@ -79,6 +87,7 @@ code be coupled to Magento? Make understandable looking at the source where code
 The POC should be delivered alongside a document `CONVENTIONS.md` where those conventions should be written.
 
 Notes:
-- Scripts as `dev/release.sh`, `.circle.ci`, are just examples in this skeleton, as so, they need to be developed.
+- Scripts as `dev/release.sh`, `.circle.ci`, are just examples in this skeleton, as so, they need to be developed
+- Mftf integration framework need to be investigated and tested
 
 **Result expected**: A POC alongside with a doc with conventions for the next modules.

@@ -10,7 +10,7 @@ class PersonalizationTracking implements ArrayInterface
     {
         return [
             ['value' => 0, 'label' => __('Ignore')],
-            ['value' => 1, 'label' => __('Track')],
+            ['value' => 1, 'label' => __('Send')],
         ];
     }
 }

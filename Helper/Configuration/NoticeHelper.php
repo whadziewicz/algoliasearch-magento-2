@@ -43,6 +43,16 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
         'getVersionNotice',
         'getClickAnalyticsNotice',
         'getQueryRulesNotice',
+        'getPersonalizationNotice',
+    ];
+
+    /** @var array[] */
+    protected $pagesWithoutQueueNotice = [
+        'algoliasearch_cc_analytics',
+        'algoliasearch_analytics',
+        'algoliasearch_personalization',
+        'algoliasearch_advanced',
+        'algoliasearch_extra_settings'
     ];
 
     /** @var array[] */
@@ -79,6 +89,12 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected function getQueueNotice()
     {
+        foreach ($this->pagesWithoutQueueNotice as $page)  {
+            if (preg_match('/' . $page . '/' , $this->urlBuilder->getCurrentUrl())) {
+                return;
+            }
+        }
+
         $jobCollection = $this->jobCollectionFactory->create();
         $size = $jobCollection->getSize();
         $maxJobsPerSingleRun = $this->configHelper->getNumberOfJobToRun();
@@ -235,6 +251,32 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'method' => 'after',
             'message' => $noticeContent,
         ];
+    }
+
+    protected function getPersonalizationNotice()
+    {
+        if (! preg_match('/algoliasearch_personalization/' , $this->urlBuilder->getCurrentUrl())) {
+            return;
+        }
+
+        $warningContent = "Personalization is based on actions a user has performed in the past. We help you collect some of the data automatically.</br>
+        After you've collected a reasonable amount of data, Personlization can be applied.";
+
+        $this->notices[] = [
+            'selector' => '.entry-edit',
+            'method' => 'before',
+            'message' => $this->formatNotice("", $warningContent, "icon-warning"),
+        ];
+
+        $footerContent = '<br/><h2>Personlization preferences</h2>
+        <p>Manage your Personalization further on the <a href="https://www.algolia.com/dashboard" target="_blank`">Algolia Dashboard</a></p>';
+
+        $this->notices[] = [
+            'selector' => '#algoliasearch_personalization_personalization_group_personalization_conversion_events_group',
+            'method' => 'after',
+            'message' => $footerContent,
+        ];
+
     }
 
     protected function formatNotice($title, $content, $icon = 'icon-warning')

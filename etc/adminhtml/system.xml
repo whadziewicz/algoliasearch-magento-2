@@ -753,7 +753,7 @@
             <tab>algolia</tab>
             <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
             <group id="personalization_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Personalization</label>
+                <label>Tracked data</label>
                 <comment>
                     <![CDATA[
                             <p>Please select what events we should track. Don't forget to save your preferences afterwards.</p>

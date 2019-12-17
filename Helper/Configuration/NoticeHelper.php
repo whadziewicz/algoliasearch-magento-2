@@ -259,6 +259,22 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
             return;
         }
 
+        //$result = $this->proxyHelper->getClientConfigurationData();
+        //echo "<pre>"; var_dump($result); die;
+
+        $docContent = "<h2 class=\"algolia-perso-title\">Personalization</h2>
+        <div class=\"algolia_block icon-documentation algoblue\">
+            <div class=\"heading\"></div>
+            Personalization brings another level of relevant search results to your customers.<br/>
+            Find out more in our <a href=\"https://www.algolia.com/doc/guides/getting-insights-and-analytics/personalization/what-is-personalization/\" target=\"_blank`\">Documentation</a>.
+        </div>";
+
+        $this->notices[] = [
+            'selector' => '.entry-edit',
+            'method' => 'before',
+            'message' => $docContent,
+        ];
+
         $warningContent = "Personalization is based on actions a user has performed in the past. We help you collect some of the data automatically.</br>
         After you've collected a reasonable amount of data, Personlization can be applied.";
 
@@ -268,8 +284,8 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'message' => $this->formatNotice("", $warningContent, "icon-warning"),
         ];
 
-        $footerContent = '<br/><h2>Personlization preferences</h2>
-        <p>Manage your Personalization further on the <a href="https://www.algolia.com/dashboard" target="_blank`">Algolia Dashboard</a></p>';
+        $footerContent = '<div class="algolia-perso-footer"><br/><h2>Personlization preferences</h2>
+        <p>Manage your Personalization further on the <a href="https://www.algolia.com/dashboard" target="_blank`">Algolia Dashboard</a></p></div>';
 
         $this->notices[] = [
             'selector' => '#algoliasearch_personalization_personalization_group_personalization_conversion_events_group',

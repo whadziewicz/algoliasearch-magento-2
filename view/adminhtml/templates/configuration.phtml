@@ -16,6 +16,7 @@ if ($section === 'algoliasearch_cc_analytics') {
 $linksAndVideoTemplate = $viewModel->getLinksAndVideoTemplate($section);
 $isEsWarningNeeded = $viewModel->isEsWarningNeeded();
 $extensionNotices = $viewModel->getExtensionNotices();
+$personalizationStatus = $viewModel->getPersonalizationStatus();
 
 ?>
 
@@ -23,6 +24,7 @@ $extensionNotices = $viewModel->getExtensionNotices();
 var isClickAnalyticsEnabled = <?php echo json_encode($isClickAnalyticsEnabled); ?>;
 var linksAndVideoTemplate = <?php echo json_encode($linksAndVideoTemplate); ?>;
 var isEsWarningNeeded = <?php echo json_encode($isEsWarningNeeded); ?>;
+var personalizationStatus = <?php echo json_encode($personalizationStatus); ?>;
 var extensionNotices = <?php echo json_encode($extensionNotices); ?>;
 
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -58,6 +60,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				// Hide click analytics config if not available
 				if (isClickAnalyticsEnabled === false) {
 					$('#algoliasearch_cc_analytics_cc_analytics_group table').hide();
+				}
+
+				// Hide personalization config if not available
+				if (personalizationStatus < 2) {
+					$('#algoliasearch_personalization_personalization_group table').parent().parent().hide();
 				}
 
 				// Adding links and videos to the config panel

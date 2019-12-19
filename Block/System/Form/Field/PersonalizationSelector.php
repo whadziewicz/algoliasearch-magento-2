@@ -8,6 +8,7 @@ class PersonalizationSelector extends \Magento\Config\Block\System\Config\Form\F
      * Retrieve label for the inheritance checkbox
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
+     *
      * @return string
      */
     protected function _getInheritCheckboxLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
@@ -19,6 +20,7 @@ class PersonalizationSelector extends \Magento\Config\Block\System\Config\Form\F
         if ($element->getCanUseWebsiteValue()) {
             $checkboxLabel = __('Use Website');
         }
+
         return $checkboxLabel;
     }
 }

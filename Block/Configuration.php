@@ -44,6 +44,8 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $algoliaHelper = $this->getAlgoliaHelper();
 
+        $persoHelper = $this->getPersonalizationHelper();
+
         $baseUrl = rtrim($this->getBaseUrl(), '/');
 
         $currencyCode = $this->getCurrencyCode();
@@ -207,6 +209,21 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'conversionAnalyticsMode' => $config->getConversionAnalyticsMode(),
                 'addToCartSelector' => $config->getConversionAnalyticsAddToCartSelector(),
                 'orderedProductIds' => $this->getOrderedProductIds($config, $request),
+            ],
+            'personalization' => [
+                'enabled' => $persoHelper->isPersoEnabled(),
+                'viewProduct' => $persoHelper->isViewProductTracked(),
+                'productClicked' => $persoHelper->isProductClickedTracked(),
+                'productClickedSelector' => $persoHelper->getProductClickedSelector(),
+                'filterClicked' => $persoHelper->isFilterClickedTracked(),
+                'filterClickedSelector' => $persoHelper->getFilterClickedSelector(),
+                'wishlistAdd' => $persoHelper->isWishlistAddTracked(),
+                'wishlistAddSelector' => $persoHelper->getWishlistAddSelector(),
+                'productRecommended' => $persoHelper->isProductRecommendedTracked(),
+                'productRecommendedSelector' => $persoHelper->getProductRecommendedSelector(),
+                'cartAdd' => $persoHelper->isCartAddTracked(),
+                'cartAddSelector' => $persoHelper->getCartAddSelector(),
+                'orderPlaced' => $persoHelper->isOrderPlacedTracked(),
             ],
             'analytics' => $config->getAnalyticsConfig(),
             'now' => $this->getTimestamp(),

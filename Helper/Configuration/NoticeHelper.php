@@ -336,13 +336,21 @@ class NoticeHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPersonalizationStatus()
     {
         $info = $this->proxyHelper->getInfo(ProxyHelper::INFO_TYPE_PERSONALIZATION);
-//        echo "<pre>"; var_dump($info); die;
 
-        if ($info && array_key_exists('personalization', $info)) {
-            return $info['personalization'] ? 2 : 0;
+        $status = 2;
+
+        if ($info
+            && array_key_exists('personalization', $info)
+            && array_key_exists('personalization_enabled_at', $info)) {
+            if (!$info['personalization']) {
+                $status = 0;
+            }
+            if ($info['personalization_enabled_at'] === null) {
+                $status = min(1, $status);
+            }
         }
 
-        return 2;
+        return $status;
     }
 
     /** @return bool */

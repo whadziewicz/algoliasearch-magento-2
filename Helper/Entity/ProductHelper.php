@@ -309,6 +309,13 @@ class ProductHelper
             'attributesForFaceting'   => $attributesForFaceting,
             'maxValuesPerFacet'       => (int) $this->configHelper->getMaxValuesPerFacet($storeId),
             'removeWordsIfNoResults'  => $this->configHelper->getRemoveWordsIfNoResult($storeId),
+            'userData'                => [
+                'disableDashboardSettings' => [
+                    'attributesForFaceting',
+                    'searchableAttributes',
+                    'hitsPerPage',
+                ],
+            ],
         ];
 
         // Additional index settings from event observer

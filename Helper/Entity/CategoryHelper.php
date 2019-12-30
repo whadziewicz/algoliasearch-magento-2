@@ -127,6 +127,11 @@ class CategoryHelper
             'searchableAttributes'    => array_values(array_unique($searchableAttributes)),
             'customRanking'           => $customRankingsArr,
             'unretrievableAttributes' => $unretrievableAttributes,
+            'userData'                => [
+                'disableDashboardSettings' => [
+                    'searchableAttributes',
+                ],
+            ],
         ];
 
         // Additional index settings from event observer

@@ -7,13 +7,13 @@ use Algolia\AlgoliaSearch\Exception\ProductDisabledException;
 use Algolia\AlgoliaSearch\Exception\ProductNotVisibleException;
 use Algolia\AlgoliaSearch\Exception\ProductOutOfStockException;
 use Algolia\AlgoliaSearch\Exception\ProductReindexingException;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\Entity\Product\PriceManager;
 use Algolia\AlgoliaSearch\Helper\Image as ImageHelper;
 use Algolia\AlgoliaSearch\Helper\Logger;
-use AlgoliaSearch\AlgoliaException;
-use AlgoliaSearch\Index;
+use Algolia\AlgoliaSearch\SearchIndex;
 use Magento\Bundle\Model\Product\Type as BundleProductType;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
@@ -1069,17 +1069,19 @@ class ProductHelper
 
         if ($rules) {
             $this->logger->log('Setting facets query rules to "' . $indexName . '" index: ' . json_encode($rules));
-            $index->batchRules($rules, true);
+            $index->saveRules($rules, [
+                'forwardToReplicas' => true,
+            ]);
         }
     }
 
-    private function clearFacetsQueryRules(Index $index)
+    private function clearFacetsQueryRules(SearchIndex $index)
     {
         try {
             $hitsPerPage = 100;
             $page = 0;
             do {
-                $fetchedQueryRules = $index->searchRules([
+                $fetchedQueryRules = $index->searchRules('', [
                     'context' => 'magento_filters',
                     'page' => $page,
                     'hitsPerPage' => $hitsPerPage,

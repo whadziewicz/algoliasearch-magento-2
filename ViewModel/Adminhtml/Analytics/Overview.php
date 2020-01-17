@@ -44,8 +44,6 @@ class Overview implements \Magento\Framework\View\Element\Block\ArgumentInterfac
         $this->backendView = $backendView;
         $this->analyticsHelper = $analyticsHelper;
         $this->indexEntityDataProvider = $indexEntityDataProvider;
-
-        $this->getTotalCountOfSearches();
     }
 
     /**

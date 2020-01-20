@@ -1,4 +1,11 @@
+<?php
+/** @var \Algolia\AlgoliaSearch\ViewModel\Adminhtml\Common $viewModel */
+$view = $this->getViewModel();
+$applicationId = $view->getApplicationId();
+?>
+
 <script>
+var applicationId = <?php echo json_encode($applicationId); ?>;
 var algoliaEventsTracking = {
 
     eventsToTrack: [

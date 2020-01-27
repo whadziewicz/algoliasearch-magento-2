@@ -6,7 +6,7 @@ $applicationId = $view->getApplicationId();
 ?>
 
 <script>
-var algoliaAppId = '<?php echo $block->escapeHtmlAttr($applicationId) ?>';
+var algoliaAppId = '<?php echo $block->escapeJs($applicationId) ?>';
 var algoliaEventsTracking = {
 
     eventsToTrack: [

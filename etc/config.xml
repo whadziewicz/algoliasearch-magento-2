@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <algoliasearch_personalization>
+            <personalization_group>
+                <personalization_click_events_group>
+                    <product_clicked_selector>.default-product-selector</product_clicked_selector>
+                    <filter_clicked_selector>.default-filter-selector</filter_clicked_selector>
+                </personalization_click_events_group>
+                <personalization_conversion_events_group>
+                    <conversion_wishist_add_selector>.default-wishlist-selector</conversion_wishist_add_selector>
+                    <conversion_product_recommended_selector>.default-shared-selector</conversion_product_recommended_selector>
+                    <conversion_cart_add_selector>.default-cart-selector</conversion_cart_add_selector>
+                </personalization_conversion_events_group>
+            </personalization_group>
+        </algoliasearch_personalization>
+    </default>
+</config>

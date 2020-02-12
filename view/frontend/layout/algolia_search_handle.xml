@@ -35,6 +35,9 @@
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.stats" template="Algolia_AlgoliaSearch::instant/stats.phtml"/>
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.facet" template="Algolia_AlgoliaSearch::instant/facet.phtml"/>
             <block class="Magento\Framework\View\Element\Template" name="algolia.instant.refinements" template="Algolia_AlgoliaSearch::instant/refinements.phtml"/>
+
+            <!-- Personalisation -->
+            <block class="Magento\Framework\View\Element\Template" name="algolia.insights.personalisation" template="Algolia_AlgoliaSearch::insights/personalisation.phtml"/>
         </referenceBlock>
     </body>
 </page>

@@ -10,7 +10,7 @@
         <algoliasearch_personalization>
             <personalization_group>
                 <personalization_click_events_group>
-                    <product_clicked_selector>.default-product-selector</product_clicked_selector>
+                    <product_clicked_selector>.ais-Hits-item a.result, .ais-InfiniteHits-item a.result</product_clicked_selector>
                     <filter_clicked_selector>.default-filter-selector</filter_clicked_selector>
                 </personalization_click_events_group>
                 <personalization_conversion_events_group>

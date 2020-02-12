@@ -1,0 +1,11 @@
+<script>
+    require([
+        'algoliaPersonalisation'
+    ], function (algoliaPersonalisation) {
+
+        if (algoliaConfig  && algoliaConfig.isPersonalizationEnabled) {
+            algoliaPersonalisation.track(algoliaConfig);
+        }
+
+    });
+</script>

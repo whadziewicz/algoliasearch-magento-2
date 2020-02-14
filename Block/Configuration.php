@@ -213,35 +213,42 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             'isPersonalizationEnabled' => $persoHelper->isPersoEnabled(),
             'personalization' => [
                 'viewProduct' => [
+                    'eventName' => 'Viewed Product',
                     'enabled' => $persoHelper->isViewProductTracked(),
                     'method' => 'viewedObjectIDs',
                 ],
                 'productClicked' => [
+                    'eventName' => 'Product Clicked',
                     'enabled' => $persoHelper->isProductClickedTracked(),
                     'selector' => $persoHelper->getProductClickedSelector(),
                     'method' => 'clickedObjectIDs',
                 ],
                 'filterClicked' => [
+                    'eventName' => 'Filter Clicked',
                     'enabled' => $persoHelper->isFilterClickedTracked(),
                     'selector' => $persoHelper->getFilterClickedSelector(),
                     'method' => 'clickedFilters',
                 ],
                 'wishlistAdd' => [
+                    'eventName' => 'Added to Wishlist',
                     'enabled' => $persoHelper->isWishlistAddTracked(),
                     'selector' => $persoHelper->getWishlistAddSelector(),
                     'method' => 'clickedObjectIDs',
                 ],
                 'productRecommended' => [
+                    'eventName' => 'Product Recommended',
                     'enabled' => $persoHelper->isProductRecommendedTracked(),
                     'selector' => $persoHelper->getProductRecommendedSelector(),
                     'method' => 'clickedObjectIDs',
                 ],
                 'cartAdd' => [
+                    'eventName' => 'Added to Cart',
                     'enabled' => $persoHelper->isCartAddTracked(),
                     'selector' => $persoHelper->getCartAddSelector(),
                     'method' => 'clickedObjectIDs',
                 ],
                 'orderPlaced' => [
+                    'eventName' => 'Order Placed',
                     'enabled' => $persoHelper->isOrderPlacedTracked(),
                     'method' => 'convertedObjectIDs',
                 ],

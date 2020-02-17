@@ -3,6 +3,7 @@ define(['jquery', 'algoliaAnalytics'], function ($, algoliaAnalytics) {
     var algoliaPersonalisation = {
 
         config: null,
+        indexName: null,
         eventMap: {
             clickedObjectIDs: 'click',
         },
@@ -10,6 +11,8 @@ define(['jquery', 'algoliaAnalytics'], function ($, algoliaAnalytics) {
         track: function(algoliaConfig) {
 
             this.config = algoliaConfig;
+            this.indexName = algoliaConfig.indexName + '_products';
+
             this.addSearchParameters();
             this.observeEvents();
         },
@@ -51,12 +54,24 @@ define(['jquery', 'algoliaAnalytics'], function ($, algoliaAnalytics) {
         mapEvent: function(key, event) {
 
             var self = this;
-            if (event.enabled && event.selector) {
-                var eventName = this.eventMap[event.method];
-                $(document).on(eventName, event.selector, function(e) {
+            if (!event.enabled) {
+                return;
+            }
 
-                    var obj = e.handleObj;
-                    var event = self.getEventBySelector(obj.selector);
+            var eventName = this.eventMap[event.method];
+            this.setDataAttrs(key, event);
+
+            if (key == 'viewProduct') {
+                this.trackProductView(event);
+            }
+
+            if (key == 'filterClicked') {
+                this.trackFilters(event);
+            }
+
+            if (event.selector) {
+                $(document).on(eventName, event.selector, function(e) {
+                    var event = self.getEventBySelector(e.handleObj.selector);
 
                     var objectId = $(this).data('objectid');
                     var indexName = $(this).data('indexname');
@@ -64,6 +79,48 @@ define(['jquery', 'algoliaAnalytics'], function ($, algoliaAnalytics) {
                     self.trackClick(event, objectId, indexName);
                 });
             }
+        },
+
+        setDataAttrs: function(key, event) {
+
+            if (key == 'wishlistAdd') {
+                if ($(document).find(event.selector).length) {
+                    $(event.selector).each(function (index, element) {
+                        var params = $(element).data('post');
+                        $(element).attr('data-objectid', params.data.product);
+                    });
+                }
+            } else if (key == 'productRecommended') {
+                if ($(document).find(event.selector).length) {
+                    $(event.selector).each(function (index, element) {
+                        if ($(element).find('[data-role="priceBox"]').length) {
+                            var objectId = $(element).find('[data-role="priceBox"]').data('product-id');
+                            $(element).attr('data-objectid', objectId);
+                        }
+                    });
+                }
+            }
+        },
+
+        trackProductView: function(event) {
+
+            if ($('body').hasClass('catalog-product-view')) {
+                var objectId  = $('#product_addtocart_form').find('input[name="product"]').val();
+                if (objectId) {
+                    var viewData = {
+                        eventName: event.eventName,
+                        objectIDs: [objectId + ''],
+                        index: this.indexName
+                    };
+
+                    algoliaAnalytics.viewedObjectIDs(viewData);
+                }
+            }
+        },
+
+        trackFilters: function(event) {
+
+
 
         },
 
@@ -72,13 +129,13 @@ define(['jquery', 'algoliaAnalytics'], function ($, algoliaAnalytics) {
             var eventName = 'Clicked Object';
 
             var data = {
-                eventName: event.eventName ? event.eventName : eventName,
+                eventName: event.eventName || eventName,
                 objectIDs: [objectId + ''],
-                index: indexName
+                index: indexName || this.indexName
             };
 
             algoliaAnalytics.clickedObjectIDs(data);
-        }
+        },
 
     };
 

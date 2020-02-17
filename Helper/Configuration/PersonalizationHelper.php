@@ -25,6 +25,8 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const CART_ADD_SELECTOR = 'algoliasearch_personalization/personalization_group/personalization_conversion_events_group/conversion_cart_add_selector';
     const ORDER_PLACED = 'algoliasearch_personalization/personalization_group/personalization_conversion_events_group/conversion_order_placed';
 
+    const ALGOLIA_USER_COOKIE = '_ALGOLIA';
+
     /** @var ScopeConfigInterface */
     private $configInterface;
 
@@ -163,4 +165,13 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->configInterface->isSetFlag(self::ORDER_PLACED, ScopeInterface::SCOPE_STORE, $storeId);
     }
+
+    /**
+     * @return string|null
+     */
+    public function getUserToken()
+    {
+        return $this->_request->getCookie(self::ALGOLIA_USER_COOKIE);
+    }
+
 }

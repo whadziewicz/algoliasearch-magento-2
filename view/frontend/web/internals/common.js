@@ -176,15 +176,20 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 			};
 
 			if (hit.__queryID) {
-				var insightsDataUrlString = $.param({
-					queryID: hit.__queryID,
-					objectID: hit.objectID,
-					indexName: hit.__indexName
-				});
-				if (hit.url.indexOf('?') > -1) {
-					hit.urlForInsights = hit.url + insightsDataUrlString
-				} else {
-					hit.urlForInsights = hit.url + '?' + insightsDataUrlString;
+
+				hit.urlForInsights = hit.url;
+
+				if (algoliaConfig.ccAnalytics.enabled) {
+					var insightsDataUrlString = $.param({
+						queryID: hit.__queryID,
+						objectID: hit.objectID,
+						indexName: hit.__indexName
+					});
+					if (hit.url.indexOf('?') > -1) {
+						hit.urlForInsights += insightsDataUrlString
+					} else {
+						hit.urlForInsights += '?' + insightsDataUrlString;
+					}
 				}
 			}
 

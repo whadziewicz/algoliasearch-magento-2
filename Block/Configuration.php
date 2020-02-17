@@ -203,6 +203,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'logo' => $this->getViewFileUrl('Algolia_AlgoliaSearch::images/search-by-algolia.svg'),
             ],
             'ccAnalytics' => [
+                'enabled' => $config->isClickConversionAnalyticsEnabled(),
                 'ISSelector' => $config->getClickConversionAnalyticsISSelector(),
                 'conversionAnalyticsMode' => $config->getConversionAnalyticsMode(),
                 'addToCartSelector' => $config->getConversionAnalyticsAddToCartSelector(),

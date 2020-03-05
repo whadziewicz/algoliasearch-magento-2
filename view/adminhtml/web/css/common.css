@@ -495,7 +495,7 @@ form[action*="algoliasearch"] .accordion .config .value {
 
 /* Personalization Config */
 #algoliasearch_personalization_personalization_group td.label{
-	width: 40%;
+	width: 20%;
 	text-align: left;
 	/*padding: 2.2rem 1.5rem 3.2rem 0;*/
 }
@@ -505,8 +505,9 @@ form[action*="algoliasearch"] .accordion .config .value {
 }
 
 #algoliasearch_personalization_personalization_group td.value {
-	width: 60%;
-	padding: 1.7rem 1.5rem 3.2rem 0;
+	width: 50%;
+	padding: 1.7rem 1.5rem 2rem 0;
+	position: relative;
 }
 
 #algoliasearch_personalization_personalization_group td.value select{
@@ -514,26 +515,20 @@ form[action*="algoliasearch"] .accordion .config .value {
 }
 
 #algoliasearch_personalization_personalization_group td.value input{
-	width: 50%;
-}
-
-#algoliasearch_personalization_personalization_group td.value .note{
-	position: absolute;
-	left: 0;
+	width: 90%;
 }
 
 #algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.label{
-	padding: 0 1.5rem 3.2rem 0;
+	padding: 0 1.5rem 2rem 0;
 }
 
 #algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.value{
-	padding: 0 1.5rem 3.2rem 0;
+	padding: 0 1.5rem 2rem 0;
 }
 
 #algoliasearch_personalization_personalization_group tr[id$="_selector"]  td.use-default{
-	position: absolute;
-	left: 39%;
-	bottom: 0;
+	width: 30%;
+	padding-top: 5px;
 }
 
 #row_algoliasearch_personalization_personalization_group_personalization_view_events_group tr,
@@ -541,6 +536,13 @@ form[action*="algoliasearch"] .accordion .config .value {
 #row_algoliasearch_personalization_personalization_group_personalization_conversion_events_group tr{
 	position: relative;
 }
+
+#row_algoliasearch_personalization_personalization_group_personalization_click_events_group_filter_clicked,
+#row_algoliasearch_personalization_personalization_group_personalization_click_events_group_product_recommended_clicked{
+	border-top: 1px solid #e5e5e5;
+	padding-top: 2rem;
+}
+
 
 
 .algolia-perso-footer {

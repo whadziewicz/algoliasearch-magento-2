@@ -13,7 +13,7 @@ class PersonalizationSelector extends \Magento\Config\Block\System\Config\Form\F
      */
     protected function _getInheritCheckboxLabel(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
-        $checkboxLabel = __('This component is based on native Magento behavior');
+        $checkboxLabel = __('Use default Magento selector');
         if ($element->getCanUseDefaultValue()) {
             $checkboxLabel = __('Use Default');
         }

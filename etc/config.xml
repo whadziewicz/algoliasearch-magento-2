@@ -12,11 +12,9 @@
                 <personalization_click_events_group>
                     <product_clicked_selector>.ais-Hits-item a.result, .ais-InfiniteHits-item a.result</product_clicked_selector>
                     <filter_clicked_selector>.default-filter-selector</filter_clicked_selector>
+                    <product_recommended_clicked_selector>.products-upsell .product-item</product_recommended_clicked_selector>
                 </personalization_click_events_group>
                 <personalization_conversion_events_group>
-                    <conversion_wishist_add_selector>[data-action="add-to-wishlist"]</conversion_wishist_add_selector>
-                    <conversion_product_recommended_selector>.products-upsell .product-item</conversion_product_recommended_selector>
-                    <conversion_cart_add_selector>.default-cart-selector</conversion_cart_add_selector>
                 </personalization_conversion_events_group>
             </personalization_group>
         </algoliasearch_personalization>

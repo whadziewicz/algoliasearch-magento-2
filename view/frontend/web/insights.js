@@ -79,18 +79,17 @@ requirejs([
 
             var self = this;
 
-            if (this.config.ccAnalytics.enabled || this.config.personalization.enabled) {
-
-                // "Click" in autocomplete
-                $(this.config.autocomplete.selector).each(function() {
-                    $(this).on('autocomplete:selected', function (e, suggestion) {
-                        var eventData = self.buildEventData(
-                            'Clicked', suggestion.objectId, suggestion.__indexName, suggestion.__position, suggestion.queryID
-                        );
-
-                        self.trackClick(eventData);
-                    });
+            algoliaBundle.$(function ($) {
+                $(self.config.autocomplete.selector).on('autocomplete:selected', function (e, suggestion) {
+                    var eventData = self.buildEventData(
+                        'Clicked', suggestion.objectID, suggestion.__indexName, suggestion.__position, suggestion.__queryID
+                    );
+                    self.trackClick(eventData);
                 });
+            });
+
+
+            if (this.config.ccAnalytics.enabled || this.config.personalization.enabled) {
 
                 $(document).on('click', this.config.ccAnalytics.ISSelector, function() {
                     var $this = $(this);
@@ -172,6 +171,11 @@ requirejs([
 
             var self = this;
 
+            // viewed event is exclusive to personalization
+            if (!this.config.personalization.enabled) {
+                return;
+            }
+
             if (this.config.personalization.viewedEvents.viewProduct.enabled) {
                 $(document).ready(function () {
                     if ($('body').hasClass('catalog-product-view')) {
@@ -238,7 +242,9 @@ requirejs([
     };
 
     algoliaBundle.$(function ($) {
-        algoliaInsights.track(algoliaConfig);
+        if (window.algoliaConfig) {
+            algoliaInsights.track(algoliaConfig);
+        }
     });
 
 });

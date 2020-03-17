@@ -688,67 +688,8 @@
                 </field>
             </group>
         </section>
-        <section id="algoliasearch_analytics" translate="label" type="text" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Google Analytics</label>
-            <tab>algolia</tab>
-            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
-            <group id="analytics_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Google Analytics</label>
-                <comment>
-                   <![CDATA[
-                        <div class="algolia-admin-content"></div>
-                    ]]>
-                </comment>
-                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable Google Analytics</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="delay" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <validate>validate-digits</validate>
-                    <label>Delay (in milliseconds)</label>
-                    <comment>
-                        <![CDATA[
-                            When the search bar is used, each keystroke triggers a search in Algolia. It’s really good for an instantsearch and as-you-type search experience, but it’s not good for analytics as it brings a lot of noise to the analytics. The delay defines how long the extension should wait before pushing data to GA.
-                            <br>
-                            Default value is 3000.
-                        ]]>
-                    </comment>
-                    <depends>
-                        <field id="enable">1</field>
-                    </depends>
-                </field>
-                <field id="trigger_on_ui_interaction" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Trigger the push function before the delay on UI interaction</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                        If a user selects a search result even before the push was triggered (because of the delay), the push to GA might never be called.
-                        With this parameter you can trigger a data push to GA when the user interacts with a search result during the delay.
-                        ]]>
-                    </comment>
-                    <depends>
-                        <field id="enable">1</field>
-                    </depends>
-                </field>
-                <field id="push_initial_search" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Trigger the push function after the initial search</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                            Sometimes your customers come directly to a search page from a link, so a search is triggered automatically without any action from the user.
-                            At the same time, the load of the page triggers standard GA code to track the page view.
-                            By this parameter you can specify if you want to trigger a data push on this kind of search scenario.
-                        ]]>
-                    </comment>
-                    <depends>
-                        <field id="enable">1</field>
-                    </depends>
-                </field>
-            </group>
-        </section>
 
-
-        <section id="algoliasearch_personalization" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="algoliasearch_personalization" translate="label" type="text" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Personalization</label>
             <tab>algolia</tab>
             <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
@@ -855,9 +796,66 @@
                     </depends>
                 </group>
             </group>
-
         </section>
 
+        <section id="algoliasearch_analytics" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Google Analytics</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="analytics_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Google Analytics</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                    ]]>
+                </comment>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Google Analytics</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="delay" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Delay (in milliseconds)</label>
+                    <comment>
+                        <![CDATA[
+                            When the search bar is used, each keystroke triggers a search in Algolia. It’s really good for an instantsearch and as-you-type search experience, but it’s not good for analytics as it brings a lot of noise to the analytics. The delay defines how long the extension should wait before pushing data to GA.
+                            <br>
+                            Default value is 3000.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="trigger_on_ui_interaction" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trigger the push function before the delay on UI interaction</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                        If a user selects a search result even before the push was triggered (because of the delay), the push to GA might never be called.
+                        With this parameter you can trigger a data push to GA when the user interacts with a search result during the delay.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="push_initial_search" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trigger the push function after the initial search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Sometimes your customers come directly to a search page from a link, so a search is triggered automatically without any action from the user.
+                            At the same time, the load of the page triggers standard GA code to track the page view.
+                            By this parameter you can specify if you want to trigger a data push on this kind of search scenario.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
 
         <section id="algoliasearch_advanced" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Advanced</label>

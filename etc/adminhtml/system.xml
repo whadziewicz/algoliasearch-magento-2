@@ -795,7 +795,6 @@
                     <field id="product_clicked" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Product clicked</label>
                         <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
-                        <comment><![CDATA[ ]]></comment>
                     </field>
                     <field id="product_clicked_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
@@ -805,31 +804,24 @@
                         </depends>
                     </field>
 
-                    <field id="filter_clicked" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Facet clicked</label>
-                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
-                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
-                    </field>
-                    <field id="filter_clicked_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
-                        <label>DOM selector</label>
-                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
-                        <depends>
-                            <field id="filter_clicked">1</field>
-                        </depends>
-                    </field>
-
-                    <field id="product_recommended_clicked" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="product_recommended_clicked" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Product recommendation clicked</label>
                         <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
-                        <comment><![CDATA[This is the event description to explain what it will be tracking exactly.]]></comment>
                     </field>
-                    <field id="product_recommended_clicked_selector" translate="label comment" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <field id="product_recommended_clicked_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>DOM selector</label>
                         <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
                         <depends>
                             <field id="product_recommended_clicked">1</field>
                         </depends>
                     </field>
+
+                    <field id="filter_clicked" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Facet clicked</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This event will track when a filter has been selected from instantsearch.]]></comment>
+                    </field>
+
                     <depends>
                         <field id="enable">1</field>
                     </depends>

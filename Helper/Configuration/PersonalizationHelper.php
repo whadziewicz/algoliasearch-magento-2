@@ -15,7 +15,6 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     const PRODUCT_CLICKED = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/product_clicked';
     const PRODUCT_CLICKED_SELECTOR = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/product_clicked_selector';
     const FILTER_CLICKED = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/filter_clicked';
-    const FILTER_CLICKED_SELECTOR = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/filter_clicked_selector';
     const PRODUCT_RECOMMENDED = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/product_recommended_clicked';
     const PRODUCT_RECOMMENDED_SELECTOR = 'algoliasearch_personalization/personalization_group/personalization_click_events_group/product_recommended_clicked_selector';
 
@@ -85,16 +84,6 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function isFilterClickedTracked($storeId = null)
     {
         return $this->configInterface->isSetFlag(self::FILTER_CLICKED, ScopeInterface::SCOPE_STORE, $storeId);
-    }
-
-    /**
-     * @param int|null $storeId
-     *
-     * @return string
-     */
-    public function getFilterClickedSelector($storeId = null)
-    {
-        return $this->configInterface->getValue(self::FILTER_CLICKED_SELECTOR, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**

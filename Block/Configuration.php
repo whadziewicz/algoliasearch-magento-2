@@ -238,7 +238,6 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'filterClicked' => [
                     'eventName' => 'Filter Clicked',
                     'enabled' => $persoHelper->isFilterClickedTracked(),
-                    'selector' => $persoHelper->getFilterClickedSelector(),
                     'method' => 'clickedFilters',
                 ],
             ],

@@ -50,7 +50,6 @@ class CheckoutCartProductAddAfter implements ObserverInterface
         if ($this->getConfigHelper()->isClickConversionAnalyticsEnabled($quoteItem->getStoreId())
             && $this->getConfigHelper()->getConversionAnalyticsMode($quoteItem->getStoreId()) === 'place_order'
             && $product->hasData('queryId')) {
-
             $quoteItem->setData('algoliasearch_query_param', $product->getData('queryId'));
         }
 

@@ -2,8 +2,8 @@
 
 namespace Algolia\AlgoliaSearch\Model\Observer\Insights;
 
-use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\Configuration\PersonalizationHelper;
+use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\InsightsHelper;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -21,6 +21,7 @@ class WishlistProductAddAfter implements ObserverInterface
 
     /**
      * CheckoutCartProductAddAfter constructor.
+     *
      * @param Data $dataHelper
      * @param PersonalizationHelper $personalisationHelper
      * @param InsightsHelper $insightsHelper

@@ -41,11 +41,11 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
 
     /**
      * @param Observer $observer
+     *
      * @return $this|void
      */
     public function execute(Observer $observer)
     {
-
         $this->logger->info('event fired');
 
         /** @var \Magento\Sales\Model\Order $order */
@@ -80,9 +80,7 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
                 }
             }
 
-
             $this->logger->info('userclient fired');
-
         } else {
             $productIds = [];
             /** @var \Magento\Sales\Model\Order\Item $item */
@@ -95,7 +93,6 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
                 $this->dataHelper->getIndexName('_products', $order->getStoreId()),
                 $productIds
             );
-
         }
 
         return $this;

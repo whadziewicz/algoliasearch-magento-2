@@ -163,5 +163,4 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_request->getCookie(self::ALGOLIA_USER_COOKIE);
     }
-
 }

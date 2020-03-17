@@ -219,7 +219,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                         'eventName' => 'Viewed Product',
                         'enabled' => $persoHelper->isViewProductTracked(),
                         'method' => 'viewedObjectIDs',
-                    ]
+                    ],
                 ],
                 'clickedEvents' => [
                     'productClicked' => [
@@ -233,7 +233,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                         'enabled' => $persoHelper->isProductRecommendedTracked(),
                         'selector' => $persoHelper->getProductRecommendedSelector(),
                         'method' => 'clickedObjectIDs',
-                    ]
+                    ],
                 ],
                 'filterClicked' => [
                     'eventName' => 'Filter Clicked',

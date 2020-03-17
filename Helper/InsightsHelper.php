@@ -2,11 +2,11 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use Algolia\AlgoliaSearch\InsightsClient;
 use Algolia\AlgoliaSearch\Insights\UserInsightsClient;
+use Algolia\AlgoliaSearch\InsightsClient;
 use Magento\Customer\Model\Session as CustomerSession;
-use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 
 class InsightsHelper
 {
@@ -37,6 +37,7 @@ class InsightsHelper
 
     /**
      * InsightsHelper constructor.
+     *
      * @param ConfigHelper $configHelper
      * @param Configuration\PersonalizationHelper $personalizationHelper
      * @param CookieManagerInterface $cookieManager
@@ -96,6 +97,7 @@ class InsightsHelper
 
     /**
      * @param null $storeId
+     *
      * @return bool
      */
     public function isOrderPlacedTracked($storeId = null)
@@ -108,6 +110,7 @@ class InsightsHelper
 
     /**
      * @param null $storeId
+     *
      * @return bool
      */
     public function isAddedToCartTracked($storeId = null)
@@ -139,6 +142,7 @@ class InsightsHelper
 
     /**
      * @param \Magento\Customer\Model\Customer $customer
+     *
      * @return string
      */
     public function setUserToken(\Magento\Customer\Model\Customer $customer)

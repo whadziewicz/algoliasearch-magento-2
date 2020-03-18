@@ -83,7 +83,7 @@ jobs:
                       sudo chown circleci:circleci ~/.composer/
                       composer global config prefer-stable true
                       composer global config minimum-stability dev
-                      composer global require algolia/magento2-tools --ignore-platform-reqs
+                      composer global require algolia/magento2-tools
 
                       # We have to do this again because we restore the cache above, overwriting the vendor with the original.
                       cd ~/magento_directory/vendor/algolia

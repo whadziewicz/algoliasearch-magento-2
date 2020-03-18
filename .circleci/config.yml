@@ -79,7 +79,7 @@ jobs:
                   command: |
                       sudo composer self-update
                       composer config http-basic.'repo.magento.com' ${MAGENTO_AUTH_USERNAME} ${MAGENTO_AUTH_PASSWORD}
-                      composer install -n --prefer-dist --ignore-platform-reqs --no-progress
+                      composer install -n --prefer-dist --no-progress
                       sudo chown circleci:circleci ~/.composer/
                       composer global config prefer-stable true
                       composer global config minimum-stability dev

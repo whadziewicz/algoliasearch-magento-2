@@ -158,7 +158,8 @@ class InsightsHelper
                 ->setSecure(false);
             $this->cookieManager->setPublicCookie(self::ALGOLIA_CUSTOMER_USER_TOKEN_COOKIE_NAME, $userToken, $metaData);
         } catch (\Exception $e) {
-            $this->logger->info($e->getMessage());
+            // return anonymous
+            $userToken = $this->cookieManager->getCookie(self::ALGOLIA_ANON_USER_TOKEN_COOKIE_NAME);
         }
 
         return $userToken;

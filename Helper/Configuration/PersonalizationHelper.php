@@ -31,9 +31,11 @@ class PersonalizationHelper extends \Magento\Framework\App\Helper\AbstractHelper
     private $configInterface;
 
     public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
         ScopeConfigInterface $configInterface
     ) {
         $this->configInterface = $configInterface;
+        parent::__construct($context);
     }
 
     /**

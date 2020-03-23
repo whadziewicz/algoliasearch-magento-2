@@ -42,7 +42,7 @@ class CheckoutCartProductAddBefore implements ObserverInterface
             return;
         }
 
-        if (isset($requestInfo['queryID'])) {
+        if (isset($requestInfo['queryID']) && $requestInfo['queryID'] == '') {
             $product->setData('queryId', $requestInfo['queryID']);
         }
     }

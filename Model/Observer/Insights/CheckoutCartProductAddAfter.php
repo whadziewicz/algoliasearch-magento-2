@@ -15,17 +15,12 @@ class CheckoutCartProductAddAfter implements ObserverInterface
     /** @var InsightsHelper */
     private $insightsHelper;
 
-    /** @var \Psr\Log\LoggerInterface */
-    private $logger;
-
     public function __construct(
         Data $dataHelper,
-        InsightsHelper $insightsHelper,
-        \Psr\Log\LoggerInterface $logger
+        InsightsHelper $insightsHelper
     ) {
         $this->dataHelper = $dataHelper;
         $this->insightsHelper = $insightsHelper;
-        $this->logger = $logger;
     }
 
     /**
@@ -46,25 +41,26 @@ class CheckoutCartProductAddAfter implements ObserverInterface
         $quoteItem = $observer->getEvent()->getQuoteItem();
         /** @var \Magento\Catalog\Model\Product $product */
         $product = $observer->getEvent()->getProduct();
+        $storeId = $quoteItem->getStoreId();
 
-        if ($this->getConfigHelper()->isClickConversionAnalyticsEnabled($quoteItem->getStoreId())
-            && $this->getConfigHelper()->getConversionAnalyticsMode($quoteItem->getStoreId()) === 'place_order'
+        if ($this->getConfigHelper()->isClickConversionAnalyticsEnabled($storeId)
+            && $this->getConfigHelper()->getConversionAnalyticsMode($storeId) === 'place_order'
             && $product->hasData('queryId')) {
             $quoteItem->setData('algoliasearch_query_param', $product->getData('queryId'));
         }
 
-        if (!$this->insightsHelper->isAddedToCartTracked($quoteItem->getStoreId())) {
+        if (!$this->insightsHelper->isAddedToCartTracked($storeId)) {
             return;
         }
 
         $userClient = $this->insightsHelper->getUserInsightsClient();
 
-        if ($this->getConfigHelper()->isClickConversionAnalyticsEnabled($quoteItem->getStoreId())
-            && $this->getConfigHelper()->getConversionAnalyticsMode($quoteItem->getStoreId()) === 'add_to_cart') {
+        if ($this->getConfigHelper()->isClickConversionAnalyticsEnabled($storeId)
+            && $this->getConfigHelper()->getConversionAnalyticsMode($storeId) === 'add_to_cart') {
             if ($product->hasData('queryId')) {
                 $userClient->convertedObjectIDsAfterSearch(
                     __('Added to Cart'),
-                    $this->dataHelper->getIndexName('_products', $quoteItem->getStoreId()),
+                    $this->dataHelper->getIndexName('_products', $storeId),
                     [$product->getId()],
                     $product->getData('queryId')
                 );
@@ -72,7 +68,7 @@ class CheckoutCartProductAddAfter implements ObserverInterface
         } else {
             $userClient->convertedObjectIDs(
                 __('Added to Cart'),
-                $this->dataHelper->getIndexName('_products', $quoteItem->getStoreId()),
+                $this->dataHelper->getIndexName('_products', $storeId),
                 [$product->getId()]
             );
         }

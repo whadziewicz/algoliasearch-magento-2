@@ -2,6 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
+use Algolia\AlgoliaSearch\Helper\Configuration\PersonalizationHelper;
 use Algolia\AlgoliaSearch\Insights\UserInsightsClient;
 use Algolia\AlgoliaSearch\InsightsClient;
 use Magento\Customer\Model\Session as CustomerSession;
@@ -17,7 +18,7 @@ class InsightsHelper
     /** @var ConfigHelper */
     private $configHelper;
 
-    /** @var Configuration\PersonalizationHelper */
+    /** @var PersonalizationHelper */
     private $personalizationHelper;
 
     /** @var CookieManagerInterface */
@@ -39,14 +40,14 @@ class InsightsHelper
      * InsightsHelper constructor.
      *
      * @param ConfigHelper $configHelper
-     * @param Configuration\PersonalizationHelper $personalizationHelper
+     * @param PersonalizationHelper $personalizationHelper
      * @param CookieManagerInterface $cookieManager
      * @param CookieMetadataFactory $cookieMetadataFactory
      * @param CustomerSession $customerSession
      */
     public function __construct(
         ConfigHelper $configHelper,
-        Configuration\PersonalizationHelper $personalizationHelper,
+        PersonalizationHelper $personalizationHelper,
         CookieManagerInterface $cookieManager,
         CookieMetadataFactory $cookieMetadataFactory,
         CustomerSession $customerSession

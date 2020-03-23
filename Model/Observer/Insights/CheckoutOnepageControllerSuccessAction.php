@@ -15,20 +15,16 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
     /** @var InsightsHelper */
     private $insightsHelper;
 
-    /** @var \Psr\Log\LoggerInterface */
-    private $logger;
     /**
      * @param Data $dataHelper
      * @param InsightsHelper $insightsHelper
      */
     public function __construct(
         Data $dataHelper,
-        InsightsHelper $insightsHelper,
-        \Psr\Log\LoggerInterface $logger
+        InsightsHelper $insightsHelper
     ) {
         $this->dataHelper = $dataHelper;
         $this->insightsHelper = $insightsHelper;
-        $this->logger = $logger;
     }
 
     /**
@@ -46,16 +42,12 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $this->logger->info('event fired');
-
         /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getEvent()->getOrder();
 
         if (!$this->insightsHelper->isOrderPlacedTracked($order->getStoreId())) {
             return $this;
         }
-
-        $this->logger->info('order placed tracking');
 
         $userClient = $this->insightsHelper->getUserInsightsClient();
         $orderItems = $order->getAllVisibleItems();
@@ -79,8 +71,6 @@ class CheckoutOnepageControllerSuccessAction implements ObserverInterface
                     }
                 }
             }
-
-            $this->logger->info('userclient fired');
         } else {
             $productIds = [];
             /** @var \Magento\Sales\Model\Order\Item $item */

@@ -216,27 +216,27 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'enabled' => $persoHelper->isPersoEnabled(),
                 'viewedEvents' => [
                     'viewProduct' => [
-                        'eventName' => 'Viewed Product',
+                        'eventName' => __('Viewed Product'),
                         'enabled' => $persoHelper->isViewProductTracked(),
                         'method' => 'viewedObjectIDs',
                     ],
                 ],
                 'clickedEvents' => [
                     'productClicked' => [
-                        'eventName' => 'Product Clicked',
+                        'eventName' => __('Product Clicked'),
                         'enabled' => $persoHelper->isProductClickedTracked(),
                         'selector' => $persoHelper->getProductClickedSelector(),
                         'method' => 'clickedObjectIDs',
                     ],
                     'productRecommended' => [
-                        'eventName' => 'Recommended Product Clicked',
+                        'eventName' => __('Recommended Product Clicked'),
                         'enabled' => $persoHelper->isProductRecommendedTracked(),
                         'selector' => $persoHelper->getProductRecommendedSelector(),
                         'method' => 'clickedObjectIDs',
                     ],
                 ],
                 'filterClicked' => [
-                    'eventName' => 'Filter Clicked',
+                    'eventName' => __('Filter Clicked'),
                     'enabled' => $persoHelper->isFilterClickedTracked(),
                     'method' => 'clickedFilters',
                 ],

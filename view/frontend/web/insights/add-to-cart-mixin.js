@@ -20,19 +20,19 @@ define(['jquery'], function ($) {
                 var queryID = form.find('button[type="submit"]').data('queryid');
             }
 
-            var queryID = queryID || this._getQueryParamFromCurrentUrl('queryID');
-            if (queryID.length == 0) {
+            var queryID = queryID || this._parseUrl('queryID');
+            if (queryID.length === 0) {
                 return;
             }
 
-            if (form.find('input[name="queryid"]').length == 0) {
+            if (form.find('input[name="queryid"]').length === 0) {
                 form.prepend('<input type="hidden" name="queryID" />');
             }
 
             form.find('input[name="queryID"]').val(queryID);
         },
 
-        _getQueryParamFromCurrentUrl: function(queryParamName) {
+        _parseUrl: function(queryParamName) {
             var url = window.location.href;
             var regex = new RegExp('[?&]' + queryParamName + '(=([^&#]*)|&|#|$)');
             var results = regex.exec(url);

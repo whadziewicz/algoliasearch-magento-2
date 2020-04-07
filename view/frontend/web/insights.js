@@ -7,8 +7,13 @@ requirejs([
     var algoliaInsights = {
         config: null,
         defaultIndexName: null,
+        isTracking: false,
 
         track: function(algoliaConfig) {
+
+            if (this.isTracking) {
+                return;
+            }
 
             this.config = algoliaConfig;
             this.defaultIndexName = algoliaConfig.indexName + '_products';
@@ -20,6 +25,8 @@ requirejs([
                 this.addSearchParameters();
                 this.bindData();
                 this.bindEvents();
+
+                this.isTracking = true;
             }
         },
 
@@ -69,10 +76,13 @@ requirejs([
             }
         },
 
-        bindEvents: function () {
+        bindEvents: function() {
 
             this.bindClickedEvents();
             this.bindViewedEvents();
+
+            algolia.triggerHooks('afterInsightsBindEvents', this);
+
         },
 
         bindClickedEvents: function() {
@@ -251,5 +261,7 @@ requirejs([
             algoliaInsights.track(algoliaConfig);
         }
     });
+
+    return algoliaInsights;
 
 });

@@ -6,7 +6,8 @@ var algolia = {
 		'beforeInstantsearchInit',
 		'beforeWidgetInitialization',
 		'beforeInstantsearchStart',
-		'afterInstantsearchStart'
+		'afterInstantsearchStart',
+		'afterInsightsBindEvents'
 	],
 	registeredHooks: [],
 	registerHook: function (hookName, callback) {

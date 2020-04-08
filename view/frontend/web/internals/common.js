@@ -6,7 +6,8 @@ var algolia = {
 		'beforeInstantsearchInit',
 		'beforeWidgetInitialization',
 		'beforeInstantsearchStart',
-		'afterInstantsearchStart'
+		'afterInstantsearchStart',
+		'afterInsightsBindEvents'
 	],
 	registeredHooks: [],
 	registerHook: function (hookName, callback) {
@@ -484,6 +485,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 		window.createISWidgetContainer = function (attributeName) {
 			var div = document.createElement('div');
 			div.className = 'is-widget-container-' + attributeName.split('.').join('_');
+			div.dataset.attr = attributeName;
 
 			return div;
 		};

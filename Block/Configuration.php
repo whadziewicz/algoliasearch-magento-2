@@ -44,6 +44,8 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $algoliaHelper = $this->getAlgoliaHelper();
 
+        $persoHelper = $this->getPersonalizationHelper();
+
         $baseUrl = rtrim($this->getBaseUrl(), '/');
 
         $currencyCode = $this->getCurrencyCode();
@@ -208,6 +210,36 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'conversionAnalyticsMode' => $config->getConversionAnalyticsMode(),
                 'addToCartSelector' => $config->getConversionAnalyticsAddToCartSelector(),
                 'orderedProductIds' => $this->getOrderedProductIds($config, $request),
+            ],
+            'isPersonalizationEnabled' => $persoHelper->isPersoEnabled(),
+            'personalization' => [
+                'enabled' => $persoHelper->isPersoEnabled(),
+                'viewedEvents' => [
+                    'viewProduct' => [
+                        'eventName' => __('Viewed Product'),
+                        'enabled' => $persoHelper->isViewProductTracked(),
+                        'method' => 'viewedObjectIDs',
+                    ],
+                ],
+                'clickedEvents' => [
+                    'productClicked' => [
+                        'eventName' => __('Product Clicked'),
+                        'enabled' => $persoHelper->isProductClickedTracked(),
+                        'selector' => $persoHelper->getProductClickedSelector(),
+                        'method' => 'clickedObjectIDs',
+                    ],
+                    'productRecommended' => [
+                        'eventName' => __('Recommended Product Clicked'),
+                        'enabled' => $persoHelper->isProductRecommendedTracked(),
+                        'selector' => $persoHelper->getProductRecommendedSelector(),
+                        'method' => 'clickedObjectIDs',
+                    ],
+                ],
+                'filterClicked' => [
+                    'eventName' => __('Filter Clicked'),
+                    'enabled' => $persoHelper->isFilterClickedTracked(),
+                    'method' => 'clickedFilters',
+                ],
             ],
             'analytics' => $config->getAnalyticsConfig(),
             'now' => $this->getTimestamp(),

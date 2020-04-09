@@ -180,7 +180,8 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 
 				hit.urlForInsights = hit.url;
 
-				if (algoliaConfig.ccAnalytics.enabled) {
+				if (algoliaConfig.ccAnalytics.enabled
+					&& algoliaConfig.ccAnalytics.conversionAnalyticsMode !== 'disabled') {
 					var insightsDataUrlString = $.param({
 						queryID: hit.__queryID,
 						objectID: hit.objectID,

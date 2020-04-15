@@ -1,5 +1,14 @@
 # CHANGE LOG
 
+## 1.13.1
+
+### UPDATES
+- Add warning after image cache is flushed (#983)
+
+### FIXES
+- Fix bundle product selections for subproducts (#982)
+- Fixes visibility in B2B / Catalog Permissions raw SQL (#977)
+
 ## 1.13.0
 
 ## FEATURES

@@ -95,6 +95,7 @@ class ConfigHelper
         'algoliasearch_advanced/advanced/backend_rendering_allowed_user_agents';
     const NON_CASTABLE_ATTRIBUTES = 'algoliasearch_advanced/advanced/non_castable_attributes';
     const MAX_RECORD_SIZE_LIMIT = 'algoliasearch_advanced/advanced/max_record_size_limit';
+    const ARCHIVE_LOG_CLEAR_LIMIT = 'algoliasearch_advanced/advanced/archive_clear_limit';
 
     const SHOW_OUT_OF_STOCK = 'cataloginventory/options/show_out_of_stock';
 
@@ -601,6 +602,13 @@ class ConfigHelper
         return $this->configInterface->getValue(self::SEARCH_ONLY_API_KEY, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
+    public function credentialsAreConfigured($storeId = null)
+    {
+        return $this->getApplicationID($storeId) &&
+            $this->getAPIKey($storeId) &&
+            $this->getSearchOnlyAPIKey($storeId);
+    }
+
     public function getIndexPrefix($storeId = null)
     {
         return $this->configInterface->getValue(self::INDEX_PREFIX, ScopeInterface::SCOPE_STORE, $storeId);
@@ -619,6 +627,8 @@ class ConfigHelper
             ScopeInterface::SCOPE_STORE,
             $storeId
         ));
+
+        $customRankings = $customRankings ?: [];
         $customRankings = array_filter($customRankings, function ($customRanking) {
             return $customRanking['attribute'] !== 'custom_attribute';
         });
@@ -658,6 +668,8 @@ class ConfigHelper
             ScopeInterface::SCOPE_STORE,
             $storeId
         ));
+
+        $customRankings = $customRankings ?: [];
         $customRankings = array_filter($customRankings, function ($customRanking) {
             return $customRanking['attribute'] !== 'custom_attribute';
         });
@@ -678,14 +690,16 @@ class ConfigHelper
             $storeId
         ));
 
-        foreach ($attrs as &$attr) {
-            if ($attr['type'] === 'other') {
-                $attr['type'] = $attr['other_type'];
+        if ($attrs) {
+            foreach ($attrs as &$attr) {
+                if ($attr['type'] === 'other') {
+                    $attr['type'] = $attr['other_type'];
+                }
             }
-        }
 
-        if (is_array($attrs)) {
-            return array_values($attrs);
+            if (is_array($attrs)) {
+                return array_values($attrs);
+            }
         }
 
         return [];
@@ -1110,6 +1124,15 @@ class ConfigHelper
         }
 
         return $this->maxRecordSize;
+    }
+
+    public function getArchiveLogClearLimit($storeId = null)
+    {
+        return (int) $this->configInterface->getValue(
+            self::ARCHIVE_LOG_CLEAR_LIMIT,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
 
     public function getCatalogSearchEngine($storeId = null)

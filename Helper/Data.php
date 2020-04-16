@@ -119,7 +119,7 @@ class Data
             'attributesToRetrieve'   => 'objectID',
             'attributesToHighlight'  => '',
             'attributesToSnippet'    => '',
-            'numericFilters'         => 'visibility_search=1',
+            'numericFilters'         => ['visibility_search=1'],
             'removeWordsIfNoResults' => $this->configHelper->getRemoveWordsIfNoResult($storeId),
             'analyticsTags'          => 'backend-search',
             'facets'                 => $facetsToRetrieve,
@@ -145,7 +145,9 @@ class Data
             }
         }
 
-        return [$data, $answer['nbHits'], $answer['facets']];
+        $facetsFromAnswer = isset($answer['facets']) ? $answer['facets'] : [];
+
+        return [$data, $answer['nbHits'], $facetsFromAnswer];
     }
 
     public function rebuildStoreAdditionalSectionsIndex($storeId)
@@ -766,7 +768,11 @@ class Data
 
         $objectIds = [];
         $counter = 0;
-        foreach ($index->browse('', ['attributesToRetrieve' => ['objectID']]) as $hit) {
+        $browseOptions = [
+            'query' => '',
+            'attributesToRetrieve' => ['objectID'],
+        ];
+        foreach ($index->browseObjects($browseOptions) as $hit) {
             $objectIds[] = $hit['objectID'];
             $counter++;
 

@@ -502,6 +502,7 @@ class CategoryHelper
     public function getCoreCategories($filterNotIncludedCategories = true)
     {
         $key = $filterNotIncludedCategories ? 'filtered' : 'non_filtered';
+
         if (isset($this->coreCategories[$key])) {
             return $this->coreCategories[$key];
         }
@@ -516,6 +517,7 @@ class CategoryHelper
         if ($filterNotIncludedCategories) {
             $collection->addAttributeToFilter('include_in_menu', '1');
         }
+
         $this->coreCategories[$key] = [];
 
         /** @var \Magento\Catalog\Model\Category $category */

@@ -739,25 +739,29 @@ class Data
             return [];
         }
 
-        $ordersTableName = $this->resource->getTableName('sales_order_item');
+        $salesData = [];
 
         $ids = $collection->getColumnValues('entity_id');
-        $ids[] = '0'; // Makes sure the imploded string is not empty
 
-        $ids = implode(', ', $ids);
+        if (count($ids)) {
+            $ordersTableName = $this->resource->getTableName('sales_order_item');
 
-        try {
-            $salesConnection = $this->resource->getConnectionByName('sales');
-        } catch (\DomainException $e) {
-            $salesConnection = $this->resource->getConnection();
+            $ids = implode(', ', $ids);
+
+            try {
+                $salesConnection = $this->resource->getConnectionByName('sales');
+            } catch (\DomainException $e) {
+                $salesConnection = $this->resource->getConnection();
+            }
+
+            $query = 'SELECT product_id, SUM(qty_ordered) AS ordered_qty, SUM(row_total) AS total_ordered 
+                FROM ' . $ordersTableName . ' 
+                WHERE product_id IN (' . $ids . ') 
+                GROUP BY product_id';
+
+            $salesData = $salesConnection->query($query)->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE|\PDO::FETCH_ASSOC);
         }
-
-        $query = 'SELECT product_id, SUM(qty_ordered) AS ordered_qty, SUM(row_total) AS total_ordered 
-            FROM ' . $ordersTableName . ' 
-            WHERE product_id IN (' . $ids . ') 
-            GROUP BY product_id';
-        $salesData = $salesConnection->query($query)->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE|\PDO::FETCH_ASSOC);
-
+        
         return $salesData;
     }
 
